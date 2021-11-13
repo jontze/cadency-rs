@@ -1,0 +1,1 @@
+export DISCORD_TOKEN=
