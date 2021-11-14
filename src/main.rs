@@ -1,28 +1,23 @@
-use serenity::async_trait;
-use serenity::client::{Client, Context, EventHandler};
-use serenity::model::channel::Message;
+#[macro_use]
+extern crate log;
+extern crate env_logger;
+extern crate serenity;
+extern crate tokio;
 
-struct Handler;
+mod client;
+mod commands;
+mod handler;
 
-#[async_trait]
-impl EventHandler for Handler {
-    async fn message(&self, _ctx: Context, _new_message: Message) {
-        println!("{:?}", _new_message);
-    }
-}
+use client::create_client;
 
 #[tokio::main]
 async fn main() {
-    let token = std::env::var("DISCORD_TOKEN").expect("Expect token in environment");
+    env_logger::init();
+    let token = std::env::var("DISCORD_TOKEN").expect("Token in environment");
 
-    let mut client = Client::builder(token)
-        .event_handler(Handler)
-        .await
-        .expect("Should on creating client");
+    let mut client = create_client(token).await.expect("Client to be created");
 
-    let start = client.start().await;
-    match start {
-        Ok(()) => println!("Start Cadency-rs client..."),
-        Err(start_error) => println!("Client start error: {:?}", start_error),
+    if let Err(why) = client.start().await {
+        error!("Client error: {:?}", why);
     }
 }
