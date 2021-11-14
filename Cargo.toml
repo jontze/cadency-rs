@@ -12,7 +12,7 @@ log = "0.4.14"
 [dependencies.serenity]
 version = "0.10.9"
 default-features = false
-features = ["client", "gateway", "rustls_backend", "model"]
+features = ["client", "gateway", "rustls_backend", "model", "unstable_discord_api"]
 
 [dependencies.tokio]
 version = "1.13.0"
