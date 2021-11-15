@@ -30,4 +30,24 @@ impl EventHandler for Handler {
     async fn resume(&self, _ctx: Context, _: ResumedEvent) {
         debug!("🔌 Reconnect to server");
     }
+
+    async fn interaction_create(&self, ctx: Context, interaction: Interaction) {
+        // TODO: Improve structure for better scale with multiple commands
+        if let Interaction::ApplicationCommand(command) = interaction {
+            let content = match command.data.name.as_str() {
+                "ping" => "Pong!".to_string(),
+                _ => "Not implemented :(".to_string(),
+            };
+            if let Err(response_err) = command
+                .create_interaction_response(ctx.http, |response| {
+                    response
+                        .kind(InteractionResponseType::ChannelMessageWithSource)
+                        .interaction_response_data(|message| message.content(content))
+                })
+                .await
+            {
+                error!("❌ Interaction response failed: {:?}", response_err);
+            }
+        };
+    }
 }
