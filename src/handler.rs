@@ -1,6 +1,15 @@
-use serenity::async_trait;
-use serenity::client::{Context, EventHandler};
-use serenity::model::{channel::Message, event::ResumedEvent, gateway::Ready};
+use serenity::{
+    async_trait,
+    client::{Context, EventHandler},
+    model::{
+        channel::Message,
+        event::ResumedEvent,
+        gateway::Ready,
+        interactions::{Interaction, InteractionResponseType},
+    },
+};
+
+use super::commands::setup_commands;
 
 pub struct Handler;
 

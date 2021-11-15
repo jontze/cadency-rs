@@ -1,6 +1,5 @@
 use super::handler::Handler;
-use serenity::client::Client;
-use serenity::http::Http;
+use serenity::{client::Client, http::Http};
 
 /// Extract the user id of the current used bot from the discord api
 ///
