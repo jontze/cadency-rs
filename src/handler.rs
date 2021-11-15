@@ -10,8 +10,12 @@ impl EventHandler for Handler {
         debug!("{:?}", _new_message);
     }
 
-    async fn ready(&self, _ctx: Context, _data_about_bot: Ready) {
+    async fn ready(&self, ctx: Context, _data_about_bot: Ready) {
         info!("🚀 Start Cadency Discord Bot");
+        match setup_commands(&ctx).await {
+            Ok(_) => info!("✅ Application commands submitted"),
+            Err(err) => error!("❌ Failed to submit application commands: {:?}", err),
+        };
     }
 
     async fn resume(&self, _ctx: Context, _: ResumedEvent) {
