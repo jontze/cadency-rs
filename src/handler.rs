@@ -9,6 +9,7 @@ use serenity::{
     },
 };
 
+use super::client::set_bot_presence;
 use super::commands::setup_commands;
 
 pub struct Handler;
@@ -25,6 +26,7 @@ impl EventHandler for Handler {
             Ok(_) => info!("✅ Application commands submitted"),
             Err(err) => error!("❌ Failed to submit application commands: {:?}", err),
         };
+        set_bot_presence(&ctx).await;
     }
 
     async fn resume(&self, _ctx: Context, _: ResumedEvent) {
