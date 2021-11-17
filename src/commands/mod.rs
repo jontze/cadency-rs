@@ -5,7 +5,7 @@ use serenity::{
     },
 };
 
-mod ping;
+pub mod ping;
 
 /// Submit global slash commands to the discord api.
 /// As global commands are cached for 1 hour, the activation ca take some time.
