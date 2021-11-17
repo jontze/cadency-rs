@@ -1,5 +1,9 @@
 use super::handler::Handler;
-use serenity::{client::Client, http::Http};
+use serenity::{
+    client::{Client, Context},
+    http::Http,
+    model::{gateway::Activity, user::OnlineStatus},
+};
 
 /// Extract the user id of the current used bot from the discord api
 ///
@@ -21,4 +25,11 @@ pub async fn create_client(token: String) -> Result<Client, serenity::Error> {
         .event_handler(Handler)
         .application_id(bot_id.0)
         .await
+}
+
+/// Set the online status and activity of the bot.
+/// Should not be set before the `ready` event.
+pub async fn set_bot_presence(ctx: &Context) {
+    ctx.set_presence(Some(Activity::listening("music")), OnlineStatus::Online)
+        .await;
 }
