@@ -1,16 +1,11 @@
 use serenity::{
     async_trait,
     client::{Context, EventHandler},
-    model::{
-        channel::Message,
-        event::ResumedEvent,
-        gateway::Ready,
-        interactions::{Interaction, InteractionResponseType},
-    },
+    model::{channel::Message, event::ResumedEvent, gateway::Ready, interactions::Interaction},
 };
 
 use super::client::set_bot_presence;
-use super::commands::setup_commands;
+use super::commands::{command_not_implemented, ping, setup_commands};
 
 pub struct Handler;
 
@@ -34,21 +29,13 @@ impl EventHandler for Handler {
     }
 
     async fn interaction_create(&self, ctx: Context, interaction: Interaction) {
-        // TODO: Improve structure for better scale with multiple commands
         if let Interaction::ApplicationCommand(command) = interaction {
-            let content = match command.data.name.as_str() {
-                "ping" => "Pong!".to_string(),
-                _ => "Not implemented :(".to_string(),
+            let cmd_execution = match command.data.name.as_str() {
+                "ping" => ping::execute(&ctx, command).await,
+                _ => command_not_implemented(&ctx, command).await,
             };
-            if let Err(response_err) = command
-                .create_interaction_response(ctx.http, |response| {
-                    response
-                        .kind(InteractionResponseType::ChannelMessageWithSource)
-                        .interaction_response_data(|message| message.content(content))
-                })
-                .await
-            {
-                error!("❌ Interaction response failed: {:?}", response_err);
+            if let Err(execution_err) = cmd_execution {
+                error!("❌ Command execution failed: {:?}", execution_err);
             }
         };
     }
