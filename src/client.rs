@@ -1,9 +1,11 @@
 use super::handler::Handler;
 use serenity::{
-    client::{Client, Context},
+    client::{Client, ClientBuilder, Context},
     http::Http,
     model::{gateway::Activity, user::OnlineStatus},
 };
+#[cfg(feature = "audio")]
+use songbird::SerenityInit;
 
 /// Extract the user id of the current used bot from the discord api
 ///
@@ -15,16 +17,31 @@ async fn get_bot_id(token: &str) -> Result<serenity::model::id::UserId, serenity
     Ok(info.id)
 }
 
-/// Create a ready to use serenity client instance
-///
-/// # Arguments
-/// * `token` - The discord bot token as string
-pub async fn create_client(token: String) -> Result<Client, serenity::Error> {
+async fn construct_client_baseline<'a>(token: String) -> ClientBuilder<'a> {
     let bot_id = get_bot_id(&token).await.expect("Bot id to be extracted");
     Client::builder(token)
         .event_handler(Handler)
         .application_id(bot_id.0)
-        .await
+}
+
+/// Create a ready to use serenity client instance
+///
+/// # Arguments
+/// * `token` - The discord bot token as string
+#[cfg(not(feature = "audio"))]
+pub async fn create_client(token: String) -> Result<Client, serenity::Error> {
+    let client = construct_client_baseline(token).await;
+    client.await
+}
+
+/// Create a ready to use serenity client instance with songbird audio  
+///
+/// # Arguments
+/// * `token` - The discord bot token as string
+#[cfg(feature = "audio")]
+pub async fn create_client(token: String) -> Result<Client, serenity::Error> {
+    let client = construct_client_baseline(token).await;
+    client.register_songbird().await
 }
 
 /// Set the online status and activity of the bot.
