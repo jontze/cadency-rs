@@ -1,5 +1,5 @@
 [package]
-name = "cadency-rs"
+name = "cadency"
 version = "0.1.0"
 edition = "2021"
 
