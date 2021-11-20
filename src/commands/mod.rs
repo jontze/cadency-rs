@@ -5,6 +5,7 @@ use serenity::{
     },
 };
 
+pub mod inspire;
 pub mod ping;
 
 /// Submit global slash commands to the discord api.
