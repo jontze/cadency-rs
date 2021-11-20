@@ -13,6 +13,7 @@ pub mod ping;
 /// For local testing it is recommended to create commandswith a guild scope.
 pub async fn setup_commands(ctx: &Context) -> Result<(), serenity::Error> {
     let _ping_cmd = ping::create(ctx).await?;
+    let _inspire_cmd = inspire::create(ctx).await?;
     Ok(())
 }
 
