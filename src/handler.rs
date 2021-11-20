@@ -5,7 +5,7 @@ use serenity::{
 };
 
 use super::client::set_bot_presence;
-use super::commands::{command_not_implemented, ping, setup_commands};
+use super::commands::{command_not_implemented, inspire, ping, setup_commands};
 
 pub struct Handler;
 
@@ -32,6 +32,7 @@ impl EventHandler for Handler {
         if let Interaction::ApplicationCommand(command) = interaction {
             let cmd_execution = match command.data.name.as_str() {
                 "ping" => ping::execute(&ctx, command).await,
+                "inspire" => inspire::execute(&ctx, command).await,
                 _ => command_not_implemented(&ctx, command).await,
             };
             if let Err(execution_err) = cmd_execution {
