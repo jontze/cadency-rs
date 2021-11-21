@@ -33,6 +33,7 @@ pub async fn setup_commands(ctx: &Context) -> Result<(), serenity::Error> {
     let _ping_cmd = Ping::register(ctx).await?;
     let _inspire_cmd = Inspire::register(ctx).await?;
     let _fib_cmd = Fib::register(ctx).await?;
+    let _urban_cmd = Urban::register(ctx).await?;
     Ok(())
 }
 
