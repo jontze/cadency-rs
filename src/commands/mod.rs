@@ -10,11 +10,13 @@ use serenity::{
 pub mod fib;
 pub mod inspire;
 pub mod ping;
+pub mod slap;
 pub mod urban;
 
 pub use fib::Fib;
 pub use inspire::Inspire;
 pub use ping::Ping;
+pub use slap::Slap;
 pub use urban::Urban;
 
 #[async_trait]
@@ -34,6 +36,7 @@ pub async fn setup_commands(ctx: &Context) -> Result<(), serenity::Error> {
     let _inspire_cmd = Inspire::register(ctx).await?;
     let _fib_cmd = Fib::register(ctx).await?;
     let _urban_cmd = Urban::register(ctx).await?;
+    let _slap_cmd = Slap::register(ctx).await?;
     Ok(())
 }
 
