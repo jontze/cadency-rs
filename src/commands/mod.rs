@@ -10,10 +10,12 @@ use serenity::{
 pub mod fib;
 pub mod inspire;
 pub mod ping;
+pub mod urban;
 
 pub use fib::Fib;
 pub use inspire::Inspire;
 pub use ping::Ping;
+pub use urban::Urban;
 
 #[async_trait]
 pub trait Command {
