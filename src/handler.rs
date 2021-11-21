@@ -6,7 +6,7 @@ use serenity::{
 
 use super::client::set_bot_presence;
 use super::commands::{
-    command_not_implemented, setup_commands, Command, Fib, Inspire, Ping, Urban,
+    command_not_implemented, setup_commands, Command, Fib, Inspire, Ping, Slap, Urban,
 };
 
 pub struct Handler;
@@ -33,6 +33,7 @@ impl EventHandler for Handler {
                 "inspire" => Inspire::execute(&ctx, command).await,
                 "fib" => Fib::execute(&ctx, command).await,
                 "urban" => Urban::execute(&ctx, command).await,
+                "slap" => Slap::execute(&ctx, command).await,
                 _ => command_not_implemented(&ctx, command).await,
             };
             if let Err(execution_err) = cmd_execution {
