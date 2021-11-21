@@ -17,6 +17,7 @@ COPY --from=cacher $CARGO_HOME $CARGO_HOME
 RUN cargo build --release --bin cadency
 
 FROM debian:bullseye-slim
+LABEL org.opencontainers.image.source="https://github.com/jontze/cadency-rs"
 WORKDIR /cadency
 COPY --from=builder /cadency/target/release/cadency cadency
 RUN apt-get update
