@@ -40,6 +40,7 @@ pub async fn create_client(token: String) -> Result<Client, serenity::Error> {
 /// * `token` - The discord bot token as string
 #[cfg(feature = "audio")]
 pub async fn create_client(token: String) -> Result<Client, serenity::Error> {
+    info!("🎶 Audio feature enabled");
     let client = construct_client_baseline(token).await;
     client.register_songbird().await
 }

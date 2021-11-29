@@ -10,12 +10,16 @@ use serenity::{
 pub mod fib;
 pub mod inspire;
 pub mod ping;
+#[cfg(feature = "audio")]
+pub mod play;
 pub mod slap;
 pub mod urban;
 
 pub use fib::Fib;
 pub use inspire::Inspire;
 pub use ping::Ping;
+#[cfg(feature = "audio")]
+pub use play::Play;
 pub use slap::Slap;
 pub use urban::Urban;
 
@@ -37,6 +41,9 @@ pub async fn setup_commands(ctx: &Context) -> Result<(), serenity::Error> {
     let _fib_cmd = Fib::register(ctx).await?;
     let _urban_cmd = Urban::register(ctx).await?;
     let _slap_cmd = Slap::register(ctx).await?;
+    if cfg!(feature = "audio") {
+        let _play_cmd = Play::register(ctx).await?;
+    }
     Ok(())
 }
 
