@@ -1,23 +1,13 @@
 use super::Command;
+use crate::error::CadencyError;
+use crate::utils;
 use serenity::{
     async_trait,
-    builder::CreateInteractionResponse,
     client::Context,
-    model::interactions::{
-        application_command::{ApplicationCommand, ApplicationCommandInteraction},
-        InteractionResponseType,
-    },
+    model::interactions::application_command::{ApplicationCommand, ApplicationCommandInteraction},
 };
 
 pub struct Ping;
-
-impl Ping {
-    fn response(response: &mut CreateInteractionResponse) -> &mut CreateInteractionResponse {
-        response
-            .kind(InteractionResponseType::ChannelMessageWithSource)
-            .interaction_response_data(|message| message.content("Pong!"))
-    }
-}
 
 #[async_trait]
 impl Command for Ping {
@@ -31,14 +21,12 @@ impl Command for Ping {
         )
     }
 
-    async fn execute(
+    async fn execute<'a>(
         ctx: &Context,
-        command: ApplicationCommandInteraction,
-    ) -> Result<(), serenity::Error> {
+        command: &'a mut ApplicationCommandInteraction,
+    ) -> Result<(), CadencyError> {
         debug!("Execute ping command");
-        command
-            .create_interaction_response(&ctx.http, Self::response)
-            .await?;
+        utils::create_response(ctx, command, "Pong!").await?;
         Ok(())
     }
 }
