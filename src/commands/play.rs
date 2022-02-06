@@ -1,5 +1,8 @@
 #![cfg(feature = "audio")]
-use super::Command;
+use crate::commands::Command;
+use crate::error::CadencyError;
+use crate::handler::voice::InactiveHandler;
+use crate::utils;
 use serenity::{
     async_trait,
     client::Context,
@@ -7,6 +10,7 @@ use serenity::{
         ApplicationCommand, ApplicationCommandInteraction, ApplicationCommandOptionType,
     },
 };
+use songbird::events::Event;
 
 pub struct Play;
 
@@ -30,11 +34,43 @@ impl Command for Play {
         )
     }
 
-    async fn execute(
-        _ctx: &Context,
-        _command: ApplicationCommandInteraction,
-    ) -> Result<(), serenity::Error> {
+    async fn execute<'a>(
+        ctx: &Context,
+        command: &'a mut ApplicationCommandInteraction,
+    ) -> Result<(), CadencyError> {
         debug!("Execute play command");
-        todo!();
+        let url_option = utils::voice::parse_valid_url(&command.data.options);
+        if let Some(valid_url) = url_option {
+            if let Ok((manager, guild_id, _channel_id)) = utils::voice::join(ctx, command).await {
+                utils::create_response(ctx, command, &format!("Playing {}", valid_url)).await?;
+                let call = manager.get(guild_id).unwrap();
+                match utils::voice::add_song(call.clone(), valid_url.to_string()).await {
+                    Ok(_) => {
+                        let mut handler = call.lock().await;
+                        handler.remove_all_global_events();
+                        handler.add_global_event(
+                            Event::Periodic(std::time::Duration::from_secs(30), None),
+                            InactiveHandler { guild_id, manager },
+                        );
+                    }
+                    Err(err) => {
+                        error!("Failed to add song to queue: {}", err);
+                        utils::create_response(
+                            ctx,
+                            command,
+                            ":x: **Could not add audio source to the queue!**",
+                        )
+                        .await?;
+                    }
+                }
+            } else {
+                utils::create_response(ctx, command, ":x: **Could not join your voice channel**")
+                    .await?;
+            }
+        } else {
+            utils::create_response(ctx, command, ":x: **This doesn't look lik a valid url**")
+                .await?;
+        };
+        Ok(())
     }
 }
