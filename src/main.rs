@@ -11,6 +11,7 @@ mod client;
 mod commands;
 mod error;
 mod handler;
+mod utils;
 
 use client::Cadency;
 
