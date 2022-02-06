@@ -8,6 +8,7 @@ extern crate tokio;
 
 mod client;
 mod commands;
+mod error;
 mod handler;
 
 use client::create_client;
