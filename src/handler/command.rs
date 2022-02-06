@@ -17,11 +17,11 @@ pub struct Handler;
 impl EventHandler for Handler {
     async fn ready(&self, ctx: Context, _data_about_bot: Ready) {
         info!("🚀 Start Cadency Discord Bot");
+        set_bot_presence(&ctx).await;
         match setup_commands(&ctx).await {
             Ok(_) => info!("✅ Application commands submitted"),
             Err(err) => error!("❌ Failed to submit application commands: {:?}", err),
         };
-        set_bot_presence(&ctx).await;
     }
 
     async fn resume(&self, _ctx: Context, _: ResumedEvent) {
