@@ -10,7 +10,7 @@ use serenity::{
         ApplicationCommandInteractionDataOptionValue,
     },
 };
-use songbird::input::Restartable;
+use songbird::{input::Input, input::Restartable};
 
 pub fn get_active_voice_channel_id(
     guild: model::guild::Guild,
@@ -64,12 +64,14 @@ pub async fn join(
 pub async fn add_song(
     call: std::sync::Arc<tokio::sync::Mutex<songbird::Call>>,
     url: String,
-) -> Result<(), songbird::input::error::Error> {
-    debug!("Add song tp playlist: {}", url);
+) -> Result<songbird::input::Metadata, songbird::input::error::Error> {
+    debug!("Add song to playlist: {}", url);
     let source = Restartable::ytdl(url, true).await?;
     let mut handler = call.lock().await;
-    handler.enqueue_source(source.into());
-    Ok(())
+    let track: Input = source.into();
+    let metadata = *track.metadata.clone();
+    handler.enqueue_source(track);
+    Ok(metadata)
 }
 
 pub fn parse_valid_url(

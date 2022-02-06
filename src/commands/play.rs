@@ -42,16 +42,28 @@ impl Command for Play {
         let url_option = utils::voice::parse_valid_url(&command.data.options);
         if let Some(valid_url) = url_option {
             if let Ok((manager, guild_id, _channel_id)) = utils::voice::join(ctx, command).await {
-                utils::create_response(ctx, command, &format!("Playing {}", valid_url)).await?;
                 let call = manager.get(guild_id).unwrap();
                 match utils::voice::add_song(call.clone(), valid_url.to_string()).await {
-                    Ok(_) => {
+                    Ok(added_song) => {
                         let mut handler = call.lock().await;
                         handler.remove_all_global_events();
                         handler.add_global_event(
                             Event::Periodic(std::time::Duration::from_secs(30), None),
                             InactiveHandler { guild_id, manager },
                         );
+                        utils::create_response(
+                            ctx,
+                            command,
+                            &format!(
+                                ":white_check_mark: **Added song to the queue** \n**Playing** :notes: `{}` \n:newspaper: `{}`",
+                                valid_url,
+                                added_song
+                                    .title
+                                    .as_ref()
+                                    .map_or(":x: **Unknown title**", |title| title)
+                            ),
+                        )
+                        .await?;
                     }
                     Err(err) => {
                         error!("Failed to add song to queue: {}", err);
