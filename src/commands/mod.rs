@@ -41,15 +41,15 @@ pub trait Command {
 /// As global commands are cached for 1 hour, the activation ca take some time.
 /// For local testing it is recommended to create commandswith a guild scope.
 pub async fn setup_commands(ctx: &Context) -> Result<(), serenity::Error> {
-    let _ping_cmd = Ping::register(ctx).await?;
-    let _inspire_cmd = Inspire::register(ctx).await?;
-    let _fib_cmd = Fib::register(ctx).await?;
-    let _urban_cmd = Urban::register(ctx).await?;
-    let _slap_cmd = Slap::register(ctx).await?;
+    tokio::try_join!(
+        Ping::register(ctx),
+        Inspire::register(ctx),
+        Fib::register(ctx),
+        Urban::register(ctx),
+        Slap::register(ctx)
+    )?;
     #[cfg(feature = "audio")]
-    let _play_cmd = Play::register(ctx).await?;
-    #[cfg(feature = "audio")]
-    let _now_cmd = Now::register(ctx).await?;
+    tokio::try_join!(Play::register(ctx), Now::register(ctx))?;
     Ok(())
 }
 
