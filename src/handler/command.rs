@@ -4,10 +4,12 @@ use serenity::{
     model::{event::ResumedEvent, gateway::Ready, interactions::Interaction},
 };
 
-use super::client::set_bot_presence;
-use super::commands::{
+#[cfg(feature = "audio")]
+use crate::commands::Play;
+use crate::commands::{
     command_not_implemented, setup_commands, Command, Fib, Inspire, Ping, Slap, Urban,
 };
+use crate::utils::set_bot_presence;
 
 pub struct Handler;
 
@@ -27,13 +29,15 @@ impl EventHandler for Handler {
     }
 
     async fn interaction_create(&self, ctx: Context, interaction: Interaction) {
-        if let Interaction::ApplicationCommand(command) = interaction {
+        if let Interaction::ApplicationCommand(mut command) = interaction {
             let cmd_execution = match command.data.name.as_str() {
-                "ping" => Ping::execute(&ctx, command).await,
-                "inspire" => Inspire::execute(&ctx, command).await,
-                "fib" => Fib::execute(&ctx, command).await,
-                "urban" => Urban::execute(&ctx, command).await,
-                "slap" => Slap::execute(&ctx, command).await,
+                "ping" => Ping::execute(&ctx, &mut command).await,
+                "inspire" => Inspire::execute(&ctx, &mut command).await,
+                "fib" => Fib::execute(&ctx, &mut command).await,
+                "urban" => Urban::execute(&ctx, &mut command).await,
+                "slap" => Slap::execute(&ctx, &mut command).await,
+                #[cfg(feature = "audio")]
+                "play" => Play::execute(&ctx, &mut command).await,
                 _ => command_not_implemented(&ctx, command).await,
             };
             if let Err(execution_err) = cmd_execution {

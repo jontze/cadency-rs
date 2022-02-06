@@ -1,13 +1,12 @@
 use super::Command;
+use crate::error::CadencyError;
+use crate::utils;
 use serenity::{
     async_trait,
     client::Context,
-    model::interactions::{
-        application_command::{
-            ApplicationCommand, ApplicationCommandInteraction,
-            ApplicationCommandInteractionDataOptionValue, ApplicationCommandOptionType,
-        },
-        InteractionResponseType,
+    model::interactions::application_command::{
+        ApplicationCommand, ApplicationCommandInteraction,
+        ApplicationCommandInteractionDataOptionValue, ApplicationCommandOptionType,
     },
 };
 
@@ -33,86 +32,63 @@ impl Command for Slap {
         )
     }
 
-    async fn execute(
+    async fn execute<'a>(
         ctx: &Context,
-        command: ApplicationCommandInteraction,
-    ) -> Result<(), serenity::Error> {
+        command: &'a mut ApplicationCommandInteraction,
+    ) -> Result<(), CadencyError> {
         debug!("Execute slap command");
-        let user_option =
-            command
-                .data
-                .options
-                .get(0)
-                .and_then(|option| match option.resolved.as_ref() {
-                    Some(value) => {
-                        if let ApplicationCommandInteractionDataOptionValue::User(user, _member) =
-                            value
-                        {
-                            Some(user)
-                        } else {
-                            error!("Command option is not a user");
-                            None
-                        }
-                    }
-                    None => {
-                        error!("Slap command option empty");
+        let args = command.data.options.clone();
+        let user_option = args
+            .first()
+            .and_then(|option| match option.resolved.as_ref() {
+                Some(value) => {
+                    if let ApplicationCommandInteractionDataOptionValue::User(user, _member) = value
+                    {
+                        Some(user)
+                    } else {
+                        error!("Command option is not a user");
                         None
                     }
-                });
+                }
+                None => {
+                    error!("Slap command option empty");
+                    None
+                }
+            });
         match user_option {
             Some(user) => {
                 if user.id == command.user.id {
-                    command
-                        .create_interaction_response(&ctx.http, |response| {
-                            response
-                                .kind(InteractionResponseType::ChannelMessageWithSource)
-                                .interaction_response_data(|message| {
-                                    message.content(format!(
-                                        "**Why do you want to slap yourself, {}?**",
-                                        command.user
-                                    ))
-                                })
-                        })
-                        .await?;
+                    utils::create_response(
+                        ctx,
+                        command,
+                        &format!("**Why do you want to slap yourself, {}?**", command.user),
+                    )
+                    .await?;
                 } else if user.id.0 == command.application_id.0 {
-                    command
-                        .create_interaction_response(&ctx.http, |response| {
-                            response
-                                .kind(InteractionResponseType::ChannelMessageWithSource)
-                                .interaction_response_data(|message| {
-                                    message.content(format!(
-                                        "**Nope!\n{} slaps {} around a bit with a large trout!**",
-                                        user, command.user
-                                    ))
-                                })
-                        })
-                        .await?;
+                    utils::create_response(
+                        ctx,
+                        command,
+                        &format!(
+                            "**Nope!\n{} slaps {} around a bit with a large trout!**",
+                            user, command.user
+                        ),
+                    )
+                    .await?;
                 } else {
-                    command
-                        .create_interaction_response(&ctx.http, |response| {
-                            response
-                                .kind(InteractionResponseType::ChannelMessageWithSource)
-                                .interaction_response_data(|message| {
-                                    message.content(format!(
-                                        "**{} slaps {} around a bit with a large trout!**",
-                                        command.user, user
-                                    ))
-                                })
-                        })
-                        .await?;
+                    utils::create_response(
+                        ctx,
+                        command,
+                        &format!(
+                            "**{} slaps {} around a bit with a large trout!**",
+                            command.user, user
+                        ),
+                    )
+                    .await?;
                 }
             }
             None => {
                 error!("Invalid user input");
-                command
-                    .create_interaction_response(&ctx.http, |response| {
-                        response
-                            .kind(InteractionResponseType::ChannelMessageWithSource)
-                            .interaction_response_data(|message| {
-                                message.content(":x: *Invalid user provided*")
-                            })
-                    })
-                    .await?;
+                utils::create_response(ctx, command, ":x: *Invalid user provided*").await?;
             }
         };
         Ok(())

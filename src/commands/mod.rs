@@ -1,3 +1,4 @@
+use crate::error::CadencyError;
 use serenity::{
     async_trait,
     client::Context,
@@ -10,22 +11,26 @@ use serenity::{
 pub mod fib;
 pub mod inspire;
 pub mod ping;
+#[cfg(feature = "audio")]
+pub mod play;
 pub mod slap;
 pub mod urban;
 
 pub use fib::Fib;
 pub use inspire::Inspire;
 pub use ping::Ping;
+#[cfg(feature = "audio")]
+pub use play::Play;
 pub use slap::Slap;
 pub use urban::Urban;
 
 #[async_trait]
 pub trait Command {
     async fn register(ctx: &Context) -> Result<ApplicationCommand, serenity::Error>;
-    async fn execute(
+    async fn execute<'a>(
         ctx: &Context,
-        command: ApplicationCommandInteraction,
-    ) -> Result<(), serenity::Error>;
+        command: &'a mut ApplicationCommandInteraction,
+    ) -> Result<(), CadencyError>;
 }
 
 /// Submit global slash commands to the discord api.
@@ -37,13 +42,15 @@ pub async fn setup_commands(ctx: &Context) -> Result<(), serenity::Error> {
     let _fib_cmd = Fib::register(ctx).await?;
     let _urban_cmd = Urban::register(ctx).await?;
     let _slap_cmd = Slap::register(ctx).await?;
+    #[cfg(feature = "audio")]
+    let _play_cmd = Play::register(ctx).await?;
     Ok(())
 }
 
 pub async fn command_not_implemented(
     ctx: &Context,
     command: ApplicationCommandInteraction,
-) -> Result<(), serenity::Error> {
+) -> Result<(), CadencyError> {
     error!("The following command is not known: {:?}", command);
     let unknown_command = command
         .create_interaction_response(&ctx.http, |response| {
@@ -51,6 +58,10 @@ pub async fn command_not_implemented(
                 .kind(InteractionResponseType::ChannelMessageWithSource)
                 .interaction_response_data(|message| message.content("Unknown command"))
         })
-        .await?;
+        .await
+        .map_err(|err| {
+            error!("Interaction response failed: {}", err);
+            CadencyError::Response
+        })?;
     Ok(unknown_command)
 }

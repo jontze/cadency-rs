@@ -1,19 +1,19 @@
 use super::Command;
+use crate::error::CadencyError;
+use crate::utils;
 use serenity::{
     async_trait,
-    builder::{CreateEmbed, CreateInteractionResponse},
+    builder::CreateEmbed,
     client::Context,
-    model::interactions::{
-        application_command::{
-            ApplicationCommand, ApplicationCommandInteraction,
-            ApplicationCommandInteractionDataOptionValue, ApplicationCommandOptionType,
-        },
-        InteractionResponseType,
+    model::interactions::application_command::{
+        ApplicationCommand, ApplicationCommandInteraction,
+        ApplicationCommandInteractionDataOptionValue, ApplicationCommandOptionType,
     },
     utils::Color,
 };
 
-#[derive(serde::Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
+#[allow(dead_code)]
 struct UrbanEntry {
     pub definition: String,
     pub permalink: String,
@@ -44,52 +44,37 @@ impl Urban {
         Ok(reqwest::get(url).await?.json::<UrbanResult>().await?.list)
     }
 
-    fn response(
-        response: &mut CreateInteractionResponse,
-        urban_entries: Vec<UrbanEntry>,
-    ) -> &mut CreateInteractionResponse {
-        response
-            .kind(InteractionResponseType::ChannelMessageWithSource)
-            .interaction_response_data(|message| {
-                for (index, urban) in urban_entries.iter().enumerate() {
-                    if index >= 3 {
-                        break;
-                    }
-                    let mut embed_urban_entry = CreateEmbed::default();
-                    embed_urban_entry.color(Color::from_rgb(255, 255, 0));
-                    embed_urban_entry.title(&urban.word.replace("[", "").replace("]", ""));
-                    embed_urban_entry.url(&urban.permalink);
-                    embed_urban_entry.field(
-                        "Definition",
-                        &urban.definition.replace("[", "").replace("]", ""),
-                        false,
-                    );
-                    embed_urban_entry.field(
-                        "Example",
-                        &urban.example.replace("[", "").replace("]", ""),
-                        false,
-                    );
-                    embed_urban_entry.field(
-                        "Rating",
-                        format!(
-                            "{} :thumbsup:  {} :thumbsdown:",
-                            urban.thumbs_up, urban.thumbs_down
-                        ),
-                        false,
-                    );
-                    message.add_embed(embed_urban_entry);
-                }
-                message
-            })
-    }
-
-    fn error_response<'a>(
-        response: &'a mut CreateInteractionResponse,
-        error_msg: &str,
-    ) -> &'a mut CreateInteractionResponse {
-        response
-            .kind(InteractionResponseType::ChannelMessageWithSource)
-            .interaction_response_data(|message| message.content(error_msg))
+    fn create_embed(urban_entries: Vec<UrbanEntry>) -> Vec<CreateEmbed> {
+        let mut embeds: Vec<CreateEmbed> = Vec::new();
+        for (index, urban) in urban_entries.iter().enumerate() {
+            if index >= 3 {
+                break;
+            }
+            let mut embed_urban_entry = CreateEmbed::default();
+            embed_urban_entry.color(Color::from_rgb(255, 255, 0));
+            embed_urban_entry.title(&urban.word.replace("[", "").replace("]", ""));
+            embed_urban_entry.url(&urban.permalink);
+            embed_urban_entry.field(
+                "Definition",
+                &urban.definition.replace("[", "").replace("]", ""),
+                false,
+            );
+            embed_urban_entry.field(
+                "Example",
+                &urban.example.replace("[", "").replace("]", ""),
+                false,
+            );
+            embed_urban_entry.field(
+                "Rating",
+                format!(
+                    "{} :thumbsup:  {} :thumbsdown:",
+                    urban.thumbs_up, urban.thumbs_down
+                ),
+                false,
+            );
+            embeds.push(embed_urban_entry);
+        }
+        embeds
     }
 }
 
@@ -113,10 +98,10 @@ impl Command for Urban {
         )
     }
 
-    async fn execute(
+    async fn execute<'a>(
         ctx: &Context,
-        command: ApplicationCommandInteraction,
-    ) -> Result<(), serenity::Error> {
+        command: &'a mut ApplicationCommandInteraction,
+    ) -> Result<(), CadencyError> {
         debug!("Execute urban command");
         let query_option =
             command
@@ -142,36 +127,30 @@ impl Command for Urban {
                 match urbans_entrys {
                     Ok(urbans) => {
                         if urbans.is_empty() {
-                            command
-                                .create_interaction_response(&ctx.http, |res| {
-                                    Self::error_response(res, ":x: *Nothing found*")
-                                })
-                                .await?
+                            utils::create_response(ctx, command, ":x: *Nothing found*").await?;
                         } else {
-                            command
-                                .create_interaction_response(&ctx.http, |res| {
-                                    Self::response(res, urbans)
-                                })
-                                .await?;
+                            utils::create_response_with_embed(
+                                ctx,
+                                command,
+                                Self::create_embed(urbans),
+                            )
+                            .await?;
                         }
                     }
                     Err(err) => {
                         error!("Failed to request urban dictionary entries : {:?}", err);
-                        command
-                            .create_interaction_response(&ctx.http, |res| {
-                                Self::error_response(res, "Failed to request urban dictionary")
-                            })
-                            .await?;
+                        utils::create_response(
+                            ctx,
+                            command,
+                            ":x: *Failed to request urban dictionary*",
+                        )
+                        .await?;
                     }
                 }
             }
             None => {
                 error!("Urban empty query");
-                command
-                    .create_interaction_response(&ctx.http, |response| {
-                        Self::error_response(response, "Empty or invalid query")
-                    })
-                    .await?;
+                utils::create_response(ctx, command, ":x: *Empty or invalid query*").await?;
             }
         };
         Ok(())

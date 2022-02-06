@@ -1,12 +1,10 @@
 use super::Command;
+use crate::error::CadencyError;
+use crate::utils;
 use serenity::{
     async_trait,
-    builder::CreateInteractionResponse,
     client::Context,
-    model::interactions::{
-        application_command::{ApplicationCommand, ApplicationCommandInteraction},
-        InteractionResponseType,
-    },
+    model::interactions::application_command::{ApplicationCommand, ApplicationCommandInteraction},
 };
 
 pub struct Inspire;
@@ -18,15 +16,6 @@ impl Inspire {
             .await?
             .text()
             .await?)
-    }
-
-    fn response(
-        response: &mut CreateInteractionResponse,
-        inspire_url: String,
-    ) -> &mut CreateInteractionResponse {
-        response
-            .kind(InteractionResponseType::ChannelMessageWithSource)
-            .interaction_response_data(|message| message.content(inspire_url))
     }
 }
 
@@ -44,10 +33,10 @@ impl Command for Inspire {
         )
     }
 
-    async fn execute(
+    async fn execute<'a>(
         ctx: &Context,
-        command: ApplicationCommandInteraction,
-    ) -> Result<(), serenity::Error> {
+        command: &'a mut ApplicationCommandInteraction,
+    ) -> Result<(), CadencyError> {
         debug!("Execute inspire command");
         let inspire_url = Self::request_inspire_image_url().await.map_or_else(
             |err| {
@@ -56,9 +45,7 @@ impl Command for Inspire {
             },
             |url| url,
         );
-        command
-            .create_interaction_response(&ctx.http, |res| Self::response(res, inspire_url))
-            .await?;
+        utils::create_response(ctx, command, &inspire_url).await?;
         Ok(())
     }
 }

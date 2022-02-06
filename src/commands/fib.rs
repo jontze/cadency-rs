@@ -1,14 +1,12 @@
 use super::Command;
+use crate::error::CadencyError;
+use crate::utils;
 use serenity::{
     async_trait,
-    builder::CreateInteractionResponse,
     client::Context,
-    model::interactions::{
-        application_command::{
-            ApplicationCommand, ApplicationCommandInteraction,
-            ApplicationCommandInteractionDataOptionValue, ApplicationCommandOptionType,
-        },
-        InteractionResponseType,
+    model::interactions::application_command::{
+        ApplicationCommand, ApplicationCommandInteraction,
+        ApplicationCommandInteractionDataOptionValue, ApplicationCommandOptionType,
     },
 };
 
@@ -21,19 +19,6 @@ impl Fib {
         // FIXME: Type conversion as f64 can lead to loss on large ints, find better way
         let asymp = phi.powf(*n as f64) / square_five;
         asymp.round()
-    }
-
-    fn response<'a>(
-        response: &'a mut CreateInteractionResponse,
-        fib_number: Option<&i64>,
-    ) -> &'a mut CreateInteractionResponse {
-        let fib_msg = match fib_number {
-            Some(number) => Self::calc(number).to_string(),
-            None => String::from("Invalid number input!"),
-        };
-        response
-            .kind(InteractionResponseType::ChannelMessageWithSource)
-            .interaction_response_data(|message| message.content(fib_msg))
     }
 }
 
@@ -58,10 +43,10 @@ impl Command for Fib {
         )
     }
 
-    async fn execute(
+    async fn execute<'a>(
         ctx: &Context,
-        command: ApplicationCommandInteraction,
-    ) -> Result<(), serenity::Error> {
+        command: &'a mut ApplicationCommandInteraction,
+    ) -> Result<(), CadencyError> {
         debug!("Execute fib command");
         let number_option =
             command
@@ -84,9 +69,11 @@ impl Command for Fib {
                         None
                     }
                 });
-        command
-            .create_interaction_response(&ctx.http, |res| Self::response(res, number_option))
-            .await?;
+        let fib_msg = match number_option {
+            Some(number) => Self::calc(number).to_string(),
+            None => String::from("Invalid number input!"),
+        };
+        utils::create_response(ctx, command, &fib_msg).await?;
         Ok(())
     }
 }
