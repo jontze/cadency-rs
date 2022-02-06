@@ -2,6 +2,7 @@
 extern crate log;
 extern crate env_logger;
 extern crate reqwest;
+#[macro_use]
 extern crate serde;
 extern crate serenity;
 extern crate tokio;

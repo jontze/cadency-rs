@@ -13,7 +13,8 @@ use serenity::{
     utils::Color,
 };
 
-#[derive(serde::Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
+#[allow(dead_code)]
 struct UrbanEntry {
     pub definition: String,
     pub permalink: String,
