@@ -10,6 +10,8 @@ use serenity::{
 
 pub mod fib;
 pub mod inspire;
+#[cfg(feature = "audio")]
+pub mod now;
 pub mod ping;
 #[cfg(feature = "audio")]
 pub mod play;
@@ -18,6 +20,8 @@ pub mod urban;
 
 pub use fib::Fib;
 pub use inspire::Inspire;
+#[cfg(feature = "audio")]
+pub use now::Now;
 pub use ping::Ping;
 #[cfg(feature = "audio")]
 pub use play::Play;
@@ -44,6 +48,8 @@ pub async fn setup_commands(ctx: &Context) -> Result<(), serenity::Error> {
     let _slap_cmd = Slap::register(ctx).await?;
     #[cfg(feature = "audio")]
     let _play_cmd = Play::register(ctx).await?;
+    #[cfg(feature = "audio")]
+    let _now_cmd = Now::register(ctx).await?;
     Ok(())
 }
 
