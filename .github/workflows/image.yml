@@ -15,6 +15,8 @@ on:
 
 jobs:
   docker:
+    env:
+      IMAGE_NAME: ghcr.io/${{ secrets.GHCR_USER }}/cadency_rs
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -23,7 +25,7 @@ jobs:
         uses: docker/metadata-action@v4
         with:
           images: |
-            ghcr.io/${{ secrets.GHCR_USER }}/cadency_rs
+            ${{ env.IMAGE_NAME }}
           tags: |
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
@@ -44,6 +46,8 @@ jobs:
           push: ${{ inputs.push }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=registry,ref=${{ env.IMAGE_NAME }}:main
+          cache-to: type=inline
       - name: Image pushed
         if: inputs.push
         run: echo "Image pushed"
