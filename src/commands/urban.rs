@@ -1,13 +1,13 @@
-use super::Command;
+use super::CadencyCommand;
 use crate::error::CadencyError;
 use crate::utils;
 use serenity::{
     async_trait,
     builder::CreateEmbed,
     client::Context,
-    model::interactions::application_command::{
-        ApplicationCommand, ApplicationCommandInteraction,
-        ApplicationCommandInteractionDataOptionValue, ApplicationCommandOptionType,
+    model::application::{
+        command::{Command, CommandOptionType},
+        interaction::application_command::{ApplicationCommandInteraction, CommandDataOptionValue},
     },
     utils::Color,
 };
@@ -52,16 +52,16 @@ impl Urban {
             }
             let mut embed_urban_entry = CreateEmbed::default();
             embed_urban_entry.color(Color::from_rgb(255, 255, 0));
-            embed_urban_entry.title(&urban.word.replace("[", "").replace("]", ""));
+            embed_urban_entry.title(&urban.word.replace('[', "").replace(']', ""));
             embed_urban_entry.url(&urban.permalink);
             embed_urban_entry.field(
                 "Definition",
-                &urban.definition.replace("[", "").replace("]", ""),
+                &urban.definition.replace('[', "").replace(']', ""),
                 false,
             );
             embed_urban_entry.field(
                 "Example",
-                &urban.example.replace("[", "").replace("]", ""),
+                &urban.example.replace('[', "").replace(']', ""),
                 false,
             );
             embed_urban_entry.field(
@@ -79,10 +79,10 @@ impl Urban {
 }
 
 #[async_trait]
-impl Command for Urban {
-    async fn register(ctx: &Context) -> Result<ApplicationCommand, serenity::Error> {
+impl CadencyCommand for Urban {
+    async fn register(ctx: &Context) -> Result<Command, serenity::Error> {
         Ok(
-            ApplicationCommand::create_global_application_command(&ctx.http, |command| {
+            Command::create_global_application_command(&ctx.http, |command| {
                 command
                     .name("urban")
                     .description("Searches the Urbandictionary for your input")
@@ -90,7 +90,7 @@ impl Command for Urban {
                         option
                             .name("query")
                             .description("Your search query")
-                            .kind(ApplicationCommandOptionType::String)
+                            .kind(CommandOptionType::String)
                             .required(true)
                     })
             })
@@ -110,7 +110,7 @@ impl Command for Urban {
                 .get(0)
                 .and_then(|option| match option.resolved.as_ref() {
                     Some(value) => {
-                        if let ApplicationCommandInteractionDataOptionValue::String(query) = value {
+                        if let CommandDataOptionValue::String(query) = value {
                             Some(query)
                         } else {
                             None

@@ -1,20 +1,22 @@
 #![cfg(feature = "audio")]
-use crate::commands::Command;
+use crate::commands::CadencyCommand;
 use crate::error::CadencyError;
 use crate::utils;
 use serenity::{
     async_trait,
     client::Context,
-    model::interactions::application_command::{ApplicationCommand, ApplicationCommandInteraction},
+    model::application::{
+        command::Command, interaction::application_command::ApplicationCommandInteraction,
+    },
 };
 
 pub struct Now;
 
 #[async_trait]
-impl Command for Now {
-    async fn register(ctx: &Context) -> Result<ApplicationCommand, serenity::Error> {
+impl CadencyCommand for Now {
+    async fn register(ctx: &Context) -> Result<Command, serenity::Error> {
         Ok(
-            ApplicationCommand::create_global_application_command(&ctx.http, |command| {
+            Command::create_global_application_command(&ctx.http, |command| {
                 command.name("now").description("Show current song")
             })
             .await?,

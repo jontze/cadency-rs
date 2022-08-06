@@ -1,22 +1,22 @@
-use super::Command;
+use super::CadencyCommand;
 use crate::error::CadencyError;
 use crate::utils;
 use serenity::{
     async_trait,
     client::Context,
-    model::interactions::application_command::{
-        ApplicationCommand, ApplicationCommandInteraction,
-        ApplicationCommandInteractionDataOptionValue, ApplicationCommandOptionType,
+    model::application::{
+        command::{Command, CommandOptionType},
+        interaction::application_command::{ApplicationCommandInteraction, CommandDataOptionValue},
     },
 };
 
 pub struct Slap;
 
 #[async_trait]
-impl Command for Slap {
-    async fn register(ctx: &Context) -> Result<ApplicationCommand, serenity::Error> {
+impl CadencyCommand for Slap {
+    async fn register(ctx: &Context) -> Result<Command, serenity::Error> {
         Ok(
-            ApplicationCommand::create_global_application_command(&ctx.http, |command| {
+            Command::create_global_application_command(&ctx.http, |command| {
                 command
                     .name("slap")
                     .description("Slap someone with a large trout!")
@@ -24,7 +24,7 @@ impl Command for Slap {
                         option
                             .name("target")
                             .description("The user you want to slap")
-                            .kind(ApplicationCommandOptionType::User)
+                            .kind(CommandOptionType::User)
                             .required(true)
                     })
             })
@@ -42,8 +42,7 @@ impl Command for Slap {
             .first()
             .and_then(|option| match option.resolved.as_ref() {
                 Some(value) => {
-                    if let ApplicationCommandInteractionDataOptionValue::User(user, _member) = value
-                    {
+                    if let CommandDataOptionValue::User(user, _member) = value {
                         Some(user)
                     } else {
                         error!("Command option is not a user");
