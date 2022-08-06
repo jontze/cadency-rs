@@ -14,7 +14,7 @@ jobs:
     name: Publish dev image
     uses: ./.github/workflows/image.yml
     with:
-      push: false
+      push: true
     secrets:
       GHCR_USER: ${{ secrets.GHCR_USER }}
       GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
