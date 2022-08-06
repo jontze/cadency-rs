@@ -1,0 +1,20 @@
+name: Development
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  test_branch:
+    name: Test Dev branch
+    uses: ./.github/workflows/test.yml
+  publish_image:
+    needs:
+      - test_branch
+    name: Publish dev image
+    uses: ./.github/workflows/image.yml
+    with:
+      push: false
+    secrets:
+      GHCR_USER: ${{ secrets.GHCR_USER }}
+      GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
