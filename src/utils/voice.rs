@@ -5,8 +5,11 @@ use reqwest::Url;
 use serenity::model;
 use serenity::{
     client::Context,
-    model::application::interaction::application_command::{
-        ApplicationCommandInteraction, CommandDataOption, CommandDataOptionValue,
+    model::application::interaction::{
+        application_command::{
+            ApplicationCommandInteraction, CommandDataOption, CommandDataOptionValue,
+        },
+        InteractionResponseType,
     },
 };
 use songbird::{input::Input, input::Restartable};
@@ -32,9 +35,7 @@ pub async fn join(
     ),
     CadencyError,
 > {
-    let manager = songbird::get(ctx)
-        .await
-        .expect("Init songbird voice client");
+    let manager = get_songbird(ctx).await;
     let guild_id = command.guild_id.ok_or(CadencyError::Join)?;
     let channel_id = ctx
         .cache
@@ -86,4 +87,42 @@ pub fn parse_valid_url(command_options: &[CommandDataOption]) -> Option<reqwest:
             None => None,
         })
         .and_then(|url| Url::parse(url).ok())
+}
+
+pub async fn get_songbird(ctx: &Context) -> std::sync::Arc<songbird::Songbird> {
+    songbird::get(ctx)
+        .await
+        .expect("Failed to get songbord manager")
+}
+
+pub async fn create_deferred_response<'a>(
+    ctx: &Context,
+    interaction: &mut ApplicationCommandInteraction,
+) -> Result<(), CadencyError> {
+    interaction
+        .create_interaction_response(&ctx.http, |response| {
+            response.kind(InteractionResponseType::DeferredChannelMessageWithSource)
+        })
+        .await
+        .map_err(|err| {
+            error!("Failed to submit deferred message: {}", err);
+            CadencyError::Response
+        })
+}
+
+pub async fn edit_deferred_response<'a>(
+    ctx: &Context,
+    interaction: &mut ApplicationCommandInteraction,
+    content: &str,
+) -> Result<(), CadencyError> {
+    interaction
+        .edit_original_interaction_response(&ctx.http, |previous_response| {
+            previous_response.content(content)
+        })
+        .await
+        .map_err(|err| {
+            error!("Failed to edit deferred message: {}", err);
+            CadencyError::Response
+        })?;
+    Ok(())
 }
