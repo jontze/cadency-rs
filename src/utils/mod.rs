@@ -18,10 +18,10 @@ pub mod voice;
 /// Should not be set before the `ready` event.
 pub async fn set_bot_presence(ctx: &Context) {
     #[cfg(feature = "audio")]
-    ctx.set_presence(Some(Activity::listening("music")), OnlineStatus::Invisible)
+    ctx.set_presence(Some(Activity::listening("music")), OnlineStatus::Online)
         .await;
     #[cfg(not(feature = "audio"))]
-    ctx.set_presence(Some(Activity::playing("Rust")), OnlineStatus::Invisible)
+    ctx.set_presence(Some(Activity::playing("Rust")), OnlineStatus::Online)
         .await
 }
 
