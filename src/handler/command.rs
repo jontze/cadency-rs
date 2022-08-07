@@ -8,7 +8,7 @@ use crate::commands::{
     command_not_implemented, setup_commands, CadencyCommand, Fib, Inspire, Ping, Slap, Urban,
 };
 #[cfg(feature = "audio")]
-use crate::commands::{Now, Play};
+use crate::commands::{Now, Play, Skip};
 use crate::utils::set_bot_presence;
 
 pub struct Handler;
@@ -40,6 +40,8 @@ impl EventHandler for Handler {
                 "play" => Play::execute(&ctx, &mut command).await,
                 #[cfg(feature = "audio")]
                 "now" => Now::execute(&ctx, &mut command).await,
+                #[cfg(feature = "audio")]
+                "skip" => Skip::execute(&ctx, &mut command).await,
                 _ => command_not_implemented(&ctx, command).await,
             };
             if let Err(execution_err) = cmd_execution {
