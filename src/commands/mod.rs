@@ -14,6 +14,8 @@ pub mod fib;
 pub mod inspire;
 #[cfg(feature = "audio")]
 pub mod now;
+#[cfg(feature = "audio")]
+pub mod pause;
 pub mod ping;
 #[cfg(feature = "audio")]
 pub mod play;
@@ -26,6 +28,8 @@ pub use fib::Fib;
 pub use inspire::Inspire;
 #[cfg(feature = "audio")]
 pub use now::Now;
+#[cfg(feature = "audio")]
+pub use pause::Pause;
 pub use ping::Ping;
 #[cfg(feature = "audio")]
 pub use play::Play;
@@ -55,7 +59,12 @@ pub async fn setup_commands(ctx: &Context) -> Result<(), serenity::Error> {
         Slap::register(ctx)
     )?;
     #[cfg(feature = "audio")]
-    tokio::try_join!(Play::register(ctx), Now::register(ctx), Skip::register(ctx))?;
+    tokio::try_join!(
+        Play::register(ctx),
+        Now::register(ctx),
+        Skip::register(ctx),
+        Pause::register(ctx)
+    )?;
     Ok(())
 }
 
