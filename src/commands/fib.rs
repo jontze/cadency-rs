@@ -1,12 +1,12 @@
-use super::Command;
+use super::CadencyCommand;
 use crate::error::CadencyError;
 use crate::utils;
 use serenity::{
     async_trait,
     client::Context,
-    model::interactions::application_command::{
-        ApplicationCommand, ApplicationCommandInteraction,
-        ApplicationCommandInteractionDataOptionValue, ApplicationCommandOptionType,
+    model::application::{
+        command::{Command, CommandOptionType},
+        interaction::application_command::{ApplicationCommandInteraction, CommandDataOptionValue},
     },
 };
 
@@ -23,11 +23,11 @@ impl Fib {
 }
 
 #[async_trait]
-impl Command for Fib {
+impl CadencyCommand for Fib {
     /// Construct the slash command that will be submited to the discord api
-    async fn register(ctx: &Context) -> Result<ApplicationCommand, serenity::Error> {
+    async fn register(ctx: &Context) -> Result<Command, serenity::Error> {
         Ok(
-            ApplicationCommand::create_global_application_command(&ctx.http, |command| {
+            Command::create_global_application_command(&ctx.http, |command| {
                 command
                     .name("fib")
                     .description("Calculate the nth number in the fibonacci series")
@@ -35,7 +35,7 @@ impl Command for Fib {
                         option
                             .name("number")
                             .description("The number in the fibonacci series")
-                            .kind(ApplicationCommandOptionType::Integer)
+                            .kind(CommandOptionType::Integer)
                             .required(true)
                     })
             })
@@ -55,9 +55,7 @@ impl Command for Fib {
                 .get(0)
                 .and_then(|option| match option.resolved.as_ref() {
                     Some(value) => {
-                        if let ApplicationCommandInteractionDataOptionValue::Integer(fib_value) =
-                            value
-                        {
+                        if let CommandDataOptionValue::Integer(fib_value) = value {
                             Some(fib_value)
                         } else {
                             error!("Fib command option not a integer: {:?}", value);

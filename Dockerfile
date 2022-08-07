@@ -1,15 +1,15 @@
-FROM lukemathwalker/cargo-chef:latest-rust-1.56 as planner
+FROM lukemathwalker/cargo-chef:latest-rust-1.62 as planner
 WORKDIR /cadency
 COPY . .
 RUN cargo chef prepare --recipe-path recipe.json
 
-FROM lukemathwalker/cargo-chef:latest-rust-1.56 as cacher
+FROM lukemathwalker/cargo-chef:latest-rust-1.62 as cacher
 WORKDIR /cadency
 COPY --from=planner /cadency/recipe.json recipe.json
 RUN cargo chef cook --release --recipe-path recipe.json
 
 
-FROM lukemathwalker/cargo-chef:latest-rust-1.56 as builder
+FROM lukemathwalker/cargo-chef:latest-rust-1.62 as builder
 WORKDIR /cadency
 COPY . .
 COPY --from=cacher /cadency/target target

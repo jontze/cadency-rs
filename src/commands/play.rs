@@ -1,13 +1,14 @@
 #![cfg(feature = "audio")]
-use crate::commands::Command;
+use crate::commands::CadencyCommand;
 use crate::error::CadencyError;
 use crate::handler::voice::InactiveHandler;
 use crate::utils;
 use serenity::{
     async_trait,
     client::Context,
-    model::interactions::application_command::{
-        ApplicationCommand, ApplicationCommandInteraction, ApplicationCommandOptionType,
+    model::application::{
+        command::{Command, CommandOptionType},
+        interaction::application_command::ApplicationCommandInteraction,
     },
 };
 use songbird::events::Event;
@@ -15,10 +16,10 @@ use songbird::events::Event;
 pub struct Play;
 
 #[async_trait]
-impl Command for Play {
-    async fn register(ctx: &Context) -> Result<ApplicationCommand, serenity::Error> {
+impl CadencyCommand for Play {
+    async fn register(ctx: &Context) -> Result<Command, serenity::Error> {
         Ok(
-            ApplicationCommand::create_global_application_command(&ctx.http, |command| {
+            Command::create_global_application_command(&ctx.http, |command| {
                 command
                     .name("play")
                     .description("Play a song from a youtube url")
@@ -26,7 +27,7 @@ impl Command for Play {
                         option
                             .name("url")
                             .description("Url to the youtube audio source")
-                            .kind(ApplicationCommandOptionType::String)
+                            .kind(CommandOptionType::String)
                             .required(true)
                     })
             })

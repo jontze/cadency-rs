@@ -1,7 +1,7 @@
 use crate::handler::command::Handler;
 use serenity::{
     client::{Client, ClientBuilder},
-    http::Http,
+    model::gateway::GatewayIntents,
 };
 #[cfg(feature = "audio")]
 use songbird::SerenityInit;
@@ -32,27 +32,17 @@ impl Cadency {
         self.client.start().await
     }
 
-    /// Extract the user id of the current used bot from the discord api
-    ///
-    /// # Arguments
-    /// * `token` - The discord bot token as string
-    async fn get_bot_id(token: &str) -> Result<serenity::model::id::UserId, serenity::Error> {
-        let http = Http::new_with_token(token);
-        let info = http.get_current_application_info().await?;
-        Ok(info.id)
-    }
-
     /// Setup the fundamental serenity client that is used for every feature
     ///
     /// # Arguments
     /// * `token` - The discord bot token as string
-    async fn construct_client_baseline<'a>(token: String) -> ClientBuilder<'a> {
-        let bot_id = Self::get_bot_id(&token)
-            .await
-            .expect("Bot id to be extracted");
-        Client::builder(token)
+    async fn construct_client_baseline(token: String) -> ClientBuilder {
+        // let bot_id = Self::get_bot_id(&token)
+        //     .await
+        //     .expect("Bot id to be extracted");
+        Client::builder(token, GatewayIntents::non_privileged())
             .event_handler(Handler)
-            .application_id(bot_id.0)
+            .application_id(234234)
     }
 
     /// Create a ready to use serenity client instance

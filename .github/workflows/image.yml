@@ -1,0 +1,53 @@
+name: Image
+on:
+  workflow_call:
+    inputs:
+      push:
+        required: true
+        default: false
+        type: boolean
+        description: "If image should be pushed"
+    secrets:
+      GHCR_USER:
+        required: true
+      GHCR_TOKEN:
+        required: true
+
+jobs:
+  docker:
+    env:
+      IMAGE_NAME: ghcr.io/${{ secrets.GHCR_USER }}/cadency_rs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Extract docker meta data
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: |
+            ${{ env.IMAGE_NAME }}
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=ref,event=tag
+            type=ref,event=branch
+            type=sha
+      - name: Login to ghcr.io
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.GHCR_USER }}
+          password: ${{ secrets.GHCR_TOKEN }}
+      - name: Build image
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          push: ${{ inputs.push }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=registry,ref=${{ env.IMAGE_NAME }}:main
+          cache-to: type=inline
+      - name: Image pushed
+        if: inputs.push
+        run: echo "Image pushed"

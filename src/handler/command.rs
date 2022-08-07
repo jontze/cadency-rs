@@ -1,11 +1,11 @@
 use serenity::{
     async_trait,
     client::{Context, EventHandler},
-    model::{event::ResumedEvent, gateway::Ready, interactions::Interaction},
+    model::{application::interaction::Interaction, event::ResumedEvent, gateway::Ready},
 };
 
 use crate::commands::{
-    command_not_implemented, setup_commands, Command, Fib, Inspire, Ping, Slap, Urban,
+    command_not_implemented, setup_commands, CadencyCommand, Fib, Inspire, Ping, Slap, Urban,
 };
 #[cfg(feature = "audio")]
 use crate::commands::{Now, Play};

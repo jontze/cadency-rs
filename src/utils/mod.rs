@@ -3,10 +3,10 @@ use serenity::{
     builder::CreateEmbed,
     client::Context,
     model::{
-        gateway::Activity,
-        interactions::{
+        application::interaction::{
             application_command::ApplicationCommandInteraction, InteractionResponseType,
         },
+        gateway::Activity,
         user::OnlineStatus,
     },
 };

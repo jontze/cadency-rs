@@ -1,10 +1,12 @@
-use super::Command;
+use super::CadencyCommand;
 use crate::error::CadencyError;
 use crate::utils;
 use serenity::{
     async_trait,
     client::Context,
-    model::interactions::application_command::{ApplicationCommand, ApplicationCommandInteraction},
+    model::application::{
+        command::Command, interaction::application_command::ApplicationCommandInteraction,
+    },
 };
 
 pub struct Inspire;
@@ -12,19 +14,19 @@ pub struct Inspire;
 impl Inspire {
     async fn request_inspire_image_url() -> Result<String, reqwest::Error> {
         debug!("Requesting inspirobot and unpack body");
-        Ok(reqwest::get("https://inspirobot.me/api?generate=true")
+        reqwest::get("https://inspirobot.me/api?generate=true")
             .await?
             .text()
-            .await?)
+            .await
     }
 }
 
 #[async_trait]
-impl Command for Inspire {
+impl CadencyCommand for Inspire {
     /// Construct the slash command that will be submited to the discord api
-    async fn register(ctx: &Context) -> Result<ApplicationCommand, serenity::Error> {
+    async fn register(ctx: &Context) -> Result<Command, serenity::Error> {
         Ok(
-            ApplicationCommand::create_global_application_command(&ctx.http, |command| {
+            Command::create_global_application_command(&ctx.http, |command| {
                 command
                     .name("inspire")
                     .description("Say something really inspiring!")

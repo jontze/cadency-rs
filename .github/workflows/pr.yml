@@ -1,0 +1,12 @@
+name: PR Analysis
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+
+jobs:
+  test_pr:
+    name: Test PR
+    uses: ./.github/workflows/test.yml

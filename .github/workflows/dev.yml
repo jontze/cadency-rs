@@ -1,18 +1,17 @@
-name: Release
+name: Development
 on:
   push:
-    tags:
-      - "v*"
+    branches:
+      - develop
 
 jobs:
-  test_release:
-    name: Test Main
+  test_branch:
+    name: Test Dev branch
     uses: ./.github/workflows/test.yml
-
   publish_image:
     needs:
-      - test_release
-    name: Publish main image
+      - test_branch
+    name: Publish dev image
     uses: ./.github/workflows/image.yml
     with:
       push: true

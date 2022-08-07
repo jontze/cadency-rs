@@ -5,9 +5,8 @@ use reqwest::Url;
 use serenity::model;
 use serenity::{
     client::Context,
-    model::interactions::application_command::{
-        ApplicationCommandInteraction, ApplicationCommandInteractionDataOption,
-        ApplicationCommandInteractionDataOptionValue,
+    model::application::interaction::application_command::{
+        ApplicationCommandInteraction, CommandDataOption, CommandDataOptionValue,
     },
 };
 use songbird::{input::Input, input::Restartable};
@@ -40,7 +39,6 @@ pub async fn join(
     let channel_id = ctx
         .cache
         .guild(guild_id)
-        .await
         .and_then(|guild| utils::voice::get_active_voice_channel_id(guild, command.user.id))
         .ok_or(CadencyError::Join)?;
     debug!("Try to join guild with id: {:?}", guild_id);
@@ -74,14 +72,12 @@ pub async fn add_song(
     Ok(metadata)
 }
 
-pub fn parse_valid_url(
-    command_options: &[ApplicationCommandInteractionDataOption],
-) -> Option<reqwest::Url> {
+pub fn parse_valid_url(command_options: &[CommandDataOption]) -> Option<reqwest::Url> {
     command_options
         .get(0)
         .and_then(|option| match option.resolved.as_ref() {
             Some(value) => {
-                if let ApplicationCommandInteractionDataOptionValue::String(url) = value {
+                if let CommandDataOptionValue::String(url) = value {
                     Some(url)
                 } else {
                     None

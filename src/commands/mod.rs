@@ -2,9 +2,11 @@ use crate::error::CadencyError;
 use serenity::{
     async_trait,
     client::Context,
-    model::interactions::{
-        application_command::{ApplicationCommand, ApplicationCommandInteraction},
-        InteractionResponseType,
+    model::application::{
+        command::Command,
+        interaction::{
+            application_command::ApplicationCommandInteraction, InteractionResponseType,
+        },
     },
 };
 
@@ -29,8 +31,8 @@ pub use slap::Slap;
 pub use urban::Urban;
 
 #[async_trait]
-pub trait Command {
-    async fn register(ctx: &Context) -> Result<ApplicationCommand, serenity::Error>;
+pub trait CadencyCommand {
+    async fn register(ctx: &Context) -> Result<Command, serenity::Error>;
     async fn execute<'a>(
         ctx: &Context,
         command: &'a mut ApplicationCommandInteraction,
@@ -58,7 +60,7 @@ pub async fn command_not_implemented(
     command: ApplicationCommandInteraction,
 ) -> Result<(), CadencyError> {
     error!("The following command is not known: {:?}", command);
-    let unknown_command = command
+    command
         .create_interaction_response(&ctx.http, |response| {
             response
                 .kind(InteractionResponseType::ChannelMessageWithSource)
@@ -68,6 +70,5 @@ pub async fn command_not_implemented(
         .map_err(|err| {
             error!("Interaction response failed: {}", err);
             CadencyError::Response
-        })?;
-    Ok(unknown_command)
+        })
 }
