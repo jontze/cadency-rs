@@ -6,6 +6,7 @@ RUN cargo chef prepare --recipe-path recipe.json
 FROM lukemathwalker/cargo-chef:latest-rust-1.62 as cacher
 WORKDIR /cadency
 COPY --from=planner /cadency/recipe.json recipe.json
+RUN apt-get update && apt-get install -y cmake 
 RUN cargo chef cook --release --recipe-path recipe.json
 
 
@@ -20,7 +21,6 @@ FROM debian:bullseye-slim
 LABEL org.opencontainers.image.source="https://github.com/jontze/cadency-rs"
 WORKDIR /cadency
 COPY --from=builder /cadency/target/release/cadency cadency
-RUN apt-get update
-RUN apt-get install -y libopus-dev ffmpeg youtube-dl
+RUN apt-get update && apt-get install -y libopus-dev ffmpeg youtube-dl
 ENTRYPOINT [ "./cadency" ]
 CMD [ "" ]
