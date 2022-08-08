@@ -26,6 +26,8 @@ pub mod skip;
 pub mod slap;
 #[cfg(feature = "audio")]
 pub mod stop;
+#[cfg(feature = "audio")]
+pub mod tracks;
 pub mod urban;
 
 pub use fib::Fib;
@@ -44,6 +46,8 @@ pub use skip::Skip;
 pub use slap::Slap;
 #[cfg(feature = "audio")]
 pub use stop::Stop;
+#[cfg(feature = "audio")]
+pub use tracks::Tracks;
 pub use urban::Urban;
 
 #[async_trait]
@@ -57,7 +61,7 @@ pub trait CadencyCommand {
 
 /// Submit global slash commands to the discord api.
 /// As global commands are cached for 1 hour, the activation ca take some time.
-/// For local testing it is recommended to create commandswith a guild scope.
+/// For local testing it is recommended to create commands with a guild scope.
 pub async fn setup_commands(ctx: &Context) -> Result<(), serenity::Error> {
     tokio::try_join!(
         Ping::register(ctx),
@@ -73,7 +77,8 @@ pub async fn setup_commands(ctx: &Context) -> Result<(), serenity::Error> {
         Skip::register(ctx),
         Pause::register(ctx),
         Resume::register(ctx),
-        Stop::register(ctx)
+        Stop::register(ctx),
+        Tracks::register(ctx)
     )?;
     Ok(())
 }

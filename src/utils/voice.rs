@@ -4,6 +4,7 @@ use crate::utils;
 use reqwest::Url;
 use serenity::model;
 use serenity::{
+    builder::CreateEmbed,
     client::Context,
     model::application::interaction::{
         application_command::{
@@ -105,7 +106,7 @@ pub async fn create_deferred_response<'a>(
         })
         .await
         .map_err(|err| {
-            error!("Failed to submit deferred message: {}", err);
+            error!("Failed to submit deferred message: {err}");
             CadencyError::Response
         })
 }
@@ -121,7 +122,24 @@ pub async fn edit_deferred_response<'a>(
         })
         .await
         .map_err(|err| {
-            error!("Failed to edit deferred message: {}", err);
+            error!("Failed to edit deferred message: {err}");
+            CadencyError::Response
+        })?;
+    Ok(())
+}
+
+pub async fn edit_deferred_response_with_embeded<'a>(
+    ctx: &Context,
+    interaction: &mut ApplicationCommandInteraction,
+    embeded_content: CreateEmbed,
+) -> Result<(), CadencyError> {
+    interaction
+        .edit_original_interaction_response(&ctx.http, |previous_response| {
+            previous_response.set_embed(embeded_content)
+        })
+        .await
+        .map_err(|err| {
+            error!("Failed to edit deferred message with embeded content: {err}");
             CadencyError::Response
         })?;
     Ok(())

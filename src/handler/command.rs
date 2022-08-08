@@ -8,7 +8,7 @@ use crate::commands::{
     command_not_implemented, setup_commands, CadencyCommand, Fib, Inspire, Ping, Slap, Urban,
 };
 #[cfg(feature = "audio")]
-use crate::commands::{Now, Pause, Play, Resume, Skip, Stop};
+use crate::commands::{Now, Pause, Play, Resume, Skip, Stop, Tracks};
 use crate::utils::set_bot_presence;
 
 pub struct Handler;
@@ -18,6 +18,7 @@ impl EventHandler for Handler {
     async fn ready(&self, ctx: Context, _data_about_bot: Ready) {
         info!("🚀 Start Cadency Discord Bot");
         set_bot_presence(&ctx).await;
+        info!("⏳ Started to submit commands, please wait...");
         match setup_commands(&ctx).await {
             Ok(_) => info!("✅ Application commands submitted"),
             Err(err) => error!("❌ Failed to submit application commands: {:?}", err),
@@ -48,6 +49,8 @@ impl EventHandler for Handler {
                 "resume" => Resume::execute(&ctx, &mut command).await,
                 #[cfg(feature = "audio")]
                 "stop" => Stop::execute(&ctx, &mut command).await,
+                #[cfg(feature = "audio")]
+                "tracks" => Tracks::execute(&ctx, &mut command).await,
                 _ => command_not_implemented(&ctx, command).await,
             };
             if let Err(execution_err) = cmd_execution {
