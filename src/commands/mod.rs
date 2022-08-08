@@ -20,6 +20,8 @@ pub mod ping;
 #[cfg(feature = "audio")]
 pub mod play;
 #[cfg(feature = "audio")]
+pub mod resume;
+#[cfg(feature = "audio")]
 pub mod skip;
 pub mod slap;
 pub mod urban;
@@ -33,6 +35,8 @@ pub use pause::Pause;
 pub use ping::Ping;
 #[cfg(feature = "audio")]
 pub use play::Play;
+#[cfg(feature = "audio")]
+pub use resume::Resume;
 #[cfg(feature = "audio")]
 pub use skip::Skip;
 pub use slap::Slap;
@@ -63,7 +67,8 @@ pub async fn setup_commands(ctx: &Context) -> Result<(), serenity::Error> {
         Play::register(ctx),
         Now::register(ctx),
         Skip::register(ctx),
-        Pause::register(ctx)
+        Pause::register(ctx),
+        Resume::register(ctx)
     )?;
     Ok(())
 }
