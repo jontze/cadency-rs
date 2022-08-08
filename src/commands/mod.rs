@@ -24,6 +24,8 @@ pub mod resume;
 #[cfg(feature = "audio")]
 pub mod skip;
 pub mod slap;
+#[cfg(feature = "audio")]
+pub mod stop;
 pub mod urban;
 
 pub use fib::Fib;
@@ -40,6 +42,8 @@ pub use resume::Resume;
 #[cfg(feature = "audio")]
 pub use skip::Skip;
 pub use slap::Slap;
+#[cfg(feature = "audio")]
+pub use stop::Stop;
 pub use urban::Urban;
 
 #[async_trait]
@@ -68,7 +72,8 @@ pub async fn setup_commands(ctx: &Context) -> Result<(), serenity::Error> {
         Now::register(ctx),
         Skip::register(ctx),
         Pause::register(ctx),
-        Resume::register(ctx)
+        Resume::register(ctx),
+        Stop::register(ctx)
     )?;
     Ok(())
 }
