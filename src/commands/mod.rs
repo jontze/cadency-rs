@@ -14,20 +14,40 @@ pub mod fib;
 pub mod inspire;
 #[cfg(feature = "audio")]
 pub mod now;
+#[cfg(feature = "audio")]
+pub mod pause;
 pub mod ping;
 #[cfg(feature = "audio")]
 pub mod play;
+#[cfg(feature = "audio")]
+pub mod resume;
+#[cfg(feature = "audio")]
+pub mod skip;
 pub mod slap;
+#[cfg(feature = "audio")]
+pub mod stop;
+#[cfg(feature = "audio")]
+pub mod tracks;
 pub mod urban;
 
 pub use fib::Fib;
 pub use inspire::Inspire;
 #[cfg(feature = "audio")]
 pub use now::Now;
+#[cfg(feature = "audio")]
+pub use pause::Pause;
 pub use ping::Ping;
 #[cfg(feature = "audio")]
 pub use play::Play;
+#[cfg(feature = "audio")]
+pub use resume::Resume;
+#[cfg(feature = "audio")]
+pub use skip::Skip;
 pub use slap::Slap;
+#[cfg(feature = "audio")]
+pub use stop::Stop;
+#[cfg(feature = "audio")]
+pub use tracks::Tracks;
 pub use urban::Urban;
 
 #[async_trait]
@@ -41,7 +61,7 @@ pub trait CadencyCommand {
 
 /// Submit global slash commands to the discord api.
 /// As global commands are cached for 1 hour, the activation ca take some time.
-/// For local testing it is recommended to create commandswith a guild scope.
+/// For local testing it is recommended to create commands with a guild scope.
 pub async fn setup_commands(ctx: &Context) -> Result<(), serenity::Error> {
     tokio::try_join!(
         Ping::register(ctx),
@@ -51,7 +71,15 @@ pub async fn setup_commands(ctx: &Context) -> Result<(), serenity::Error> {
         Slap::register(ctx)
     )?;
     #[cfg(feature = "audio")]
-    tokio::try_join!(Play::register(ctx), Now::register(ctx))?;
+    tokio::try_join!(
+        Play::register(ctx),
+        Now::register(ctx),
+        Skip::register(ctx),
+        Pause::register(ctx),
+        Resume::register(ctx),
+        Stop::register(ctx),
+        Tracks::register(ctx)
+    )?;
     Ok(())
 }
 

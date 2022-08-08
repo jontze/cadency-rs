@@ -42,6 +42,7 @@ impl CadencyCommand for Play {
         debug!("Execute play command");
         let url_option = utils::voice::parse_valid_url(&command.data.options);
         if let Some(valid_url) = url_option {
+            utils::voice::create_deferred_response(ctx, command).await?;
             if let Ok((manager, guild_id, _channel_id)) = utils::voice::join(ctx, command).await {
                 let call = manager.get(guild_id).unwrap();
                 match utils::voice::add_song(call.clone(), valid_url.to_string()).await {
@@ -49,10 +50,10 @@ impl CadencyCommand for Play {
                         let mut handler = call.lock().await;
                         handler.remove_all_global_events();
                         handler.add_global_event(
-                            Event::Periodic(std::time::Duration::from_secs(30), None),
+                            Event::Periodic(std::time::Duration::from_secs(120), None),
                             InactiveHandler { guild_id, manager },
                         );
-                        utils::create_response(
+                        utils::voice::edit_deferred_response(
                             ctx,
                             command,
                             &format!(
@@ -68,7 +69,7 @@ impl CadencyCommand for Play {
                     }
                     Err(err) => {
                         error!("Failed to add song to queue: {}", err);
-                        utils::create_response(
+                        utils::voice::edit_deferred_response(
                             ctx,
                             command,
                             ":x: **Could not add audio source to the queue!**",
@@ -77,8 +78,12 @@ impl CadencyCommand for Play {
                     }
                 }
             } else {
-                utils::create_response(ctx, command, ":x: **Could not join your voice channel**")
-                    .await?;
+                utils::voice::edit_deferred_response(
+                    ctx,
+                    command,
+                    ":x: **Could not join your voice channel**",
+                )
+                .await?;
             }
         } else {
             utils::create_response(ctx, command, ":x: **This doesn't look lik a valid url**")
