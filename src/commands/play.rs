@@ -50,7 +50,7 @@ impl CadencyCommand for Play {
                         let mut handler = call.lock().await;
                         handler.remove_all_global_events();
                         handler.add_global_event(
-                            Event::Periodic(std::time::Duration::from_secs(30), None),
+                            Event::Periodic(std::time::Duration::from_secs(120), None),
                             InactiveHandler { guild_id, manager },
                         );
                         utils::voice::edit_deferred_response(
