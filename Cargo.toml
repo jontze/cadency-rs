@@ -29,4 +29,5 @@ version = "1.0.130"
 features = ["derive"]
 
 [features]
+default = ["audio"]
 audio = ["songbird", "songbird/builtin-queue", "serenity/voice", "serenity/cache"]
