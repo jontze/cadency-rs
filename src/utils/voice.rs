@@ -1,4 +1,3 @@
-#![cfg(feature = "audio")]
 use crate::error::CadencyError;
 use crate::utils;
 use reqwest::Url;

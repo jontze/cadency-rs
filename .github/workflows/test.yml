@@ -47,16 +47,3 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: build
-  build_audio:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Setup rust
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-      - name: Build binary with audio feature
-        uses: actions-rs/cargo@v1
-        with:
-          command: build
-          args: --features=audio
