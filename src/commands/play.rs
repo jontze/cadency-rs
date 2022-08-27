@@ -1,4 +1,3 @@
-#![cfg(feature = "audio")]
 use crate::commands::CadencyCommand;
 use crate::error::CadencyError;
 use crate::handler::voice::InactiveHandler;
