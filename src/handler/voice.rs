@@ -1,4 +1,3 @@
-#![cfg(feature = "audio")]
 use serenity::async_trait;
 use songbird::events::{Event, EventContext};
 

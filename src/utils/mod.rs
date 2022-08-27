@@ -11,18 +11,13 @@ use serenity::{
     },
 };
 
-#[cfg(feature = "audio")]
 pub mod voice;
 
 /// Set the online status and activity of the bot.
 /// Should not be set before the `ready` event.
 pub async fn set_bot_presence(ctx: &Context) {
-    #[cfg(feature = "audio")]
     ctx.set_presence(Some(Activity::listening("music")), OnlineStatus::Online)
         .await;
-    #[cfg(not(feature = "audio"))]
-    ctx.set_presence(Some(Activity::playing("Rust")), OnlineStatus::Online)
-        .await
 }
 
 pub async fn create_response<'a>(

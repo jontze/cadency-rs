@@ -7,7 +7,7 @@ use serenity::{
 use crate::commands::{
     command_not_implemented, setup_commands, CadencyCommand, Fib, Inspire, Ping, Slap, Urban,
 };
-#[cfg(feature = "audio")]
+
 use crate::commands::{Now, Pause, Play, Resume, Skip, Stop, Tracks};
 use crate::utils::set_bot_presence;
 
@@ -37,19 +37,19 @@ impl EventHandler for Handler {
                 "fib" => Fib::execute(&ctx, &mut command).await,
                 "urban" => Urban::execute(&ctx, &mut command).await,
                 "slap" => Slap::execute(&ctx, &mut command).await,
-                #[cfg(feature = "audio")]
+
                 "play" => Play::execute(&ctx, &mut command).await,
-                #[cfg(feature = "audio")]
+
                 "now" => Now::execute(&ctx, &mut command).await,
-                #[cfg(feature = "audio")]
+
                 "skip" => Skip::execute(&ctx, &mut command).await,
-                #[cfg(feature = "audio")]
+
                 "pause" => Pause::execute(&ctx, &mut command).await,
-                #[cfg(feature = "audio")]
+
                 "resume" => Resume::execute(&ctx, &mut command).await,
-                #[cfg(feature = "audio")]
+
                 "stop" => Stop::execute(&ctx, &mut command).await,
-                #[cfg(feature = "audio")]
+
                 "tracks" => Tracks::execute(&ctx, &mut command).await,
                 _ => command_not_implemented(&ctx, command).await,
             };
