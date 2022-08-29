@@ -3,6 +3,19 @@ use crate::handler::command::Handler;
 use crate::intents::CadencyIntents;
 use serenity::client::Client;
 use songbird::SerenityInit;
+#[cfg(not(test))]
+use std::env;
+
+#[cfg_attr(test, mockall::automock)]
+mod env_read {
+    #[allow(dead_code)]
+    pub fn var(_env_name: &str) -> Result<String, ()> {
+        Ok(String::from("SOME_ENV_VALUE"))
+    }
+}
+
+#[cfg(test)]
+use mock_env_read as env;
 
 pub const DISCORD_TOKEN_ENV: &str = "DISCORD_TOKEN";
 
@@ -10,10 +23,11 @@ pub struct Cadency {
     client: serenity::Client,
 }
 
+#[cfg_attr(test, mockall::automock)]
 impl Cadency {
     /// Construct the Cadency discord but with default configuration
     pub async fn default() -> Result<Self, CadencyError> {
-        let token = std::env::var(DISCORD_TOKEN_ENV)
+        let token = env::var(DISCORD_TOKEN_ENV)
             .map_err(|_| CadencyError::Environment(DISCORD_TOKEN_ENV.to_string()))?;
         Self::new(token).await
     }
@@ -39,21 +53,42 @@ impl Cadency {
 
 #[cfg(test)]
 mod test {
-    use std::env;
-
     use super::*;
+    use std::sync::{Mutex, MutexGuard};
 
-    #[tokio::test]
-    async fn should_error_on_missing_env() {
-        env::remove_var(DISCORD_TOKEN_ENV);
-        let cadency = Cadency::default().await;
-        assert!(cadency.is_err())
+    static MTX: Mutex<()> = Mutex::new(());
+
+    // When a test panics, it will poison the Mutex. Since we don't actually
+    // care about the state of the data we ignore that it is poisoned and grab
+    // the lock regardless.  If you just do `let _m = &MTX.lock().unwrap()`, one
+    // test panicking will cause all other tests that try and acquire a lock on
+    // that Mutex to also panic.
+    fn get_lock(m: &'static Mutex<()>) -> MutexGuard<'static, ()> {
+        match m.lock() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        }
     }
 
-    // #[tokio::test]
-    // async fn should_build_cadency() {
-    //     env::set_var(DISCORD_TOKEN_ENV, "example_token");
-    //     let test = Cadency::default().await;
-    //     assert!(test.is_ok())
-    // }
+    #[tokio::test]
+    async fn should_error_on_missing_env_token() {
+        let _m = get_lock(&MTX);
+
+        let env_cxt = mock_env_read::var_context();
+        env_cxt.expect().return_once(|_| Err(()));
+        let cadency = Cadency::default().await;
+        assert!(cadency.is_err());
+    }
+
+    #[tokio::test]
+    async fn should_build_cadency_with_env_token() {
+        let _m = get_lock(&MTX);
+
+        let env_cxt = mock_env_read::var_context();
+        env_cxt
+            .expect()
+            .return_once(|_| Ok(String::from("ENV_VAR_VALUE")));
+        let test = Cadency::default().await;
+        assert!(test.is_ok())
+    }
 }
