@@ -14,6 +14,10 @@ pub struct Slap;
 
 #[async_trait]
 impl CadencyCommand for Slap {
+    fn name() -> &'static str {
+        "slap"
+    }
+
     async fn register(ctx: &Context) -> Result<Command, serenity::Error> {
         Ok(
             Command::create_global_application_command(&ctx.http, |command| {

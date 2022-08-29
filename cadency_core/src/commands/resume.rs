@@ -13,6 +13,10 @@ pub struct Resume;
 
 #[async_trait]
 impl CadencyCommand for Resume {
+    fn name() -> &'static str {
+        "resume"
+    }
+
     async fn register(ctx: &Context) -> Result<Command, serenity::Error> {
         Ok(
             Command::create_global_application_command(&ctx.http, |command| {

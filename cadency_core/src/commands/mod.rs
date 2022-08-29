@@ -9,49 +9,34 @@ use serenity::{
         },
     },
 };
-
 pub mod fib;
 pub mod inspire;
-
 pub mod now;
-
 pub mod pause;
 pub mod ping;
-
 pub mod play;
-
 pub mod resume;
-
 pub mod skip;
 pub mod slap;
-
 pub mod stop;
-
 pub mod tracks;
 pub mod urban;
-
 pub use fib::Fib;
 pub use inspire::Inspire;
-
 pub use now::Now;
-
 pub use pause::Pause;
 pub use ping::Ping;
-
 pub use play::Play;
-
 pub use resume::Resume;
-
 pub use skip::Skip;
 pub use slap::Slap;
-
 pub use stop::Stop;
-
 pub use tracks::Tracks;
 pub use urban::Urban;
 
 #[async_trait]
 pub trait CadencyCommand {
+    fn name() -> &'static str;
     async fn register(ctx: &Context) -> Result<Command, serenity::Error>;
     async fn execute<'a>(
         ctx: &Context,

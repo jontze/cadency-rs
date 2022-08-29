@@ -24,6 +24,10 @@ impl Fib {
 
 #[async_trait]
 impl CadencyCommand for Fib {
+    fn name() -> &'static str {
+        "fib"
+    }
+
     /// Construct the slash command that will be submited to the discord api
     async fn register(ctx: &Context) -> Result<Command, serenity::Error> {
         Ok(

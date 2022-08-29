@@ -23,6 +23,10 @@ impl Inspire {
 
 #[async_trait]
 impl CadencyCommand for Inspire {
+    fn name() -> &'static str {
+        "inspire"
+    }
+
     /// Construct the slash command that will be submited to the discord api
     async fn register(ctx: &Context) -> Result<Command, serenity::Error> {
         Ok(

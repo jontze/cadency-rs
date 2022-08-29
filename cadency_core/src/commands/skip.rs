@@ -13,6 +13,10 @@ pub struct Skip;
 
 #[async_trait]
 impl CadencyCommand for Skip {
+    fn name() -> &'static str {
+        "skip"
+    }
+
     async fn register(ctx: &Context) -> Result<Command, serenity::Error> {
         Ok(
             Command::create_global_application_command(&ctx.http, |command| {

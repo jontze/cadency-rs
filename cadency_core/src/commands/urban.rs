@@ -80,6 +80,10 @@ impl Urban {
 
 #[async_trait]
 impl CadencyCommand for Urban {
+    fn name() -> &'static str {
+        "urban"
+    }
+
     async fn register(ctx: &Context) -> Result<Command, serenity::Error> {
         Ok(
             Command::create_global_application_command(&ctx.http, |command| {

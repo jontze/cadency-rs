@@ -13,6 +13,10 @@ pub struct Pause;
 
 #[async_trait]
 impl CadencyCommand for Pause {
+    fn name() -> &'static str {
+        "pause"
+    }
+
     async fn register(ctx: &Context) -> Result<Command, serenity::Error> {
         Ok(
             Command::create_global_application_command(&ctx.http, |command| {

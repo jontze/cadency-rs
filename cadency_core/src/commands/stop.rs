@@ -13,6 +13,10 @@ pub struct Stop;
 
 #[async_trait]
 impl CadencyCommand for Stop {
+    fn name() -> &'static str {
+        "stop"
+    }
+
     async fn register(ctx: &Context) -> Result<Command, serenity::Error> {
         Ok(
             Command::create_global_application_command(&ctx.http, |command| {

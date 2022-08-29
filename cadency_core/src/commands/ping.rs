@@ -13,6 +13,10 @@ pub struct Ping;
 
 #[async_trait]
 impl CadencyCommand for Ping {
+    fn name() -> &'static str {
+        "ping"
+    }
+
     /// Construct the slash command that will be submited to the discord api
     async fn register(ctx: &Context) -> Result<Command, serenity::Error> {
         Ok(
