@@ -61,7 +61,7 @@ pub async fn join(
 }
 
 pub async fn add_song(
-    call: std::sync::Arc<tokio::sync::Mutex<songbird::Call>>,
+    call: std::sync::Arc<serenity::prelude::Mutex<songbird::Call>>,
     url: String,
 ) -> Result<songbird::input::Metadata, songbird::input::error::Error> {
     debug!("Add song to playlist: {}", url);

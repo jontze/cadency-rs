@@ -1,20 +1,7 @@
 #[macro_use]
 extern crate log;
-extern crate env_logger;
-extern crate reqwest;
-#[macro_use]
-extern crate serde;
-extern crate serenity;
-extern crate tokio;
 
-mod client;
-mod commands;
-mod error;
-mod handler;
-mod intents;
-mod utils;
-
-use client::Cadency;
+use cadency_core::client::Cadency;
 
 #[tokio::main]
 async fn main() {
