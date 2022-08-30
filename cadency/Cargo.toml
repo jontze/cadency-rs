@@ -12,6 +12,9 @@ log = "0.4.14"
 [dependencies.cadency_core]
 path = "../cadency_core"
 
+[dependencies.cadency_commands]
+path = "../cadency_commands"
+
 [dependencies.tokio]
 version = "1.13.0"
 features = ["macros", "rt-multi-thread"]

@@ -1,6 +1,6 @@
 use serenity::model::gateway::GatewayIntents;
 
-pub struct CadencyIntents {
+pub(crate) struct CadencyIntents {
     inner: GatewayIntents,
 }
 

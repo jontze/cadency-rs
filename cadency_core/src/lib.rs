@@ -3,6 +3,7 @@ extern crate log;
 extern crate serenity;
 
 pub mod client;
+pub use client::Cadency;
 mod command;
 pub use command::CadencyCommand;
 mod error;

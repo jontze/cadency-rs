@@ -1,4 +1,4 @@
-use crate::error::CadencyError;
+use crate::{error::CadencyError, utils};
 use serenity::{
     async_trait,
     client::Context,
@@ -22,7 +22,7 @@ pub trait CadencyCommand: Sync + Send {
     ) -> Result<(), CadencyError>;
 }
 
-pub struct Commands;
+pub(crate) struct Commands;
 
 impl TypeMapKey for Commands {
     type Value = std::sync::Arc<Vec<Box<dyn CadencyCommand>>>;
@@ -32,7 +32,12 @@ impl TypeMapKey for Commands {
 /// As global commands are cached for 1 hour, the activation ca take some time.
 /// For local testing it is recommended to create commands with a guild scope.
 pub(crate) async fn setup_commands(ctx: &Context) -> Result<(), serenity::Error> {
-    unimplemented!("Register each CadencyCommand");
+    let commands = utils::get_commands(ctx).await;
+    // No need to run this in parallel as serenity will enforce one-by-one execution
+    for command in commands.iter() {
+        command.register(ctx).await?;
+    }
+    Ok(())
 }
 
 pub(crate) async fn command_not_implemented(

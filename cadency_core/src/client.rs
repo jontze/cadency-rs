@@ -1,6 +1,7 @@
-use crate::error::CadencyError;
-use crate::handler::command::Handler;
-use crate::intents::CadencyIntents;
+use crate::{
+    command::Commands, error::CadencyError, handler::command::Handler, intents::CadencyIntents,
+    CadencyCommand,
+};
 use serenity::client::Client;
 use songbird::SerenityInit;
 #[cfg(not(test))]
@@ -43,6 +44,16 @@ impl Cadency {
             .await
             .map_err(|err| CadencyError::Builder { source: err })?;
         Ok(Self { client })
+    }
+
+    /// This will register and provide the commands for cadency.
+    /// Every struct that implements the CadencyCommand trait can be used.
+    pub async fn with_commands(self, commands: Vec<Box<dyn CadencyCommand>>) -> Self {
+        {
+            let mut data = self.client.data.write().await;
+            data.insert::<Commands>(std::sync::Arc::new(commands));
+        }
+        self
     }
 
     /// This will actually start the configured Cadency bot
