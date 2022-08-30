@@ -11,11 +11,11 @@ pub struct Now;
 
 #[async_trait]
 impl CadencyCommand for Now {
-    fn name() -> &'static str {
+    fn name(&self) -> &'static str {
         "now"
     }
 
-    async fn register(ctx: &Context) -> Result<Command, serenity::Error> {
+    async fn register(&self, ctx: &Context) -> Result<Command, serenity::Error> {
         Ok(
             Command::create_global_application_command(&ctx.http, |command| {
                 command.name("now").description("Show current song")
@@ -25,6 +25,7 @@ impl CadencyCommand for Now {
     }
 
     async fn execute<'a>(
+        &self,
         ctx: &Context,
         command: &'a mut ApplicationCommandInteraction,
     ) -> Result<(), CadencyError> {

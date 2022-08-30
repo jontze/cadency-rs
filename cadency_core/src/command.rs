@@ -8,16 +8,24 @@ use serenity::{
             application_command::ApplicationCommandInteraction, InteractionResponseType,
         },
     },
+    prelude::TypeMapKey,
 };
 
 #[async_trait]
-pub trait CadencyCommand {
-    fn name() -> &'static str;
-    async fn register(ctx: &Context) -> Result<Command, serenity::Error>;
+pub trait CadencyCommand: Sync + Send {
+    fn name(&self) -> &'static str;
+    async fn register(&self, ctx: &Context) -> Result<Command, serenity::Error>;
     async fn execute<'a>(
+        &self,
         ctx: &Context,
         command: &'a mut ApplicationCommandInteraction,
     ) -> Result<(), CadencyError>;
+}
+
+pub struct Commands;
+
+impl TypeMapKey for Commands {
+    type Value = std::sync::Arc<Vec<Box<dyn CadencyCommand>>>;
 }
 
 /// Submit global slash commands to the discord api.
