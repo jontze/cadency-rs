@@ -1,6 +1,4 @@
-use crate::commands::CadencyCommand;
-use crate::error::CadencyError;
-use crate::utils;
+use cadency_core::{utils, CadencyCommand, CadencyError};
 use serenity::{
     async_trait,
     client::Context,
@@ -9,18 +7,18 @@ use serenity::{
     },
 };
 
-pub struct Pause;
+pub struct Skip;
 
 #[async_trait]
-impl CadencyCommand for Pause {
+impl CadencyCommand for Skip {
     fn name() -> &'static str {
-        "pause"
+        "skip"
     }
 
     async fn register(ctx: &Context) -> Result<Command, serenity::Error> {
         Ok(
             Command::create_global_application_command(&ctx.http, |command| {
-                command.name("pause").description("Pause current song")
+                command.name("skip").description("Skip current song")
             })
             .await?,
         )
@@ -30,38 +28,38 @@ impl CadencyCommand for Pause {
         ctx: &Context,
         command: &'a mut ApplicationCommandInteraction,
     ) -> Result<(), CadencyError> {
-        debug!("Execute pause command");
+        debug!("Execute skip command");
         if let Some(guild_id) = command.guild_id {
             utils::voice::create_deferred_response(ctx, command).await?;
             let manager = utils::voice::get_songbird(ctx).await;
             if let Some(call) = manager.get(guild_id) {
                 let handler = call.lock().await;
                 if handler.queue().is_empty() {
-                    utils::voice::edit_deferred_response(ctx, command, ":x: **Nothing to pause**")
+                    utils::voice::edit_deferred_response(ctx, command, ":x: **Nothing to skip**")
                         .await?;
                 } else {
-                    match handler.queue().pause() {
+                    match handler.queue().skip() {
                         Ok(_) => {
                             utils::voice::edit_deferred_response(
                                 ctx,
                                 command,
-                                ":pause_button: **Paused**",
+                                ":fast_forward: **Skipped current song**",
                             )
                             .await?;
                         }
                         Err(err) => {
-                            error!("Failed to pause: {err:?}");
+                            error!("Failed to skip: {err:?}");
                             utils::voice::edit_deferred_response(
                                 ctx,
                                 command,
-                                ":x: **Could not pause**",
+                                ":x: **Could not skip**",
                             )
                             .await?;
                         }
                     };
                 }
             } else {
-                utils::voice::edit_deferred_response(ctx, command, ":x: **Nothing to pause**")
+                utils::voice::edit_deferred_response(ctx, command, ":x: **Nothing to skip**")
                     .await?;
             }
         } else {

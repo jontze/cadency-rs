@@ -9,30 +9,6 @@ use serenity::{
         },
     },
 };
-pub mod fib;
-pub mod inspire;
-pub mod now;
-pub mod pause;
-pub mod ping;
-pub mod play;
-pub mod resume;
-pub mod skip;
-pub mod slap;
-pub mod stop;
-pub mod tracks;
-pub mod urban;
-pub use fib::Fib;
-pub use inspire::Inspire;
-pub use now::Now;
-pub use pause::Pause;
-pub use ping::Ping;
-pub use play::Play;
-pub use resume::Resume;
-pub use skip::Skip;
-pub use slap::Slap;
-pub use stop::Stop;
-pub use tracks::Tracks;
-pub use urban::Urban;
 
 #[async_trait]
 pub trait CadencyCommand {
@@ -47,28 +23,11 @@ pub trait CadencyCommand {
 /// Submit global slash commands to the discord api.
 /// As global commands are cached for 1 hour, the activation ca take some time.
 /// For local testing it is recommended to create commands with a guild scope.
-pub async fn setup_commands(ctx: &Context) -> Result<(), serenity::Error> {
-    tokio::try_join!(
-        Ping::register(ctx),
-        Inspire::register(ctx),
-        Fib::register(ctx),
-        Urban::register(ctx),
-        Slap::register(ctx)
-    )?;
-
-    tokio::try_join!(
-        Play::register(ctx),
-        Now::register(ctx),
-        Skip::register(ctx),
-        Pause::register(ctx),
-        Resume::register(ctx),
-        Stop::register(ctx),
-        Tracks::register(ctx)
-    )?;
-    Ok(())
+pub(crate) async fn setup_commands(ctx: &Context) -> Result<(), serenity::Error> {
+    unimplemented!("Register each CadencyCommand");
 }
 
-pub async fn command_not_implemented(
+pub(crate) async fn command_not_implemented(
     ctx: &Context,
     command: ApplicationCommandInteraction,
 ) -> Result<(), CadencyError> {

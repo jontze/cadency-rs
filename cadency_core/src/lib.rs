@@ -1,14 +1,12 @@
 #[macro_use]
 extern crate log;
-extern crate env_logger;
-extern crate reqwest;
-#[macro_use]
-extern crate serde;
 extern crate serenity;
 
 pub mod client;
-mod commands;
+mod command;
+pub use command::CadencyCommand;
 mod error;
-mod handler;
+pub use error::CadencyError;
+pub mod handler;
 mod intents;
-mod utils;
+pub mod utils;

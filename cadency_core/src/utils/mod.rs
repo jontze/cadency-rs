@@ -15,7 +15,7 @@ pub mod voice;
 
 /// Set the online status and activity of the bot.
 /// Should not be set before the `ready` event.
-pub async fn set_bot_presence(ctx: &Context) {
+pub(crate) async fn set_bot_presence(ctx: &Context) {
     ctx.set_presence(Some(Activity::listening("music")), OnlineStatus::Online)
         .await;
 }

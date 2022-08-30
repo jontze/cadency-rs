@@ -1,6 +1,4 @@
-use crate::commands::CadencyCommand;
-use crate::error::CadencyError;
-use crate::utils;
+use cadency_core::{utils, CadencyCommand, CadencyError};
 use serenity::{
     async_trait,
     client::Context,
@@ -9,20 +7,20 @@ use serenity::{
     },
 };
 
-pub struct Resume;
+pub struct Stop;
 
 #[async_trait]
-impl CadencyCommand for Resume {
+impl CadencyCommand for Stop {
     fn name() -> &'static str {
-        "resume"
+        "stop"
     }
 
     async fn register(ctx: &Context) -> Result<Command, serenity::Error> {
         Ok(
             Command::create_global_application_command(&ctx.http, |command| {
                 command
-                    .name("resume")
-                    .description("Resume current song if paused")
+                    .name("stop")
+                    .description("Stop music and clean up the track list")
             })
             .await?,
         )
@@ -32,38 +30,26 @@ impl CadencyCommand for Resume {
         ctx: &Context,
         command: &'a mut ApplicationCommandInteraction,
     ) -> Result<(), CadencyError> {
-        debug!("Execute skip command");
+        debug!("Execute stop command");
         if let Some(guild_id) = command.guild_id {
             utils::voice::create_deferred_response(ctx, command).await?;
             let manager = utils::voice::get_songbird(ctx).await;
             if let Some(call) = manager.get(guild_id) {
                 let handler = call.lock().await;
                 if handler.queue().is_empty() {
-                    utils::voice::edit_deferred_response(ctx, command, ":x: **Nothing to resume**")
+                    utils::voice::edit_deferred_response(ctx, command, ":x: **Nothing to stop**")
                         .await?;
                 } else {
-                    match handler.queue().resume() {
-                        Ok(_) => {
-                            utils::voice::edit_deferred_response(
-                                ctx,
-                                command,
-                                ":play_pause: **Resumed**",
-                            )
-                            .await?;
-                        }
-                        Err(err) => {
-                            error!("Failed to resume: {err:?}");
-                            utils::voice::edit_deferred_response(
-                                ctx,
-                                command,
-                                ":x: **Could not resume**",
-                            )
-                            .await?;
-                        }
-                    };
+                    handler.queue().stop();
+                    utils::voice::edit_deferred_response(
+                        ctx,
+                        command,
+                        ":white_check_mark: :wastebasket: **Successfully stopped and cleared the playlist**",
+                    )
+                    .await?;
                 }
             } else {
-                utils::voice::edit_deferred_response(ctx, command, ":x: **Nothing to resume**")
+                utils::voice::edit_deferred_response(ctx, command, ":x: **Nothing to stop**")
                     .await?;
             }
         } else {
