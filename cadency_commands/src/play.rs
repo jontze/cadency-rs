@@ -1,7 +1,4 @@
-use crate::commands::CadencyCommand;
-use crate::error::CadencyError;
-use crate::handler::voice::InactiveHandler;
-use crate::utils;
+use cadency_core::{handler::voice::InactiveHandler, utils, CadencyCommand, CadencyError};
 use serenity::{
     async_trait,
     client::Context,
@@ -16,7 +13,11 @@ pub struct Play;
 
 #[async_trait]
 impl CadencyCommand for Play {
-    async fn register(ctx: &Context) -> Result<Command, serenity::Error> {
+    fn name(&self) -> &'static str {
+        "play"
+    }
+
+    async fn register(&self, ctx: &Context) -> Result<Command, serenity::Error> {
         Ok(
             Command::create_global_application_command(&ctx.http, |command| {
                 command
@@ -35,6 +36,7 @@ impl CadencyCommand for Play {
     }
 
     async fn execute<'a>(
+        &self,
         ctx: &Context,
         command: &'a mut ApplicationCommandInteraction,
     ) -> Result<(), CadencyError> {

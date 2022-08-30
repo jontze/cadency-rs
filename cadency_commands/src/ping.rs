@@ -1,6 +1,4 @@
-use super::CadencyCommand;
-use crate::error::CadencyError;
-use crate::utils;
+use cadency_core::{utils, CadencyCommand, CadencyError};
 use serenity::{
     async_trait,
     client::Context,
@@ -13,8 +11,12 @@ pub struct Ping;
 
 #[async_trait]
 impl CadencyCommand for Ping {
+    fn name(&self) -> &'static str {
+        "ping"
+    }
+
     /// Construct the slash command that will be submited to the discord api
-    async fn register(ctx: &Context) -> Result<Command, serenity::Error> {
+    async fn register(&self, ctx: &Context) -> Result<Command, serenity::Error> {
         Ok(
             Command::create_global_application_command(&ctx.http, |command| {
                 command.name("ping").description("Play Ping-Pong")
@@ -24,6 +26,7 @@ impl CadencyCommand for Ping {
     }
 
     async fn execute<'a>(
+        &self,
         ctx: &Context,
         command: &'a mut ApplicationCommandInteraction,
     ) -> Result<(), CadencyError> {

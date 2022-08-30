@@ -1,4 +1,4 @@
-use crate::error::CadencyError;
+use crate::{error::CadencyError, utils};
 use serenity::{
     async_trait,
     client::Context,
@@ -8,82 +8,39 @@ use serenity::{
             application_command::ApplicationCommandInteraction, InteractionResponseType,
         },
     },
+    prelude::TypeMapKey,
 };
 
-pub mod fib;
-pub mod inspire;
-
-pub mod now;
-
-pub mod pause;
-pub mod ping;
-
-pub mod play;
-
-pub mod resume;
-
-pub mod skip;
-pub mod slap;
-
-pub mod stop;
-
-pub mod tracks;
-pub mod urban;
-
-pub use fib::Fib;
-pub use inspire::Inspire;
-
-pub use now::Now;
-
-pub use pause::Pause;
-pub use ping::Ping;
-
-pub use play::Play;
-
-pub use resume::Resume;
-
-pub use skip::Skip;
-pub use slap::Slap;
-
-pub use stop::Stop;
-
-pub use tracks::Tracks;
-pub use urban::Urban;
-
 #[async_trait]
-pub trait CadencyCommand {
-    async fn register(ctx: &Context) -> Result<Command, serenity::Error>;
+pub trait CadencyCommand: Sync + Send {
+    fn name(&self) -> &'static str;
+    async fn register(&self, ctx: &Context) -> Result<Command, serenity::Error>;
     async fn execute<'a>(
+        &self,
         ctx: &Context,
         command: &'a mut ApplicationCommandInteraction,
     ) -> Result<(), CadencyError>;
 }
 
+pub(crate) struct Commands;
+
+impl TypeMapKey for Commands {
+    type Value = std::sync::Arc<Vec<Box<dyn CadencyCommand>>>;
+}
+
 /// Submit global slash commands to the discord api.
 /// As global commands are cached for 1 hour, the activation ca take some time.
 /// For local testing it is recommended to create commands with a guild scope.
-pub async fn setup_commands(ctx: &Context) -> Result<(), serenity::Error> {
-    tokio::try_join!(
-        Ping::register(ctx),
-        Inspire::register(ctx),
-        Fib::register(ctx),
-        Urban::register(ctx),
-        Slap::register(ctx)
-    )?;
-
-    tokio::try_join!(
-        Play::register(ctx),
-        Now::register(ctx),
-        Skip::register(ctx),
-        Pause::register(ctx),
-        Resume::register(ctx),
-        Stop::register(ctx),
-        Tracks::register(ctx)
-    )?;
+pub(crate) async fn setup_commands(ctx: &Context) -> Result<(), serenity::Error> {
+    let commands = utils::get_commands(ctx).await;
+    // No need to run this in parallel as serenity will enforce one-by-one execution
+    for command in commands.iter() {
+        command.register(ctx).await?;
+    }
     Ok(())
 }
 
-pub async fn command_not_implemented(
+pub(crate) async fn command_not_implemented(
     ctx: &Context,
     command: ApplicationCommandInteraction,
 ) -> Result<(), CadencyError> {

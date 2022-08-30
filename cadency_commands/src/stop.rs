@@ -1,6 +1,4 @@
-use crate::commands::CadencyCommand;
-use crate::error::CadencyError;
-use crate::utils;
+use cadency_core::{utils, CadencyCommand, CadencyError};
 use serenity::{
     async_trait,
     client::Context,
@@ -13,7 +11,11 @@ pub struct Stop;
 
 #[async_trait]
 impl CadencyCommand for Stop {
-    async fn register(ctx: &Context) -> Result<Command, serenity::Error> {
+    fn name(&self) -> &'static str {
+        "stop"
+    }
+
+    async fn register(&self, ctx: &Context) -> Result<Command, serenity::Error> {
         Ok(
             Command::create_global_application_command(&ctx.http, |command| {
                 command
@@ -25,6 +27,7 @@ impl CadencyCommand for Stop {
     }
 
     async fn execute<'a>(
+        &self,
         ctx: &Context,
         command: &'a mut ApplicationCommandInteraction,
     ) -> Result<(), CadencyError> {

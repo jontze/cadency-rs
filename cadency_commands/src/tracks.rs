@@ -1,6 +1,4 @@
-use crate::commands::CadencyCommand;
-use crate::error::CadencyError;
-use crate::utils;
+use cadency_core::{utils, CadencyCommand, CadencyError};
 use serenity::{
     async_trait,
     builder::CreateEmbed,
@@ -15,7 +13,11 @@ pub struct Tracks;
 
 #[async_trait]
 impl CadencyCommand for Tracks {
-    async fn register(ctx: &Context) -> Result<Command, serenity::Error> {
+    fn name(&self) -> &'static str {
+        "tracks"
+    }
+
+    async fn register(&self, ctx: &Context) -> Result<Command, serenity::Error> {
         Ok(
             Command::create_global_application_command(&ctx.http, |command| {
                 command
@@ -27,6 +29,7 @@ impl CadencyCommand for Tracks {
     }
 
     async fn execute<'a>(
+        &self,
         ctx: &Context,
         command: &'a mut ApplicationCommandInteraction,
     ) -> Result<(), CadencyError> {
@@ -61,7 +64,7 @@ impl CadencyCommand for Tracks {
                             .map_or("**No url provided**", |u| u);
                         embeded_tracks.field(
                             format!("{position}. :newspaper: `{title}`"),
-                            format!(":notes: `${url}`"),
+                            format!(":notes: `{url}`"),
                             false,
                         );
                     }

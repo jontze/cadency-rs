@@ -1,4 +1,4 @@
-use crate::error::CadencyError;
+use crate::{command::Commands, error::CadencyError, CadencyCommand};
 use serenity::{
     builder::CreateEmbed,
     client::Context,
@@ -15,9 +15,17 @@ pub mod voice;
 
 /// Set the online status and activity of the bot.
 /// Should not be set before the `ready` event.
-pub async fn set_bot_presence(ctx: &Context) {
+pub(crate) async fn set_bot_presence(ctx: &Context) {
     ctx.set_presence(Some(Activity::listening("music")), OnlineStatus::Online)
         .await;
+}
+
+pub(crate) async fn get_commands(ctx: &Context) -> std::sync::Arc<Vec<Box<dyn CadencyCommand>>> {
+    let data_read = ctx.data.read().await;
+    data_read
+        .get::<Commands>()
+        .expect("Command array missing")
+        .clone()
 }
 
 pub async fn create_response<'a>(

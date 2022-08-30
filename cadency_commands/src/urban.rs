@@ -1,6 +1,4 @@
-use super::CadencyCommand;
-use crate::error::CadencyError;
-use crate::utils;
+use cadency_core::{utils, CadencyCommand, CadencyError};
 use serenity::{
     async_trait,
     builder::CreateEmbed,
@@ -80,7 +78,11 @@ impl Urban {
 
 #[async_trait]
 impl CadencyCommand for Urban {
-    async fn register(ctx: &Context) -> Result<Command, serenity::Error> {
+    fn name(&self) -> &'static str {
+        "urban"
+    }
+
+    async fn register(&self, ctx: &Context) -> Result<Command, serenity::Error> {
         Ok(
             Command::create_global_application_command(&ctx.http, |command| {
                 command
@@ -99,6 +101,7 @@ impl CadencyCommand for Urban {
     }
 
     async fn execute<'a>(
+        &self,
         ctx: &Context,
         command: &'a mut ApplicationCommandInteraction,
     ) -> Result<(), CadencyError> {

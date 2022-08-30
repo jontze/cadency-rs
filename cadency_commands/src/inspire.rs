@@ -1,6 +1,4 @@
-use super::CadencyCommand;
-use crate::error::CadencyError;
-use crate::utils;
+use cadency_core::{utils, CadencyCommand, CadencyError};
 use serenity::{
     async_trait,
     client::Context,
@@ -23,8 +21,12 @@ impl Inspire {
 
 #[async_trait]
 impl CadencyCommand for Inspire {
+    fn name(&self) -> &'static str {
+        "inspire"
+    }
+
     /// Construct the slash command that will be submited to the discord api
-    async fn register(ctx: &Context) -> Result<Command, serenity::Error> {
+    async fn register(&self, ctx: &Context) -> Result<Command, serenity::Error> {
         Ok(
             Command::create_global_application_command(&ctx.http, |command| {
                 command
@@ -36,6 +38,7 @@ impl CadencyCommand for Inspire {
     }
 
     async fn execute<'a>(
+        &self,
         ctx: &Context,
         command: &'a mut ApplicationCommandInteraction,
     ) -> Result<(), CadencyError> {
