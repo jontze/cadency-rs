@@ -64,7 +64,7 @@ impl CadencyCommand for Tracks {
                             .map_or("**No url provided**", |u| u);
                         embeded_tracks.field(
                             format!("{position}. :newspaper: `{title}`"),
-                            format!(":notes: `${url}`"),
+                            format!(":notes: `{url}`"),
                             false,
                         );
                     }
