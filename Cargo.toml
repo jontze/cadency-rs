@@ -1,6 +1,7 @@
 [workspace]
 members = [
     "cadency_core",
+    "cadency_derive",
     "cadency_commands",
     "cadency"
 ]
