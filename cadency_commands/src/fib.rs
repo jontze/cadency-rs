@@ -42,6 +42,7 @@ impl CadencyCommand for Fib {
         )
     }
 
+    #[command]
     async fn execute<'a>(
         &self,
         ctx: &Context,

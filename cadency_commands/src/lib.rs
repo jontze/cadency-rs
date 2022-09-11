@@ -3,7 +3,7 @@ extern crate serde;
 #[macro_use]
 extern crate log;
 #[macro_use]
-extern crate cadency_derive;
+extern crate cadency_codegen;
 
 mod fib;
 pub use fib::Fib;

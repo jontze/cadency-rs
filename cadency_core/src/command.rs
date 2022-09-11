@@ -67,14 +67,14 @@ mod test {
 
     #[test]
     fn impl_commandbaseline_trait_with_macro() {
-        #[derive(cadency_derive::CommandBaseline)]
+        #[derive(cadency_codegen::CommandBaseline)]
         struct Test;
         assert!(true)
     }
 
     #[test]
     fn return_lowercase_struct_name_as_name() {
-        #[derive(cadency_derive::CommandBaseline)]
+        #[derive(cadency_codegen::CommandBaseline)]
         struct Test;
         let name: String = Test.name();
         assert_eq!(name, "test", "Test command name ton be lowercase {name}")
@@ -82,7 +82,7 @@ mod test {
 
     #[test]
     fn not_return_uppercase_struct_name_as_name() {
-        #[derive(cadency_derive::CommandBaseline)]
+        #[derive(cadency_codegen::CommandBaseline)]
         struct Test;
         let name: String = Test.name();
         assert_ne!(
