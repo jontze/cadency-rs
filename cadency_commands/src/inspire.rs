@@ -34,12 +34,12 @@ impl CadencyCommand for Inspire {
         )
     }
 
+    #[command]
     async fn execute<'a>(
         &self,
         ctx: &Context,
         command: &'a mut ApplicationCommandInteraction,
     ) -> Result<(), CadencyError> {
-        debug!("Execute {} command", self.name());
         let inspire_url = Self::request_inspire_image_url().await.map_or_else(
             |err| {
                 error!("{:?}", err);

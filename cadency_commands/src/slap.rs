@@ -31,12 +31,12 @@ impl CadencyCommand for Slap {
         )
     }
 
+    #[command]
     async fn execute<'a>(
         &self,
         ctx: &Context,
         command: &'a mut ApplicationCommandInteraction,
     ) -> Result<(), CadencyError> {
-        debug!("Execute {} command", self.name());
         let args = command.data.options.clone();
         let user_option = args
             .first()
