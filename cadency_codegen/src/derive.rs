@@ -8,6 +8,14 @@ pub(crate) fn impl_command_baseline(derive_input: DeriveInput) -> TokenStream {
             fn name(&self) -> String {
                 String::from(stringify!(#struct_name)).to_lowercase()
             }
+
+            fn description(&self) -> String {
+                self.description.to_string()
+            }
+
+            fn options(&self) -> &Vec<CadencyCommandOption> {
+                self.options.as_ref()
+            }
         }
     }
     .into()
