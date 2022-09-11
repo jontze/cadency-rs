@@ -10,18 +10,18 @@ use cadency_core::{Cadency, CadencyCommand};
 async fn main() {
     env_logger::init();
     let commands: Vec<Box<dyn CadencyCommand>> = vec![
-        Box::new(Fib),
-        Box::new(Inspire),
-        Box::new(Now),
-        Box::new(Pause),
-        Box::new(Ping),
-        Box::new(Play),
-        Box::new(Resume),
-        Box::new(Skip),
-        Box::new(Slap),
-        Box::new(Stop),
-        Box::new(Tracks),
-        Box::new(Urban),
+        Box::new(Fib::default()),
+        Box::new(Inspire::default()),
+        Box::new(Now::default()),
+        Box::new(Pause::default()),
+        Box::new(Ping::default()),
+        Box::new(Play::default()),
+        Box::new(Resume::default()),
+        Box::new(Skip::default()),
+        Box::new(Slap::default()),
+        Box::new(Stop::default()),
+        Box::new(Tracks::default()),
+        Box::new(Urban::default()),
     ];
     let mut cadency = Cadency::default()
         .await

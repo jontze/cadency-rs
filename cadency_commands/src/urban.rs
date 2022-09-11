@@ -1,10 +1,10 @@
-use cadency_core::{utils, CadencyCommand, CadencyError, CommandBaseline};
+use cadency_core::{utils, CadencyCommand, CadencyCommandOption, CadencyError, CommandBaseline};
 use serenity::{
     async_trait,
     builder::CreateEmbed,
     client::Context,
     model::application::{
-        command::{Command, CommandOptionType},
+        command::CommandOptionType,
         interaction::application_command::{ApplicationCommandInteraction, CommandDataOptionValue},
     },
     utils::Color,
@@ -32,7 +32,24 @@ struct UrbanResult {
 }
 
 #[derive(CommandBaseline)]
-pub struct Urban;
+pub struct Urban {
+    description: &'static str,
+    options: Vec<CadencyCommandOption>,
+}
+
+impl std::default::Default for Urban {
+    fn default() -> Self {
+        Self {
+            description: "Searches the Urbandictionary for your input",
+            options: vec![CadencyCommandOption {
+                name: "url",
+                description: "Your search query",
+                kind: CommandOptionType::String,
+                required: true,
+            }],
+        }
+    }
+}
 
 impl Urban {
     async fn request_urban_dictionary_entries(
@@ -79,24 +96,6 @@ impl Urban {
 
 #[async_trait]
 impl CadencyCommand for Urban {
-    async fn register(&self, ctx: &Context) -> Result<Command, serenity::Error> {
-        Ok(
-            Command::create_global_application_command(&ctx.http, |command| {
-                command
-                    .name(self.name())
-                    .description("Searches the Urbandictionary for your input")
-                    .create_option(|option| {
-                        option
-                            .name("query")
-                            .description("Your search query")
-                            .kind(CommandOptionType::String)
-                            .required(true)
-                    })
-            })
-            .await?,
-        )
-    }
-
     #[command]
     async fn execute<'a>(
         &self,

@@ -1,27 +1,26 @@
-use cadency_core::{utils, CadencyCommand, CadencyError, CommandBaseline};
+use cadency_core::{utils, CadencyCommand, CadencyCommandOption, CadencyError, CommandBaseline};
 use serenity::{
-    async_trait,
-    client::Context,
-    model::application::{
-        command::Command, interaction::application_command::ApplicationCommandInteraction,
-    },
+    async_trait, client::Context,
+    model::application::interaction::application_command::ApplicationCommandInteraction,
 };
 
 #[derive(CommandBaseline)]
-pub struct Ping;
+pub struct Ping {
+    description: &'static str,
+    options: Vec<CadencyCommandOption>,
+}
+
+impl std::default::Default for Ping {
+    fn default() -> Self {
+        Self {
+            description: "Play Ping-Pong",
+            options: vec![],
+        }
+    }
+}
 
 #[async_trait]
 impl CadencyCommand for Ping {
-    /// Construct the slash command that will be submited to the discord api
-    async fn register(&self, ctx: &Context) -> Result<Command, serenity::Error> {
-        Ok(
-            Command::create_global_application_command(&ctx.http, |command| {
-                command.name(self.name()).description("Play Ping-Pong")
-            })
-            .await?,
-        )
-    }
-
     #[command]
     async fn execute<'a>(
         &self,

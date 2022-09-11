@@ -1,14 +1,23 @@
-use cadency_core::{utils, CadencyCommand, CadencyError, CommandBaseline};
+use cadency_core::{utils, CadencyCommand, CadencyCommandOption, CadencyError, CommandBaseline};
 use serenity::{
-    async_trait,
-    client::Context,
-    model::application::{
-        command::Command, interaction::application_command::ApplicationCommandInteraction,
-    },
+    async_trait, client::Context,
+    model::application::interaction::application_command::ApplicationCommandInteraction,
 };
 
 #[derive(CommandBaseline)]
-pub struct Inspire;
+pub struct Inspire {
+    description: &'static str,
+    options: Vec<CadencyCommandOption>,
+}
+
+impl std::default::Default for Inspire {
+    fn default() -> Self {
+        Self {
+            description: "Say something really inspiring!",
+            options: vec![],
+        }
+    }
+}
 
 impl Inspire {
     async fn request_inspire_image_url() -> Result<String, reqwest::Error> {
@@ -22,18 +31,6 @@ impl Inspire {
 
 #[async_trait]
 impl CadencyCommand for Inspire {
-    /// Construct the slash command that will be submited to the discord api
-    async fn register(&self, ctx: &Context) -> Result<Command, serenity::Error> {
-        Ok(
-            Command::create_global_application_command(&ctx.http, |command| {
-                command
-                    .name(self.name())
-                    .description("Say something really inspiring!")
-            })
-            .await?,
-        )
-    }
-
     #[command]
     async fn execute<'a>(
         &self,

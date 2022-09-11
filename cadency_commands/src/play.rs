@@ -1,39 +1,38 @@
 use cadency_core::{
-    handler::voice::InactiveHandler, utils, CadencyCommand, CadencyError, CommandBaseline,
+    handler::voice::InactiveHandler, utils, CadencyCommand, CadencyCommandOption, CadencyError,
+    CommandBaseline,
 };
 use serenity::{
     async_trait,
     client::Context,
     model::application::{
-        command::{Command, CommandOptionType},
-        interaction::application_command::ApplicationCommandInteraction,
+        command::CommandOptionType, interaction::application_command::ApplicationCommandInteraction,
     },
 };
 use songbird::events::Event;
 
 #[derive(CommandBaseline)]
-pub struct Play;
+pub struct Play {
+    description: &'static str,
+    options: Vec<CadencyCommandOption>,
+}
+
+impl std::default::Default for Play {
+    fn default() -> Self {
+        Self {
+            description: "Play a song from a youtube url",
+            options: vec![CadencyCommandOption {
+                name: "url",
+                description: "Url to the youtube audio source",
+                kind: CommandOptionType::String,
+                required: true,
+            }],
+        }
+    }
+}
 
 #[async_trait]
 impl CadencyCommand for Play {
-    async fn register(&self, ctx: &Context) -> Result<Command, serenity::Error> {
-        Ok(
-            Command::create_global_application_command(&ctx.http, |command| {
-                command
-                    .name(self.name())
-                    .description("Play a song from a youtube url")
-                    .create_option(|option| {
-                        option
-                            .name("url")
-                            .description("Url to the youtube audio source")
-                            .kind(CommandOptionType::String)
-                            .required(true)
-                    })
-            })
-            .await?,
-        )
-    }
-
     #[command]
     async fn execute<'a>(
         &self,

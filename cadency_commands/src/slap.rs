@@ -1,36 +1,35 @@
-use cadency_core::{utils, CadencyCommand, CadencyError, CommandBaseline};
+use cadency_core::{utils, CadencyCommand, CadencyCommandOption, CadencyError, CommandBaseline};
 use serenity::{
     async_trait,
     client::Context,
     model::application::{
-        command::{Command, CommandOptionType},
+        command::CommandOptionType,
         interaction::application_command::{ApplicationCommandInteraction, CommandDataOptionValue},
     },
 };
 
 #[derive(CommandBaseline)]
-pub struct Slap;
+pub struct Slap {
+    description: &'static str,
+    options: Vec<CadencyCommandOption>,
+}
+
+impl std::default::Default for Slap {
+    fn default() -> Self {
+        Self {
+            description: "Slap someone with a large trout!",
+            options: vec![CadencyCommandOption {
+                name: "target",
+                description: "The user you want to slap",
+                kind: CommandOptionType::User,
+                required: true,
+            }],
+        }
+    }
+}
 
 #[async_trait]
 impl CadencyCommand for Slap {
-    async fn register(&self, ctx: &Context) -> Result<Command, serenity::Error> {
-        Ok(
-            Command::create_global_application_command(&ctx.http, |command| {
-                command
-                    .name(self.name())
-                    .description("Slap someone with a large trout!")
-                    .create_option(|option| {
-                        option
-                            .name("target")
-                            .description("The user you want to slap")
-                            .kind(CommandOptionType::User)
-                            .required(true)
-                    })
-            })
-            .await?,
-        )
-    }
-
     #[command]
     async fn execute<'a>(
         &self,
