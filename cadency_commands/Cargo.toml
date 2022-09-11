@@ -24,3 +24,6 @@ features = ["builtin-queue"]
 
 [dependencies.cadency_core]
 path = "../cadency_core"
+
+[dependencies.cadency_derive]
+path = "../cadency_derive"

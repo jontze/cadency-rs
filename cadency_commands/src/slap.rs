@@ -1,4 +1,4 @@
-use cadency_core::{utils, CadencyCommand, CadencyError};
+use cadency_core::{utils, CadencyCommand, CadencyError, CommandBaseline};
 use serenity::{
     async_trait,
     client::Context,
@@ -8,19 +8,16 @@ use serenity::{
     },
 };
 
+#[derive(CommandBaseline)]
 pub struct Slap;
 
 #[async_trait]
 impl CadencyCommand for Slap {
-    fn name(&self) -> &'static str {
-        "slap"
-    }
-
     async fn register(&self, ctx: &Context) -> Result<Command, serenity::Error> {
         Ok(
             Command::create_global_application_command(&ctx.http, |command| {
                 command
-                    .name("slap")
+                    .name(self.name())
                     .description("Slap someone with a large trout!")
                     .create_option(|option| {
                         option
@@ -39,7 +36,7 @@ impl CadencyCommand for Slap {
         ctx: &Context,
         command: &'a mut ApplicationCommandInteraction,
     ) -> Result<(), CadencyError> {
-        debug!("Execute slap command");
+        debug!("Execute {} command", self.name());
         let args = command.data.options.clone();
         let user_option = args
             .first()

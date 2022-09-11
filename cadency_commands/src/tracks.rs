@@ -1,4 +1,4 @@
-use cadency_core::{utils, CadencyCommand, CadencyError};
+use cadency_core::{utils, CadencyCommand, CadencyError, CommandBaseline};
 use serenity::{
     async_trait,
     builder::CreateEmbed,
@@ -9,19 +9,16 @@ use serenity::{
     utils::Color,
 };
 
+#[derive(CommandBaseline)]
 pub struct Tracks;
 
 #[async_trait]
 impl CadencyCommand for Tracks {
-    fn name(&self) -> &'static str {
-        "tracks"
-    }
-
     async fn register(&self, ctx: &Context) -> Result<Command, serenity::Error> {
         Ok(
             Command::create_global_application_command(&ctx.http, |command| {
                 command
-                    .name("tracks")
+                    .name(self.name())
                     .description("List all tracks in the queue")
             })
             .await?,
@@ -33,7 +30,7 @@ impl CadencyCommand for Tracks {
         ctx: &Context,
         command: &'a mut ApplicationCommandInteraction,
     ) -> Result<(), CadencyError> {
-        debug!("Execute tracks command");
+        debug!("Execute {} command", self.name());
         if let Some(guild_id) = command.guild_id {
             utils::voice::create_deferred_response(ctx, command).await?;
             let manager = utils::voice::get_songbird(ctx).await;

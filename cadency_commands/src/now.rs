@@ -1,4 +1,4 @@
-use cadency_core::{utils, CadencyCommand, CadencyError};
+use cadency_core::{utils, CadencyCommand, CadencyError, CommandBaseline};
 use serenity::{
     async_trait,
     client::Context,
@@ -7,18 +7,15 @@ use serenity::{
     },
 };
 
+#[derive(CommandBaseline)]
 pub struct Now;
 
 #[async_trait]
 impl CadencyCommand for Now {
-    fn name(&self) -> &'static str {
-        "now"
-    }
-
     async fn register(&self, ctx: &Context) -> Result<Command, serenity::Error> {
         Ok(
             Command::create_global_application_command(&ctx.http, |command| {
-                command.name("now").description("Show current song")
+                command.name(self.name()).description("Show current song")
             })
             .await?,
         )
@@ -29,9 +26,9 @@ impl CadencyCommand for Now {
         ctx: &Context,
         command: &'a mut ApplicationCommandInteraction,
     ) -> Result<(), CadencyError> {
-        debug!("Execute now command");
+        debug!("Execute {} command", self.name());
         if let Some(guild_id) = command.guild_id {
-            let manager = songbird::get(ctx).await.expect("Songbord manager");
+            let manager = utils::voice::get_songbird(ctx).await;
             let call = manager.get(guild_id).unwrap();
             let handler = call.lock().await;
             match handler.queue().current() {

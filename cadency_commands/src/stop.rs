@@ -1,4 +1,4 @@
-use cadency_core::{utils, CadencyCommand, CadencyError};
+use cadency_core::{utils, CadencyCommand, CadencyError, CommandBaseline};
 use serenity::{
     async_trait,
     client::Context,
@@ -7,19 +7,16 @@ use serenity::{
     },
 };
 
+#[derive(CommandBaseline)]
 pub struct Stop;
 
 #[async_trait]
 impl CadencyCommand for Stop {
-    fn name(&self) -> &'static str {
-        "stop"
-    }
-
     async fn register(&self, ctx: &Context) -> Result<Command, serenity::Error> {
         Ok(
             Command::create_global_application_command(&ctx.http, |command| {
                 command
-                    .name("stop")
+                    .name(self.name())
                     .description("Stop music and clean up the track list")
             })
             .await?,
@@ -31,7 +28,7 @@ impl CadencyCommand for Stop {
         ctx: &Context,
         command: &'a mut ApplicationCommandInteraction,
     ) -> Result<(), CadencyError> {
-        debug!("Execute stop command");
+        debug!("Execute {} command", self.name());
         if let Some(guild_id) = command.guild_id {
             utils::voice::create_deferred_response(ctx, command).await?;
             let manager = utils::voice::get_songbird(ctx).await;
