@@ -1,4 +1,4 @@
-use cadency_core::{utils, CadencyCommand, CadencyError};
+use cadency_core::{utils, CadencyCommand, CadencyError, CommandBaseline};
 use serenity::{
     async_trait,
     builder::CreateEmbed,
@@ -31,6 +31,7 @@ struct UrbanResult {
     pub list: Vec<UrbanEntry>,
 }
 
+#[derive(CommandBaseline)]
 pub struct Urban;
 
 impl Urban {
@@ -78,15 +79,11 @@ impl Urban {
 
 #[async_trait]
 impl CadencyCommand for Urban {
-    fn name(&self) -> &'static str {
-        "urban"
-    }
-
     async fn register(&self, ctx: &Context) -> Result<Command, serenity::Error> {
         Ok(
             Command::create_global_application_command(&ctx.http, |command| {
                 command
-                    .name("urban")
+                    .name(self.name())
                     .description("Searches the Urbandictionary for your input")
                     .create_option(|option| {
                         option
@@ -105,7 +102,7 @@ impl CadencyCommand for Urban {
         ctx: &Context,
         command: &'a mut ApplicationCommandInteraction,
     ) -> Result<(), CadencyError> {
-        debug!("Execute urban command");
+        debug!("Execute {} command", self.name());
         let query_option =
             command
                 .data

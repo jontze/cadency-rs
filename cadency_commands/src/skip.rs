@@ -1,4 +1,4 @@
-use cadency_core::{utils, CadencyCommand, CadencyError};
+use cadency_core::{utils, CadencyCommand, CadencyError, CommandBaseline};
 use serenity::{
     async_trait,
     client::Context,
@@ -7,18 +7,15 @@ use serenity::{
     },
 };
 
+#[derive(CommandBaseline)]
 pub struct Skip;
 
 #[async_trait]
 impl CadencyCommand for Skip {
-    fn name(&self) -> &'static str {
-        "skip"
-    }
-
     async fn register(&self, ctx: &Context) -> Result<Command, serenity::Error> {
         Ok(
             Command::create_global_application_command(&ctx.http, |command| {
-                command.name("skip").description("Skip current song")
+                command.name(self.name()).description("Skip current song")
             })
             .await?,
         )
@@ -29,7 +26,7 @@ impl CadencyCommand for Skip {
         ctx: &Context,
         command: &'a mut ApplicationCommandInteraction,
     ) -> Result<(), CadencyError> {
-        debug!("Execute skip command");
+        debug!("Execute {} command", self.name());
         if let Some(guild_id) = command.guild_id {
             utils::voice::create_deferred_response(ctx, command).await?;
             let manager = utils::voice::get_songbird(ctx).await;

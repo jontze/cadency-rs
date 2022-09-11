@@ -1,4 +1,4 @@
-use cadency_core::{utils, CadencyCommand, CadencyError};
+use cadency_core::{utils, CadencyCommand, CadencyError, CommandBaseline};
 use serenity::{
     async_trait,
     client::Context,
@@ -8,6 +8,7 @@ use serenity::{
     },
 };
 
+#[derive(CommandBaseline)]
 pub struct Fib;
 
 impl Fib {
@@ -22,16 +23,12 @@ impl Fib {
 
 #[async_trait]
 impl CadencyCommand for Fib {
-    fn name(&self) -> &'static str {
-        "fib"
-    }
-
     /// Construct the slash command that will be submited to the discord api
     async fn register(&self, ctx: &Context) -> Result<Command, serenity::Error> {
         Ok(
             Command::create_global_application_command(&ctx.http, |command| {
                 command
-                    .name("fib")
+                    .name(self.name())
                     .description("Calculate the nth number in the fibonacci series")
                     .create_option(|option| {
                         option
@@ -50,7 +47,7 @@ impl CadencyCommand for Fib {
         ctx: &Context,
         command: &'a mut ApplicationCommandInteraction,
     ) -> Result<(), CadencyError> {
-        debug!("Execute fib command");
+        debug!("Execute {} command", self.name());
         let number_option =
             command
                 .data
@@ -61,12 +58,12 @@ impl CadencyCommand for Fib {
                         if let CommandDataOptionValue::Integer(fib_value) = value {
                             Some(fib_value)
                         } else {
-                            error!("Fib command option not a integer: {:?}", value);
+                            error!("{} command option not a integer: {:?}", self.name(), value);
                             None
                         }
                     }
                     None => {
-                        error!("Fib command option empty");
+                        error!("{} command option empty", self.name());
                         None
                     }
                 });

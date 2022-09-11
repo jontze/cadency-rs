@@ -19,6 +19,7 @@ jobs:
         with:
           command: clippy
           args: -- -D warnings
+
   format:
     runs-on: ubuntu-latest
     steps:
@@ -35,6 +36,23 @@ jobs:
         with:
           command: fmt
           args: --all -- --check
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Rust with rustfmt
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          override: true
+      - name: Run tests
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --all
+
   build:
     runs-on: ubuntu-latest
     steps:

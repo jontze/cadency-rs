@@ -1,4 +1,6 @@
-use cadency_core::{handler::voice::InactiveHandler, utils, CadencyCommand, CadencyError};
+use cadency_core::{
+    handler::voice::InactiveHandler, utils, CadencyCommand, CadencyError, CommandBaseline,
+};
 use serenity::{
     async_trait,
     client::Context,
@@ -9,19 +11,16 @@ use serenity::{
 };
 use songbird::events::Event;
 
+#[derive(CommandBaseline)]
 pub struct Play;
 
 #[async_trait]
 impl CadencyCommand for Play {
-    fn name(&self) -> &'static str {
-        "play"
-    }
-
     async fn register(&self, ctx: &Context) -> Result<Command, serenity::Error> {
         Ok(
             Command::create_global_application_command(&ctx.http, |command| {
                 command
-                    .name("play")
+                    .name(self.name())
                     .description("Play a song from a youtube url")
                     .create_option(|option| {
                         option
@@ -40,7 +39,7 @@ impl CadencyCommand for Play {
         ctx: &Context,
         command: &'a mut ApplicationCommandInteraction,
     ) -> Result<(), CadencyError> {
-        debug!("Execute play command");
+        debug!("Execute {} command", self.name());
         let url_option = utils::voice::parse_valid_url(&command.data.options);
         if let Some(valid_url) = url_option {
             utils::voice::create_deferred_response(ctx, command).await?;
