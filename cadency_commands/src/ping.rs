@@ -22,12 +22,12 @@ impl CadencyCommand for Ping {
         )
     }
 
+    #[command]
     async fn execute<'a>(
         &self,
         ctx: &Context,
         command: &'a mut ApplicationCommandInteraction,
     ) -> Result<(), CadencyError> {
-        debug!("Execute {} command", self.name());
         utils::create_response(ctx, command, "Pong!").await?;
         Ok(())
     }

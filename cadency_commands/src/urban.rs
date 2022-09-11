@@ -97,12 +97,12 @@ impl CadencyCommand for Urban {
         )
     }
 
+    #[command]
     async fn execute<'a>(
         &self,
         ctx: &Context,
         command: &'a mut ApplicationCommandInteraction,
     ) -> Result<(), CadencyError> {
-        debug!("Execute {} command", self.name());
         let query_option =
             command
                 .data

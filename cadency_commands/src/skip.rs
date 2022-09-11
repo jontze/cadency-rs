@@ -21,12 +21,12 @@ impl CadencyCommand for Skip {
         )
     }
 
+    #[command]
     async fn execute<'a>(
         &self,
         ctx: &Context,
         command: &'a mut ApplicationCommandInteraction,
     ) -> Result<(), CadencyError> {
-        debug!("Execute {} command", self.name());
         if let Some(guild_id) = command.guild_id {
             utils::voice::create_deferred_response(ctx, command).await?;
             let manager = utils::voice::get_songbird(ctx).await;

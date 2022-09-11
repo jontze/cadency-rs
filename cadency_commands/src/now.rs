@@ -21,12 +21,12 @@ impl CadencyCommand for Now {
         )
     }
 
+    #[command]
     async fn execute<'a>(
         &self,
         ctx: &Context,
         command: &'a mut ApplicationCommandInteraction,
     ) -> Result<(), CadencyError> {
-        debug!("Execute {} command", self.name());
         if let Some(guild_id) = command.guild_id {
             let manager = utils::voice::get_songbird(ctx).await;
             let call = manager.get(guild_id).unwrap();

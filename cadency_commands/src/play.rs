@@ -34,12 +34,12 @@ impl CadencyCommand for Play {
         )
     }
 
+    #[command]
     async fn execute<'a>(
         &self,
         ctx: &Context,
         command: &'a mut ApplicationCommandInteraction,
     ) -> Result<(), CadencyError> {
-        debug!("Execute {} command", self.name());
         let url_option = utils::voice::parse_valid_url(&command.data.options);
         if let Some(valid_url) = url_option {
             utils::voice::create_deferred_response(ctx, command).await?;

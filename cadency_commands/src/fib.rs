@@ -48,7 +48,6 @@ impl CadencyCommand for Fib {
         ctx: &Context,
         command: &'a mut ApplicationCommandInteraction,
     ) -> Result<(), CadencyError> {
-        debug!("Execute {} command", self.name());
         let number_option =
             command
                 .data
