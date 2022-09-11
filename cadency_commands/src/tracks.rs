@@ -1,30 +1,27 @@
-use cadency_core::{utils, CadencyCommand, CadencyError, CommandBaseline};
+use cadency_core::{utils, CadencyCommand, CadencyCommandOption, CadencyError, CommandBaseline};
 use serenity::{
-    async_trait,
-    builder::CreateEmbed,
-    client::Context,
-    model::application::{
-        command::Command, interaction::application_command::ApplicationCommandInteraction,
-    },
+    async_trait, builder::CreateEmbed, client::Context,
+    model::application::interaction::application_command::ApplicationCommandInteraction,
     utils::Color,
 };
 
 #[derive(CommandBaseline)]
-pub struct Tracks;
+pub struct Tracks {
+    description: &'static str,
+    options: Vec<CadencyCommandOption>,
+}
+
+impl std::default::Default for Tracks {
+    fn default() -> Self {
+        Self {
+            description: "List all tracks in the queue",
+            options: vec![],
+        }
+    }
+}
 
 #[async_trait]
 impl CadencyCommand for Tracks {
-    async fn register(&self, ctx: &Context) -> Result<Command, serenity::Error> {
-        Ok(
-            Command::create_global_application_command(&ctx.http, |command| {
-                command
-                    .name(self.name())
-                    .description("List all tracks in the queue")
-            })
-            .await?,
-        )
-    }
-
     #[command]
     async fn execute<'a>(
         &self,

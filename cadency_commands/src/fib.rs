@@ -1,15 +1,32 @@
-use cadency_core::{utils, CadencyCommand, CadencyError, CommandBaseline};
+use cadency_core::{utils, CadencyCommand, CadencyCommandOption, CadencyError, CommandBaseline};
 use serenity::{
     async_trait,
     client::Context,
     model::application::{
-        command::{Command, CommandOptionType},
+        command::CommandOptionType,
         interaction::application_command::{ApplicationCommandInteraction, CommandDataOptionValue},
     },
 };
 
 #[derive(CommandBaseline)]
-pub struct Fib;
+pub struct Fib {
+    description: &'static str,
+    options: Vec<CadencyCommandOption>,
+}
+
+impl std::default::Default for Fib {
+    fn default() -> Self {
+        Self {
+            description: "Calculate the nth number in the fibonacci series",
+            options: vec![CadencyCommandOption {
+                name: "number",
+                description: "The number in the fibonacci series",
+                kind: CommandOptionType::Integer,
+                required: true,
+            }],
+        }
+    }
+}
 
 impl Fib {
     fn calc(n: &i64) -> f64 {
@@ -23,25 +40,6 @@ impl Fib {
 
 #[async_trait]
 impl CadencyCommand for Fib {
-    /// Construct the slash command that will be submited to the discord api
-    async fn register(&self, ctx: &Context) -> Result<Command, serenity::Error> {
-        Ok(
-            Command::create_global_application_command(&ctx.http, |command| {
-                command
-                    .name(self.name())
-                    .description("Calculate the nth number in the fibonacci series")
-                    .create_option(|option| {
-                        option
-                            .name("number")
-                            .description("The number in the fibonacci series")
-                            .kind(CommandOptionType::Integer)
-                            .required(true)
-                    })
-            })
-            .await?,
-        )
-    }
-
     #[command]
     async fn execute<'a>(
         &self,

@@ -1,26 +1,26 @@
-use cadency_core::{utils, CadencyCommand, CadencyError, CommandBaseline};
+use cadency_core::{utils, CadencyCommand, CadencyCommandOption, CadencyError, CommandBaseline};
 use serenity::{
-    async_trait,
-    client::Context,
-    model::application::{
-        command::Command, interaction::application_command::ApplicationCommandInteraction,
-    },
+    async_trait, client::Context,
+    model::application::interaction::application_command::ApplicationCommandInteraction,
 };
 
 #[derive(CommandBaseline)]
-pub struct Pause;
+pub struct Pause {
+    description: &'static str,
+    options: Vec<CadencyCommandOption>,
+}
+
+impl std::default::Default for Pause {
+    fn default() -> Self {
+        Self {
+            description: "Pause current song",
+            options: vec![],
+        }
+    }
+}
 
 #[async_trait]
 impl CadencyCommand for Pause {
-    async fn register(&self, ctx: &Context) -> Result<Command, serenity::Error> {
-        Ok(
-            Command::create_global_application_command(&ctx.http, |command| {
-                command.name(self.name()).description("Pause current song")
-            })
-            .await?,
-        )
-    }
-
     #[command]
     async fn execute<'a>(
         &self,
