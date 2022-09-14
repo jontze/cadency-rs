@@ -27,3 +27,11 @@ path = "../cadency_core"
 
 [dependencies.cadency_codegen]
 path = "../cadency_codegen"
+
+[dev-dependencies.tokio]
+version = "1.13.0"
+features = ["macros", "rt-multi-thread"]
+
+[dev-dependencies.cadency_codegen]
+path = "../cadency_codegen"
+
