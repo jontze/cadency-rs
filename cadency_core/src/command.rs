@@ -14,7 +14,7 @@ use serenity::{
     prelude::TypeMapKey,
 };
 
-pub trait CommandBaseline {
+pub trait CadencyCommandBaseline {
     fn name(&self) -> String;
     fn description(&self) -> String;
     fn options(&self) -> &Vec<CadencyCommandOption>;
@@ -28,7 +28,7 @@ pub struct CadencyCommandOption {
 }
 
 #[async_trait]
-pub trait CadencyCommand: Sync + Send + CommandBaseline {
+pub trait CadencyCommand: Sync + Send + CadencyCommandBaseline {
     /// Construct the slash command that will be submited to the discord api
     async fn register(&self, ctx: &Context) -> Result<Command, serenity::Error> {
         Ok(
@@ -89,52 +89,4 @@ pub(crate) async fn command_not_implemented(
             error!("Interaction response failed: {}", err);
             CadencyError::Response
         })
-}
-
-#[cfg(test)]
-mod test {
-    use super::{CadencyCommandOption, CommandBaseline};
-
-    #[test]
-    fn impl_commandbaseline_trait_with_macro() {
-        #[derive(cadency_codegen::CommandBaseline)]
-        struct Test {
-            description: String,
-            options: Vec<CadencyCommandOption>,
-        }
-        assert!(true)
-    }
-
-    #[test]
-    fn return_lowercase_struct_name_as_name() {
-        #[derive(cadency_codegen::CommandBaseline)]
-        struct Test {
-            description: String,
-            options: Vec<CadencyCommandOption>,
-        }
-        let test = Test {
-            description: "123".to_string(),
-            options: Vec::new(),
-        };
-        let name: String = test.name();
-        assert_eq!(name, "test", "Test command name ton be lowercase {name}")
-    }
-
-    #[test]
-    fn not_return_uppercase_struct_name_as_name() {
-        #[derive(cadency_codegen::CommandBaseline)]
-        struct Test {
-            description: String,
-            options: Vec<CadencyCommandOption>,
-        }
-        let test = Test {
-            description: "123".to_string(),
-            options: Vec::new(),
-        };
-        let name: String = test.name();
-        assert_ne!(
-            name, "Test",
-            "Testing that the first char is not uppercase: {name}"
-        )
-    }
 }
