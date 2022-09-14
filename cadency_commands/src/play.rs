@@ -1,6 +1,5 @@
 use cadency_core::{
     handler::voice::InactiveHandler, utils, CadencyCommand, CadencyCommandOption, CadencyError,
-    CommandBaseline,
 };
 use serenity::{
     async_trait,
