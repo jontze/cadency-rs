@@ -1,4 +1,4 @@
-use cadency_core::{utils, CadencyCommand, CadencyCommandOption, CadencyError, CommandBaseline};
+use cadency_core::{utils, CadencyCommand, CadencyCommandOption, CadencyError};
 use serenity::{
     async_trait, builder::CreateEmbed, client::Context,
     model::application::interaction::application_command::ApplicationCommandInteraction,
