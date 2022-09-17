@@ -68,18 +68,14 @@ impl Urban {
             }
             let mut embed_urban_entry = CreateEmbed::default();
             embed_urban_entry.color(Color::from_rgb(255, 255, 0));
-            embed_urban_entry.title(&urban.word.replace('[', "").replace(']', ""));
+            embed_urban_entry.title(&urban.word.replace(['[', ']'], ""));
             embed_urban_entry.url(&urban.permalink);
             embed_urban_entry.field(
                 "Definition",
-                &urban.definition.replace('[', "").replace(']', ""),
+                &urban.definition.replace(['[', ']'], ""),
                 false,
             );
-            embed_urban_entry.field(
-                "Example",
-                &urban.example.replace('[', "").replace(']', ""),
-                false,
-            );
+            embed_urban_entry.field("Example", &urban.example.replace(['[', ']'], ""), false);
             embed_urban_entry.field(
                 "Rating",
                 format!(

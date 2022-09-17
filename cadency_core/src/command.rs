@@ -13,6 +13,21 @@ use serenity::{
     },
     prelude::TypeMapKey,
 };
+use std::sync::Arc;
+
+#[macro_export]
+macro_rules! setup_commands {
+    ($($command_struct:expr),* $(,)*) => {
+        {
+            let mut commands: Vec<std::sync::Arc<dyn cadency_core::CadencyCommand>> = Vec::new();
+            $(
+                let command = std::sync::Arc::new($command_struct);
+                commands.push(command);
+            )*
+            commands
+        }
+    };
+}
 
 pub trait CadencyCommandBaseline {
     fn name(&self) -> String;
@@ -58,7 +73,7 @@ pub trait CadencyCommand: Sync + Send + CadencyCommandBaseline {
 pub(crate) struct Commands;
 
 impl TypeMapKey for Commands {
-    type Value = std::sync::Arc<Vec<Box<dyn CadencyCommand>>>;
+    type Value = Vec<Arc<dyn CadencyCommand>>;
 }
 
 /// Submit global slash commands to the discord api.

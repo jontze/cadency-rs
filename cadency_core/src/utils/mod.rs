@@ -10,6 +10,7 @@ use serenity::{
         user::OnlineStatus,
     },
 };
+use std::sync::Arc;
 
 pub mod voice;
 
@@ -20,7 +21,7 @@ pub(crate) async fn set_bot_presence(ctx: &Context) {
         .await;
 }
 
-pub(crate) async fn get_commands(ctx: &Context) -> std::sync::Arc<Vec<Box<dyn CadencyCommand>>> {
+pub(crate) async fn get_commands(ctx: &Context) -> Vec<Arc<dyn CadencyCommand>> {
     let data_read = ctx.data.read().await;
     data_read
         .get::<Commands>()

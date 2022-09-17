@@ -1,27 +1,30 @@
 #[macro_use]
 extern crate log;
+#[macro_use]
+extern crate cadency_core;
 
 use cadency_commands::{
     Fib, Inspire, Now, Pause, Ping, Play, Resume, Skip, Slap, Stop, Tracks, Urban,
 };
-use cadency_core::{Cadency, CadencyCommand};
+use cadency_core::Cadency;
 
 #[tokio::main]
 async fn main() {
     env_logger::init();
-    let commands: Vec<Box<dyn CadencyCommand>> = vec![
-        Box::new(Fib::default()),
-        Box::new(Inspire::default()),
-        Box::new(Now::default()),
-        Box::new(Pause::default()),
-        Box::new(Ping::default()),
-        Box::new(Play::default()),
-        Box::new(Resume::default()),
-        Box::new(Skip::default()),
-        Box::new(Slap::default()),
-        Box::new(Stop::default()),
-        Box::new(Tracks::default()),
-        Box::new(Urban::default()),
+
+    let commands = setup_commands![
+        Fib::default(),
+        Inspire::default(),
+        Now::default(),
+        Pause::default(),
+        Ping::default(),
+        Play::default(),
+        Resume::default(),
+        Skip::default(),
+        Slap::default(),
+        Stop::default(),
+        Tracks::default(),
+        Urban::default(),
     ];
     let mut cadency = Cadency::default()
         .await
