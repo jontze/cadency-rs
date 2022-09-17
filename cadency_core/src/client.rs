@@ -6,6 +6,7 @@ use serenity::client::Client;
 use songbird::SerenityInit;
 #[cfg(not(test))]
 use std::env;
+use std::sync::Arc;
 
 #[cfg_attr(test, mockall::automock)]
 mod env_read {
@@ -48,10 +49,10 @@ impl Cadency {
 
     /// This will register and provide the commands for cadency.
     /// Every struct that implements the CadencyCommand trait can be used.
-    pub async fn with_commands(self, commands: Vec<Box<dyn CadencyCommand>>) -> Self {
+    pub async fn with_commands(self, commands: Vec<Arc<dyn CadencyCommand>>) -> Self {
         {
             let mut data = self.client.data.write().await;
-            data.insert::<Commands>(std::sync::Arc::new(commands));
+            data.insert::<Commands>(commands);
         }
         self
     }
