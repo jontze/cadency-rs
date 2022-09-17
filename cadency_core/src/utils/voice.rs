@@ -135,11 +135,11 @@ pub async fn edit_deferred_response<'a>(
 pub async fn edit_deferred_response_with_embeded<'a>(
     ctx: &Context,
     interaction: &mut ApplicationCommandInteraction,
-    embeded_content: CreateEmbed,
+    embeded_content: Vec<CreateEmbed>,
 ) -> Result<(), CadencyError> {
     interaction
         .edit_original_interaction_response(&ctx.http, |previous_response| {
-            previous_response.set_embed(embeded_content)
+            previous_response.add_embeds(embeded_content)
         })
         .await
         .map_err(|err| {
