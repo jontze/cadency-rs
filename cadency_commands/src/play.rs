@@ -1,11 +1,13 @@
 use cadency_core::{
     handler::voice::InactiveHandler, utils, CadencyCommand, CadencyCommandOption, CadencyError,
 };
+use reqwest::Url;
 use serenity::{
     async_trait,
     client::Context,
     model::application::{
-        command::CommandOptionType, interaction::application_command::ApplicationCommandInteraction,
+        command::CommandOptionType,
+        interaction::application_command::{ApplicationCommandInteraction, CommandDataOptionValue},
     },
 };
 use songbird::events::Event;
@@ -19,10 +21,10 @@ pub struct Play {
 impl std::default::Default for Play {
     fn default() -> Self {
         Self {
-            description: "Play a song from a youtube url",
+            description: "Play a song from a youtube",
             options: vec![CadencyCommandOption {
-                name: "url",
-                description: "Url to the youtube audio source",
+                name: "payload",
+                description: "Url or search string to the youtube audio source",
                 kind: CommandOptionType::String,
                 required: true,
             }],
@@ -38,12 +40,21 @@ impl CadencyCommand for Play {
         ctx: &Context,
         command: &'a mut ApplicationCommandInteraction,
     ) -> Result<(), CadencyError> {
-        let url_option = utils::voice::parse_valid_url(&command.data.options);
-        if let Some(valid_url) = url_option {
-            utils::voice::create_deferred_response(ctx, command).await?;
-            if let Ok((manager, guild_id, _channel_id)) = utils::voice::join(ctx, command).await {
+        utils::voice::create_deferred_response(ctx, command).await?;
+        let search_data = utils::get_option_value_at_position(command.data.options.as_ref(), 0)
+            .and_then(|option_value| {
+                if let CommandDataOptionValue::String(string_value) = option_value {
+                    let is_valid_url = Url::parse(string_value).ok().map_or(false, |_| true);
+                    Some((string_value, is_valid_url))
+                } else {
+                    None
+                }
+            });
+        let joined_voice = utils::voice::join(ctx, command).await;
+        match (search_data, joined_voice) {
+            (Some((search_payload, is_url)), Ok((manager, guild_id, _channel_id))) => {
                 let call = manager.get(guild_id).unwrap();
-                match utils::voice::add_song(call.clone(), valid_url.to_string()).await {
+                match utils::voice::add_song(call.clone(), search_payload.clone(), is_url).await {
                     Ok(added_song) => {
                         let mut handler = call.lock().await;
                         handler.remove_all_global_events();
@@ -51,12 +62,20 @@ impl CadencyCommand for Play {
                             Event::Periodic(std::time::Duration::from_secs(120), None),
                             InactiveHandler { guild_id, manager },
                         );
+                        let song_url = if is_url {
+                            search_payload
+                        } else {
+                            added_song
+                                .source_url
+                                .as_ref()
+                                .map_or("unknown url", |url| url)
+                        };
                         utils::voice::edit_deferred_response(
                             ctx,
                             command,
                             &format!(
                                 ":white_check_mark: **Added song to the queue** \n**Playing** :notes: `{}` \n:newspaper: `{}`",
-                                valid_url,
+                                song_url,
                                 added_song
                                     .title
                                     .as_ref()
@@ -70,22 +89,29 @@ impl CadencyCommand for Play {
                         utils::voice::edit_deferred_response(
                             ctx,
                             command,
-                            ":x: **Could not add audio source to the queue!**",
+                            ":x: **Couldn't add audio source to the queue!**",
                         )
                         .await?;
                     }
                 }
-            } else {
+            }
+            (None, _) => {
                 utils::voice::edit_deferred_response(
                     ctx,
                     command,
-                    ":x: **Could not join your voice channel**",
+                    ":x: **Couldn't find a search string**",
                 )
                 .await?;
             }
-        } else {
-            utils::create_response(ctx, command, ":x: **This doesn't look lik a valid url**")
+            (_, Err(err)) => {
+                error!("{err}");
+                utils::voice::edit_deferred_response(
+                    ctx,
+                    command,
+                    ":x: **Couldn't join your voice channel**",
+                )
                 .await?;
+            }
         };
         Ok(())
     }

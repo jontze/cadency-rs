@@ -46,28 +46,22 @@ impl CadencyCommand for Fib {
         ctx: &Context,
         command: &'a mut ApplicationCommandInteraction,
     ) -> Result<(), CadencyError> {
-        let number_option =
-            command
-                .data
-                .options
-                .get(0)
-                .and_then(|option| match option.resolved.as_ref() {
-                    Some(value) => {
-                        if let CommandDataOptionValue::Integer(fib_value) = value {
-                            Some(fib_value)
-                        } else {
-                            error!("{} command option not a integer: {:?}", self.name(), value);
-                            None
-                        }
-                    }
-                    None => {
-                        error!("{} command option empty", self.name());
-                        None
-                    }
-                });
+        let number_option = utils::get_option_value_at_position(command.data.options.as_ref(), 0)
+            .and_then(|option_value| {
+                if let CommandDataOptionValue::Integer(fib_value) = option_value {
+                    Some(fib_value)
+                } else {
+                    error!(
+                        "{} command option not a integer: {:?}",
+                        self.name(),
+                        option_value
+                    );
+                    None
+                }
+            });
         let fib_msg = match number_option {
             Some(number) => Self::calc(number).to_string(),
-            None => String::from("Invalid number input!"),
+            None => "Invalid number input!".to_string(),
         };
         utils::create_response(ctx, command, &fib_msg).await?;
         Ok(())

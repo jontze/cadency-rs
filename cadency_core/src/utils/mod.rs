@@ -4,7 +4,10 @@ use serenity::{
     client::Context,
     model::{
         application::interaction::{
-            application_command::ApplicationCommandInteraction, InteractionResponseType,
+            application_command::{
+                ApplicationCommandInteraction, CommandDataOption, CommandDataOptionValue,
+            },
+            InteractionResponseType,
         },
         gateway::Activity,
         user::OnlineStatus,
@@ -27,6 +30,15 @@ pub(crate) async fn get_commands(ctx: &Context) -> Vec<Arc<dyn CadencyCommand>> 
         .get::<Commands>()
         .expect("Command array missing")
         .clone()
+}
+
+pub fn get_option_value_at_position(
+    options: &[CommandDataOption],
+    position: usize,
+) -> Option<&CommandDataOptionValue> {
+    options
+        .get(position)
+        .and_then(|option| option.resolved.as_ref())
 }
 
 pub async fn create_response<'a>(

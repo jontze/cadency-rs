@@ -62,8 +62,12 @@ impl CadencyCommand for Tracks {
                             false,
                         );
                     }
-                    utils::voice::edit_deferred_response_with_embeded(ctx, command, embeded_tracks)
-                        .await?;
+                    utils::voice::edit_deferred_response_with_embeded(
+                        ctx,
+                        command,
+                        vec![embeded_tracks],
+                    )
+                    .await?;
                 }
             } else {
                 utils::voice::edit_deferred_response(
