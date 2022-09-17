@@ -21,6 +21,6 @@ FROM debian:bullseye-slim
 LABEL org.opencontainers.image.source="https://github.com/jontze/cadency-rs"
 WORKDIR /cadency
 COPY --from=builder /cadency/target/release/cadency cadency
-RUN apt-get update && apt-get install -y libopus-dev ffmpeg youtube-dl
-ENTRYPOINT [ "./cadency" ]
-CMD [ "" ]
+RUN apt-get update && apt-get install -y libopus-dev ffmpeg wget python3
+RUN wget https://github.com/yt-dlp/yt-dlp/releases/download/2022.09.01/yt-dlp && chmod +x yt-dlp && mv yt-dlp /usr/bin
+CMD [ "./cadency" ]
