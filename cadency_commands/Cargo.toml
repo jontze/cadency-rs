@@ -20,7 +20,7 @@ features = ["client", "gateway", "rustls_backend", "model", "voice", "cache"]
 
 [dependencies.songbird]
 version = "0.3.0"
-features = ["builtin-queue"]
+features = ["builtin-queue", "yt-dlp"]
 
 [dependencies.cadency_core]
 path = "../cadency_core"

@@ -16,7 +16,7 @@ features = ["client", "gateway", "rustls_backend", "model", "voice", "cache"]
 
 [dependencies.songbird]
 version = "0.3.0"
-features = ["builtin-queue"]
+features = ["builtin-queue", "yt-dlp"]
 
 [dev-dependencies]
 mockall = "0.11.2"
