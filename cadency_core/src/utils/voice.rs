@@ -62,10 +62,15 @@ pub async fn join(
 
 pub async fn add_song(
     call: std::sync::Arc<serenity::prelude::Mutex<songbird::Call>>,
-    url: String,
+    payload: String,
+    is_url: bool,
 ) -> Result<songbird::input::Metadata, songbird::input::error::Error> {
-    debug!("Add song to playlist: {}", url);
-    let source = Restartable::ytdl(url, true).await?;
+    debug!("Add song to playlist: '{payload}'");
+    let source = if is_url {
+        Restartable::ytdl(payload, true).await?
+    } else {
+        Restartable::ytdl_search(payload, true).await?
+    };
     let mut handler = call.lock().await;
     let track: Input = source.into();
     let metadata = *track.metadata.clone();
@@ -112,7 +117,7 @@ pub async fn create_deferred_response<'a>(
 
 pub async fn edit_deferred_response<'a>(
     ctx: &Context,
-    interaction: &mut ApplicationCommandInteraction,
+    interaction: &'a mut ApplicationCommandInteraction,
     content: &str,
 ) -> Result<(), CadencyError> {
     interaction
