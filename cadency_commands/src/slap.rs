@@ -36,20 +36,12 @@ impl CadencyCommand for Slap {
         ctx: &Context,
         command: &'a mut ApplicationCommandInteraction,
     ) -> Result<(), CadencyError> {
-        let args = command.data.options.clone();
-        let user_option = args
-            .first()
-            .and_then(|option| match option.resolved.as_ref() {
-                Some(value) => {
-                    if let CommandDataOptionValue::User(user, _member) = value {
-                        Some(user)
-                    } else {
-                        error!("Command option is not a user");
-                        None
-                    }
-                }
-                None => {
-                    error!("Slap command option empty");
+        let user_option = utils::get_option_value_at_position(command.data.options.as_ref(), 0)
+            .and_then(|option_value| {
+                if let CommandDataOptionValue::User(user, _) = option_value {
+                    Some(user)
+                } else {
+                    error!("Command option is not a user");
                     None
                 }
             });
