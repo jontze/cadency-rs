@@ -1,0 +1,64 @@
+{
+  "_type": "url",
+  "ie_key": "Youtube",
+  "id": "eH4F1Tdb040",
+  "url": "https://www.youtube.com/watch?v=eH4F1Tdb040",
+  "title": "Stephen - Crossfire",
+  "description": null,
+  "duration": 272.0,
+  "view_count": null,
+  "uploader": "MrSuicideSheep",
+  "channel_id": "UC5nc_ZtjKW1htCVZVRxlQAQ",
+  "thumbnails": [
+    {
+      "url": "https://i.ytimg.com/vi/eH4F1Tdb040/hqdefault.jpg?sqp=-oaymwEbCKgBEF5IVfKriqkDDggBFQAAiEIYAXABwAEG&rs=AOn4CLAjjN3-SaGlrgjIwXC5uC9NROreew",
+      "height": 94,
+      "width": 168
+    },
+    {
+      "url": "https://i.ytimg.com/vi/eH4F1Tdb040/hqdefault.jpg?sqp=-oaymwEbCMQBEG5IVfKriqkDDggBFQAAiEIYAXABwAEG&rs=AOn4CLCe3k3UTP_depnvvrz27mDum0qdyQ",
+      "height": 110,
+      "width": 196
+    },
+    {
+      "url": "https://i.ytimg.com/vi/eH4F1Tdb040/hqdefault.jpg?sqp=-oaymwEcCPYBEIoBSFXyq4qpAw4IARUAAIhCGAFwAcABBg==&rs=AOn4CLAVGCzhSLdMbuyEWdjGhIxsicmIbg",
+      "height": 138,
+      "width": 246
+    },
+    {
+      "url": "https://i.ytimg.com/vi/eH4F1Tdb040/hqdefault.jpg?sqp=-oaymwEcCNACELwBSFXyq4qpAw4IARUAAIhCGAFwAcABBg==&rs=AOn4CLDI4fC3EnBOSek33NCjqqPhvyQNJg",
+      "height": 188,
+      "width": 336
+    }
+  ],
+  "upload_date": null,
+  "live_status": null,
+  "release_timestamp": null,
+  "availability": null,
+  "__x_forwarded_for_ip": null,
+  "webpage_url": "https://www.youtube.com/watch?v=eH4F1Tdb040",
+  "original_url": "https://www.youtube.com/watch?v=eH4F1Tdb040",
+  "webpage_url_basename": "watch",
+  "webpage_url_domain": "youtube.com",
+  "extractor": "youtube",
+  "extractor_key": "Youtube",
+  "playlist_count": 50,
+  "playlist": "MrSuicideSheep Playlist",
+  "playlist_id": "PLDfKAXSi6kUZRvdikbdwSKsnbeezhmDW8",
+  "playlist_title": "MrSuicideSheep Playlist",
+  "playlist_uploader": "MrSuicideSheep",
+  "playlist_uploader_id": "UC5nc_ZtjKW1htCVZVRxlQAQ",
+  "n_entries": 50,
+  "playlist_index": 1,
+  "__last_playlist_index": 50,
+  "playlist_autonumber": 1,
+  "epoch": 1663460818,
+  "filename": "Stephen - Crossfire [eH4F1Tdb040].NA",
+  "urls": "https://www.youtube.com/watch?v=eH4F1Tdb040",
+  "_version": {
+    "version": "2022.09.01",
+    "current_git_head": null,
+    "release_git_head": "5d7c7d6",
+    "repository": "yt-dlp/yt-dlp"
+  }
+}
