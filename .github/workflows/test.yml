@@ -50,7 +50,7 @@ jobs:
       - name: Setup yt-dlp
         run: >
           wget https://github.com/yt-dlp/yt-dlp/releases/download/2022.09.01/yt-dlp &&
-          chmod +x yt-dlp &&
+          chmod a+x yt-dlp &&
           mv yt-dlp /usr/bin &&
           yt-dlp --version
       - name: Run tests
