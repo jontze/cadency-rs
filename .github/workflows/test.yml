@@ -51,7 +51,7 @@ jobs:
         run: >
           wget https://github.com/yt-dlp/yt-dlp/releases/download/2022.09.01/yt-dlp &&
           chmod a+x yt-dlp &&
-          mv yt-dlp /usr/bin &&
+          mv yt-dlp /usr/local/bin &&
           yt-dlp --version
       - name: Run tests
         uses: actions-rs/cargo@v1
