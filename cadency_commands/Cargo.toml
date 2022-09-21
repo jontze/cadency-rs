@@ -28,10 +28,12 @@ path = "../cadency_core"
 [dependencies.cadency_codegen]
 path = "../cadency_codegen"
 
+[dependencies.cadency_yt_playlist]
+path = "../cadency_yt_playlist"
+
 [dev-dependencies.tokio]
 version = "1.13.0"
 features = ["macros", "rt-multi-thread"]
 
-[dev-dependencies.cadency_codegen]
-path = "../cadency_codegen"
+
 
