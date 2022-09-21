@@ -1,12 +1,12 @@
 use serde::de;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Message {
     pub content: String,
     pub data: String,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Debug)]
 pub struct YtDlpResponse<T: de::DeserializeOwned> {
     pub data: T,
     pub messages: Vec<Message>,
