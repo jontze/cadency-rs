@@ -1,0 +1,35 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: cadency
+  name: cadency-bot
+spec:
+  selector:
+    matchLabels:
+      app: cadency
+  template:
+    metadata:
+      labels:
+        app: cadency
+    spec:
+      containers:
+        - name: cadency
+          image: ghcr.io/jontze/cadency_rs:main
+          resources:
+            limits:
+              memory: "5Gi"
+              cpu: "1"
+          env:
+            - name: RUST_LOG
+              valueFrom:
+                configMapKeyRef:
+                  name: config
+                  key: log_level
+                  optional: true
+            - name: DISCORD_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: secret
+                  key: token
+                  optional: false
