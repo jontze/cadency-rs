@@ -2,3 +2,9 @@ target/
 .env
 .github/
 .env.example
+.git
+.gitignore
+k8
+LICENSE
+*.md
+.cache

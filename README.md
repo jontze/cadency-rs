@@ -29,7 +29,7 @@ docker pull ghcr.io/jontze/cadency_rs:main
 
 ## Contributing
 
-1. Install the latest stable rust toolchaun: https://www.rust-lang.org/tools/install
+1. Install the latest stable rust toolchain: https://www.rust-lang.org/tools/install
 2. Intall [yt-dlp](https://github.com/yt-dlp/yt-dlp#installation)
 3. Clone the repository
 4. Create a discord bot so you can run the bot local on your computer
