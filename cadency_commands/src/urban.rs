@@ -40,9 +40,9 @@ pub struct Urban {
 impl std::default::Default for Urban {
     fn default() -> Self {
         Self {
-            description: "Searches the Urbandictionary for your input",
+            description: "Searches the Urbandictionary for your query",
             options: vec![CadencyCommandOption {
-                name: "url",
+                name: "query",
                 description: "Your search query",
                 kind: CommandOptionType::String,
                 required: true,
