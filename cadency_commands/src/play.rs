@@ -21,10 +21,10 @@ pub struct Play {
 impl std::default::Default for Play {
     fn default() -> Self {
         Self {
-            description: "Play a song from a youtube",
+            description: "Play a song from Youtube",
             options: vec![CadencyCommandOption {
-                name: "payload",
-                description: "Url or search string to the youtube audio source",
+                name: "query",
+                description: "URL or search query like: 'Africa Toto'",
                 kind: CommandOptionType::String,
                 required: true,
             }],
