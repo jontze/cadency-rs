@@ -13,7 +13,7 @@ pub struct Now {
 impl std::default::Default for Now {
     fn default() -> Self {
         Self {
-            description: "Show current song",
+            description: "Shows current song",
             options: vec![],
         }
     }
