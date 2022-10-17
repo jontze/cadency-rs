@@ -10,7 +10,8 @@ use cadency_core::Cadency;
 
 #[tokio::main]
 async fn main() {
-    env_logger::init();
+    let env = env_logger::Env::default().filter_or("RUST_LOG", "cadency=info");
+    env_logger::init_from_env(env);
 
     let commands = setup_commands![
         Fib::default(),
