@@ -44,11 +44,7 @@ Do remember to remove the container and rerun the first command after an update.
 1. Install the latest stable rust toolchaun: https://www.rust-lang.org/tools/install
 2. Intall [yt-dlp](https://github.com/yt-dlp/yt-dlp#installation)
 3. Clone the repository
-<<<<<<< HEAD
 4. Install [ffmpeg](https://ffmpeg.org/). It is reccomended you install the [yt-dlp build](https://github.com/yt-dlp/FFmpeg-Builds), as this is used in the Docker image as well and includes additional bug-fixes.
-=======
-4. Install [ffmpeg](https://ffmpeg.org/). It is reccomended you install the [yt-dlp build](https://github.com/yt-dlp/FFmpeg-Builds), as this is used in the Docker image as well.
->>>>>>> 588735338d19ab667a288693a9627f38c11ff4a1
 5. Create a discord bot so you can run the bot local on your computer
 5. Set the environment variables that are listed as example in [.env.example](./.env.example)
 6. You should be able to run `cargo test` and `cargo run` successfully
