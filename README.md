@@ -15,6 +15,7 @@ docker pull ghcr.io/jontze/cadency_rs:main
 
 2. Start a container and pass your discord bot token to the container by setting the `DISCORD_TOKEN` environment variable and optional specify the log level e.g. `RUST_LOG="cadency=info"`.
 
+
 3. Invite the bot to your discord server, discord offers great [documentation](https://discord.com/developers/docs/getting-started) on how to do this.
 
 ## Example docker setup:  
@@ -26,7 +27,9 @@ This creates a new container named `cadency_rs`. After the first run you can use
 ```sh
 docker start -a cadency_rs
 ```
-When you execute the command nothing seems to happen, but this is not the case. When in doubt, check if the bot is online in Discord.  
+When you execute the command nothing seems to happen, but this is not the case. When in doubt, check if the bot is online in Discord. A
+Also, remember to remove the container and rerun the first command after an update.
+
 ## Features
 
 - **Play songs** from Youtube using a url or a search phrase
@@ -43,8 +46,8 @@ When you execute the command nothing seems to happen, but this is not the case. 
 1. Install the latest stable rust toolchaun: https://www.rust-lang.org/tools/install
 2. Intall [yt-dlp](https://github.com/yt-dlp/yt-dlp#installation)
 3. Clone the repository
-4. Install [ffmpeg](https://ffmpeg.org/download.html). Install the [yt-dlp version](https://github.com/yt-dlp/FFmpeg-Builds), as this version contains bugfixes and is used in the Docker file
-4. Create a discord bot so you can run the bot local on your computer
+4. Install [ffmpeg](https://ffmpeg.org/). It is reccomended you install the [yt-dlp build](https://github.com/yt-dlp/FFmpeg-Builds), as this is used in the Docker image as well and includes additional bug-fixes.
+5. Create a discord bot so you can run the bot local on your computer
 5. Set the environment variables that are listed as example in [.env.example](./.env.example)
 6. You should be able to run `cargo test` and `cargo run` successfully
 
