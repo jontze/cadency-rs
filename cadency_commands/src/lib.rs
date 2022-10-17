@@ -56,7 +56,7 @@ mod test {
             options: Vec::new(),
         };
         let name: String = test.name();
-        assert_eq!(name, "test", "Test command name ton be lowercase {name}")
+        assert_eq!(name, "test", "Test command name to be lowercase {name}")
     }
 
     #[test]
