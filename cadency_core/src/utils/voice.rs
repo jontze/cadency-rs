@@ -97,7 +97,7 @@ pub fn parse_valid_url(command_options: &[CommandDataOption]) -> Option<reqwest:
 pub async fn get_songbird(ctx: &Context) -> std::sync::Arc<songbird::Songbird> {
     songbird::get(ctx)
         .await
-        .expect("Failed to get songbord manager")
+        .expect("Failed to get songbird manager")
 }
 
 pub async fn create_deferred_response<'a>(

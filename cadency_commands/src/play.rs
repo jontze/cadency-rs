@@ -21,10 +21,10 @@ pub struct Play {
 impl std::default::Default for Play {
     fn default() -> Self {
         Self {
-            description: "Play a song from a youtube",
+            description: "Play a song from Youtube",
             options: vec![CadencyCommandOption {
-                name: "payload",
-                description: "Url or search string to the youtube audio source",
+                name: "query",
+                description: "URL or search query like: 'Hey Jude Beatles'",
                 kind: CommandOptionType::String,
                 required: true,
             }],
@@ -127,7 +127,7 @@ impl CadencyCommand for Play {
                                 ctx,
                                 command,
                                 &format!(
-                                    ":white_check_mark: **Added song to the queue** \n**Playing** :notes: `{}` \n:newspaper: `{}`",
+                                    ":white_check_mark: **Added song to the queue and started playing:** \n:notes: `{}` \n:link: `{}`",
                                     song_url,
                                     added_song
                                         .title

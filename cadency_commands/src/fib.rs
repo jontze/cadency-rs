@@ -17,10 +17,10 @@ pub struct Fib {
 impl std::default::Default for Fib {
     fn default() -> Self {
         Self {
-            description: "Calculate the nth number in the fibonacci series",
+            description: "Calculate the nth number in the fibonacci sequence",
             options: vec![CadencyCommandOption {
                 name: "number",
-                description: "The number in the fibonacci series",
+                description: "The number in the fibonacci sequence",
                 kind: CommandOptionType::Integer,
                 required: true,
             }],
