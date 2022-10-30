@@ -64,12 +64,13 @@ pub async fn add_song(
     call: std::sync::Arc<serenity::prelude::Mutex<songbird::Call>>,
     payload: String,
     is_url: bool,
+    add_lazy: bool,
 ) -> Result<songbird::input::Metadata, songbird::input::error::Error> {
     debug!("Add song to playlist: '{payload}'");
     let source = if is_url {
-        Restartable::ytdl(payload, true).await?
+        Restartable::ytdl(payload, add_lazy).await?
     } else {
-        Restartable::ytdl_search(payload, true).await?
+        Restartable::ytdl_search(payload, add_lazy).await?
     };
     let mut handler = call.lock().await;
     let track: Input = source.into();
