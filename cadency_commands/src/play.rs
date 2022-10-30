@@ -62,6 +62,10 @@ impl CadencyCommand for Play {
         match (search_data, joined_voice) {
             (Some((search_payload, is_url, is_playlist)), Ok((manager, guild_id, _channel_id))) => {
                 let call = manager.get(guild_id).unwrap();
+                let mut is_queue_empty = {
+                    let call_handler = call.lock().await;
+                    call_handler.queue().is_empty()
+                };
                 if is_playlist {
                     let playlist_items =
                         cadency_yt_playlist::fetch_playlist_songs(search_payload.clone()).unwrap();
@@ -73,11 +77,21 @@ impl CadencyCommand for Play {
                     let mut amount = 0;
                     let mut total_duration = 0_f32;
                     for song in songs {
+                        // Add max the first 30 songs of the playlist
+                        // and only if the duration of the song is below 10mins
                         if amount <= 30 && song.duration <= 600_f32 {
-                            match utils::voice::add_song(call.clone(), song.url, true).await {
+                            match utils::voice::add_song(
+                                call.clone(),
+                                song.url,
+                                true,
+                                !is_queue_empty, // Don't add first song lazy to the queue
+                            )
+                            .await
+                            {
                                 Ok(added_song) => {
                                     amount += 1;
                                     total_duration += song.duration;
+                                    is_queue_empty = false;
                                     debug!("Added song '{:?}' from playlist", added_song.title);
                                 }
                                 Err(err) => {
@@ -106,7 +120,13 @@ impl CadencyCommand for Play {
                     )
                     .await?;
                 } else {
-                    match utils::voice::add_song(call.clone(), search_payload.clone(), is_url).await
+                    match utils::voice::add_song(
+                        call.clone(),
+                        search_payload.clone(),
+                        is_url,
+                        !is_queue_empty, // Don't add first song lazy to the queue
+                    )
+                    .await
                     {
                         Ok(added_song) => {
                             let mut handler = call.lock().await;
