@@ -18,19 +18,16 @@ docker pull ghcr.io/jontze/cadency_rs:main
 
 ## Example docker setup
 
-First run (replace the TOKEN_HERE with your token):
+Replace the TOKEN_HERE with your token:
 
 ```sh
-docker run --name cadency_rs -e DISCORD_TOKEN=TOKEN_HERE ghcr.io/jontze/cadency_rs:main
+docker run --name cadency_rs -d -it --rm -e DISCORD_TOKEN=DISCORD_TOKEN_HERE ghcr.io/jontze/cadency_rs:develop
 ```
-
-This creates a new container named `cadency_rs`. After the first run you can use this container like so:
-
+This runs the container in detatched mode (background) and removes it when it stops running. This makes sure that you are always using an up-to-date version of cadency-rs.  
+To stop the container, execute the following command and substitute ID for the id that was returned when running the docker run command:
 ```sh
-docker start -a cadency_rs
+docker stop ID
 ```
-
-When you execute the command nothing seems to happen, but this is not the case. When in doubt, check if the bot is online in Discord.
 
 ## Features
 
