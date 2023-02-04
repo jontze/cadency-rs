@@ -40,9 +40,9 @@ pub struct Urban {
 impl std::default::Default for Urban {
     fn default() -> Self {
         Self {
-            description: "Searches the Urbandictionary for your input",
+            description: "Searches the Urbandictionary for your query",
             options: vec![CadencyCommandOption {
-                name: "url",
+                name: "query",
                 description: "Your search query",
                 kind: CommandOptionType::String,
                 required: true,
@@ -56,7 +56,7 @@ impl Urban {
         query: &str,
     ) -> Result<Vec<UrbanEntry>, reqwest::Error> {
         debug!("Requesting urban dictionary and deserialize json body");
-        let url = format!("https://api.urbandictionary.com/v0/define?term={}", query);
+        let url = format!("https://api.urbandictionary.com/v0/define?term={query}");
         Ok(reqwest::get(url).await?.json::<UrbanResult>().await?.list)
     }
 
@@ -98,33 +98,29 @@ impl CadencyCommand for Urban {
         ctx: &Context,
         command: &'a mut ApplicationCommandInteraction,
     ) -> Result<(), CadencyError> {
-        let query_option =
-            command
-                .data
-                .options
-                .get(0)
-                .and_then(|option| match option.resolved.as_ref() {
-                    Some(value) => {
-                        if let CommandDataOptionValue::String(query) = value {
-                            Some(query)
-                        } else {
-                            None
-                        }
-                    }
-                    None => {
-                        error!("Urban command option empty");
-                        None
-                    }
-                });
+        utils::voice::create_deferred_response(ctx, command).await?;
+        let query_option = utils::get_option_value_at_position(command.data.options.as_ref(), 0)
+            .and_then(|option_value| {
+                if let CommandDataOptionValue::String(query) = option_value {
+                    Some(query)
+                } else {
+                    None
+                }
+            });
         match query_option {
             Some(query) => {
                 let urbans_entrys = Self::request_urban_dictionary_entries(query).await;
                 match urbans_entrys {
                     Ok(urbans) => {
                         if urbans.is_empty() {
-                            utils::create_response(ctx, command, ":x: *Nothing found*").await?;
+                            utils::voice::edit_deferred_response(
+                                ctx,
+                                command,
+                                ":x: *Nothing found*",
+                            )
+                            .await?;
                         } else {
-                            utils::create_response_with_embed(
+                            utils::voice::edit_deferred_response_with_embeded(
                                 ctx,
                                 command,
                                 Self::create_embed(urbans),
@@ -134,7 +130,7 @@ impl CadencyCommand for Urban {
                     }
                     Err(err) => {
                         error!("Failed to request urban dictionary entries : {:?}", err);
-                        utils::create_response(
+                        utils::voice::edit_deferred_response(
                             ctx,
                             command,
                             ":x: *Failed to request urban dictionary*",
@@ -144,8 +140,9 @@ impl CadencyCommand for Urban {
                 }
             }
             None => {
-                error!("Urban empty query");
-                utils::create_response(ctx, command, ":x: *Empty or invalid query*").await?;
+                error!("Urban command option empty");
+                utils::voice::edit_deferred_response(ctx, command, ":x: *Empty or invalid query*")
+                    .await?;
             }
         };
         Ok(())

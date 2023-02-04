@@ -1,16 +1,19 @@
 [package]
 name = "cadency_commands"
-version = "0.2.1"
+version = "0.3.0"
 edition = "2021"
+description = "Library with a collection of some commands for the cadency discord bot"
+license = "MIT"
+repository = "https://github.com/jontze/cadency-rs"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-log = "0.4.14"
-reqwest = "0.11.6"
+log = "0.4.17"
+reqwest = "0.11.14"
 
 [dependencies.serde]
-version = "1.0.130"
+version = "1.0.152"
 features = ["derive"]
 
 [dependencies.serenity]
@@ -24,14 +27,19 @@ features = ["builtin-queue", "yt-dlp"]
 
 [dependencies.cadency_core]
 path = "../cadency_core"
+version = "0.3.0"
 
 [dependencies.cadency_codegen]
 path = "../cadency_codegen"
+version = "0.3.0"
+
+[dependencies.cadency_yt_playlist]
+path = "../cadency_yt_playlist"
+version = "0.3.0"
 
 [dev-dependencies.tokio]
-version = "1.13.0"
+version = "1.25.0"
 features = ["macros", "rt-multi-thread"]
 
-[dev-dependencies.cadency_codegen]
-path = "../cadency_codegen"
+
 

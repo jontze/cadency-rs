@@ -13,7 +13,7 @@ pub struct Stop {
 impl std::default::Default for Stop {
     fn default() -> Self {
         Self {
-            description: "Stop music and clean up the track list",
+            description: "Stop music and clear the track list",
             options: vec![],
         }
     }

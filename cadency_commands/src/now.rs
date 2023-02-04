@@ -13,7 +13,7 @@ pub struct Now {
 impl std::default::Default for Now {
     fn default() -> Self {
         Self {
-            description: "Show current song",
+            description: "Shows current song",
             options: vec![],
         }
     }
@@ -38,7 +38,7 @@ impl CadencyCommand for Now {
                         command,
                         &track.metadata().title.as_ref().map_or(
                             String::from(":x: **Could not add audio source to the queue!**"),
-                            |title| format!(":newspaper: `{}`", title),
+                            |title| format!(":newspaper: `{title}`"),
                         ),
                     )
                     .await?;

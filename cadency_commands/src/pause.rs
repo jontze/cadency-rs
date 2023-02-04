@@ -13,7 +13,7 @@ pub struct Pause {
 impl std::default::Default for Pause {
     fn default() -> Self {
         Self {
-            description: "Pause current song",
+            description: "Pause the current song",
             options: vec![],
         }
     }

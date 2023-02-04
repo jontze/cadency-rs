@@ -1,16 +1,17 @@
 [package]
-name = "cadency_codegen"
+name = "cadency_yt_playlist"
 version = "0.3.0"
 edition = "2021"
-description = "Library with codegen macros for the cadency discord bot"
+description = "Library of the cadency discord bot to interact with youtube playlists"
 license = "MIT"
 repository = "https://github.com/jontze/cadency-rs"
-
-[lib]
-proc_macro = true
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-quote = "1.0.23"
-syn = "1.0.107"
+serde_json = "1.0.91"
+thiserror = "1.0.38"
+
+[dependencies.serde]
+version = "1.0.152"
+features = ["derive"]
