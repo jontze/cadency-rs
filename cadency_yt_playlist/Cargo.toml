@@ -13,5 +13,5 @@ serde_json = "1.0.91"
 thiserror = "1.0.38"
 
 [dependencies.serde]
-version = "1.0.144"
+version = "1.0.152"
 features = ["derive"]
