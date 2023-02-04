@@ -19,7 +19,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Run fmt
-        run: rust fmt --all --check
+        run: cargo fmt --all --check
 
   test:
     runs-on: ubuntu-latest
