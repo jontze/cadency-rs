@@ -8,7 +8,7 @@ repository = "https://github.com/jontze/cadency-rs"
 
 [dependencies]
 log = "0.4.17"
-reqwest = "0.11.6"
+reqwest = "0.11.14"
 thiserror = "1.0.30"
 mockall_double = "0.3.0"
 
