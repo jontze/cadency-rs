@@ -37,13 +37,12 @@ impl CadencyCommand for Inspire {
         ctx: &Context,
         command: &'a mut ApplicationCommandInteraction,
     ) -> Result<(), CadencyError> {
-        let inspire_url = Self::request_inspire_image_url().await.map_or_else(
-            |err| {
-                error!("{:?}", err);
-                String::from("The source of my inspiration is currently unavailable.")
-            },
-            |url| url,
-        );
+        let inspire_url = Self::request_inspire_image_url().await.map_err(|err| {
+            error!("{:?}", err);
+            CadencyError::Command {
+                message: "**The source of my inspiration is currently unavailable :(**".to_string(),
+            }
+        })?;
         utils::create_response(ctx, command, &inspire_url).await?;
         Ok(())
     }

@@ -36,7 +36,7 @@ impl CadencyCommand for Slap {
         ctx: &Context,
         command: &'a mut ApplicationCommandInteraction,
     ) -> Result<(), CadencyError> {
-        let user_option = utils::get_option_value_at_position(command.data.options.as_ref(), 0)
+        let user = utils::get_option_value_at_position(command.data.options.as_ref(), 0)
             .and_then(|option_value| {
                 if let CommandDataOptionValue::User(user, _) = option_value {
                     Some(user)
@@ -44,43 +44,39 @@ impl CadencyCommand for Slap {
                     error!("Command option is not a user");
                     None
                 }
-            });
-        match user_option {
-            Some(user) => {
-                if user.id == command.user.id {
-                    utils::create_response(
-                        ctx,
-                        command,
-                        &format!("**Why do you want to slap yourself, {}?**", command.user),
-                    )
-                    .await?;
-                } else if user.id.0 == command.application_id.0 {
-                    utils::create_response(
-                        ctx,
-                        command,
-                        &format!(
-                            "**Nope!\n{} slaps {} around a bit with a large trout!**",
-                            user, command.user
-                        ),
-                    )
-                    .await?;
-                } else {
-                    utils::create_response(
-                        ctx,
-                        command,
-                        &format!(
-                            "**{} slaps {} around a bit with a large trout!**",
-                            command.user, user
-                        ),
-                    )
-                    .await?;
-                }
-            }
-            None => {
-                error!("Invalid user input");
-                utils::create_response(ctx, command, ":x: *Invalid user provided*").await?;
-            }
-        };
+            })
+            .ok_or(CadencyError::Command {
+                message: ":x: *Invalid user provided*".to_string(),
+            })?;
+
+        if user.id == command.user.id {
+            utils::create_response(
+                ctx,
+                command,
+                &format!("**Why do you want to slap yourself, {}?**", command.user),
+            )
+            .await?;
+        } else if user.id.0 == command.application_id.0 {
+            utils::create_response(
+                ctx,
+                command,
+                &format!(
+                    "**Nope!\n{} slaps {} around a bit with a large trout!**",
+                    user, command.user
+                ),
+            )
+            .await?;
+        } else {
+            utils::create_response(
+                ctx,
+                command,
+                &format!(
+                    "**{} slaps {} around a bit with a large trout!**",
+                    command.user, user
+                ),
+            )
+            .await?;
+        }
         Ok(())
     }
 }
