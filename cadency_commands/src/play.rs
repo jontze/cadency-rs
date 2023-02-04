@@ -112,10 +112,7 @@ impl CadencyCommand for Play {
                         ctx,
                         command,
                         &format!(
-                            ":white_check_mark: **Added ___{}___ songs to the queue with a duration of ___{:.2}___ mins** \n**Playing** :notes: `{}`",
-                            amount,
-                            total_duration,
-                            search_payload,
+                            ":white_check_mark: **Added ___{amount}___ songs to the queue with a duration of ___{total_duration:.2}___ mins** \n**Playing** :notes: `{search_payload}`",
                         ),
                     )
                     .await?;

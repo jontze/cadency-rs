@@ -38,7 +38,7 @@ impl CadencyCommand for Now {
                         command,
                         &track.metadata().title.as_ref().map_or(
                             String::from(":x: **Could not add audio source to the queue!**"),
-                            |title| format!(":newspaper: `{}`", title),
+                            |title| format!(":newspaper: `{title}`"),
                         ),
                     )
                     .await?;

@@ -56,7 +56,7 @@ impl Urban {
         query: &str,
     ) -> Result<Vec<UrbanEntry>, reqwest::Error> {
         debug!("Requesting urban dictionary and deserialize json body");
-        let url = format!("https://api.urbandictionary.com/v0/define?term={}", query);
+        let url = format!("https://api.urbandictionary.com/v0/define?term={query}");
         Ok(reqwest::get(url).await?.json::<UrbanResult>().await?.list)
     }
 
