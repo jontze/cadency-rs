@@ -12,5 +12,5 @@ proc_macro = true
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-quote = "1.0.21"
-syn = "1.0.99"
+quote = "1.0.23"
+syn = "1.0.107"
