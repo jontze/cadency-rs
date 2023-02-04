@@ -1,0 +1,37 @@
+[package]
+name = "custom_commands"
+version = "0.3.0"
+edition = "2021"
+description = "An example how to integrate custom commands into cadency_rs"
+license = "MIT"
+repository = "https://github.com/jontze/cadency-rs"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[[example]]
+name = "custom_commands"
+
+[dependencies]
+env_logger = "0.10.0"
+log = "0.4.17"
+
+[dependencies.serenity]
+version = "0.11.5"
+default-features = false
+features = ["client", "gateway", "rustls_backend", "model", "voice", "cache"]
+
+[dependencies.cadency_core]
+path = "../../cadency_core"
+version = "0.3.0"
+
+[dependencies.cadency_codegen]
+path = "../../cadency_codegen"
+version = "0.3.0"
+
+[dependencies.cadency_commands]
+path = "../../cadency_commands"
+version = "0.3.0"
+
+[dependencies.tokio]
+version = "1.25.0"
+features = ["macros", "rt-multi-thread"]

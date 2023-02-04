@@ -4,5 +4,6 @@ members = [
     "cadency_codegen",
     "cadency_commands",
     "cadency_yt_playlist",
-    "cadency"
+    "cadency",
+    "examples/*"
 ]
