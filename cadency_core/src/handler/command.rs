@@ -6,7 +6,7 @@ use serenity::{
 
 use crate::{
     command::{command_not_implemented, setup_commands},
-    utils,
+    utils, CadencyError,
 };
 
 use crate::utils::set_bot_presence;
@@ -38,10 +38,27 @@ impl EventHandler for Handler {
                 .find(|cadency_command| cadency_command.name() == command_name);
             let cmd_execution = match cmd_target {
                 Some(target) => target.execute(&ctx, &mut command).await,
-                None => command_not_implemented(&ctx, command).await,
+                None => command_not_implemented(&ctx, &command).await,
             };
             if let Err(execution_err) = cmd_execution {
                 error!("❌ Command execution failed: {execution_err:?}");
+                match execution_err {
+                    CadencyError::Command { message } => {
+                        utils::create_response(&ctx, &mut command, &message).await
+                    }
+                    _ => {
+                        utils::create_response(
+                            &ctx,
+                            &mut command,
+                            "**Oops! Something went terrible wrong.**",
+                        )
+                        .await
+                    }
+                }
+                .map_err(|err| {
+                    error!("❌ Fatal error! Is discord down? {:?}", err);
+                })
+                .expect("Unable to send response");
             }
         };
     }

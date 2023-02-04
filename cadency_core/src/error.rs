@@ -10,4 +10,6 @@ pub enum CadencyError {
     Join,
     #[error("Response failed")]
     Response,
+    #[error("Command execution failed: {message}")]
+    Command { message: String },
 }

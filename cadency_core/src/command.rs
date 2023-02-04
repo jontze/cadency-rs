@@ -90,7 +90,7 @@ pub(crate) async fn setup_commands(ctx: &Context) -> Result<(), serenity::Error>
 
 pub(crate) async fn command_not_implemented(
     ctx: &Context,
-    command: ApplicationCommandInteraction,
+    command: &ApplicationCommandInteraction,
 ) -> Result<(), CadencyError> {
     error!("The following command is not known: {:?}", command);
     command
