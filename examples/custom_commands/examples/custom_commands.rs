@@ -31,7 +31,7 @@ impl std::default::Default for Hello {
             description: "Say Hello to a user".to_string(),
             options: vec![CadencyCommandOption {
                 name: "user",
-                description: "The number in the fibonacci sequence",
+                description: "The user to greet",
                 kind: CommandOptionType::User,
                 required: true,
             }],
