@@ -10,7 +10,7 @@ repository = "https://github.com/jontze/cadency-rs"
 
 [dependencies]
 env_logger = "0.10.0"
-log = "0.4.14"
+log = "0.4.17"
 
 [dependencies.cadency_core]
 path = "../cadency_core"

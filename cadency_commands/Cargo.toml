@@ -9,7 +9,7 @@ repository = "https://github.com/jontze/cadency-rs"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-log = "0.4.14"
+log = "0.4.17"
 reqwest = "0.11.6"
 
 [dependencies.serde]
