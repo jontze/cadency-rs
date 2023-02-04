@@ -7,46 +7,28 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Setup Rust with clippy
-        uses: actions-rs/toolchain@v1
+      - name: Setup Cache for Rust
+        uses: Swatinem/rust-cache@v2
         with:
-          toolchain: stable
-          profile: minimal
-          override: true
-          components: clippy
+          prefix-key: "rust-${{ github.job }}"
       - name: Run clippy
-        uses: actions-rs/cargo@v1
-        with:
-          command: clippy
-          args: -- -D warnings
+        run: cargo clippy
 
   format:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Setup Rust with rustfmt
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          profile: minimal
-          override: true
-          components: rustfmt
-      - name: Run rustfmt
-        uses: actions-rs/cargo@v1
-        with:
-          command: fmt
-          args: --all -- --check
+      - name: Run fmt
+        run: rust fmt --all --check
 
   test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Setup Rust with rustfmt
-        uses: actions-rs/toolchain@v1
+      - name: Setup Cache for Rust
+        uses: Swatinem/rust-cache@v2
         with:
-          toolchain: stable
-          profile: minimal
-          override: true
+          prefix-key: "rust-${{ github.job }}"
       - name: Setup yt-dlp
         run: >
           wget https://github.com/yt-dlp/yt-dlp/releases/download/2022.09.01/yt-dlp &&
@@ -54,20 +36,15 @@ jobs:
           mv yt-dlp /usr/local/bin &&
           yt-dlp --version
       - name: Run tests
-        uses: actions-rs/cargo@v1
-        with:
-          command: test
-          args: --all
+        run: cargo test --all
 
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Setup rust
-        uses: actions-rs/toolchain@v1
+      - name: Setup Cache for Rust
+        uses: Swatinem/rust-cache@v2
         with:
-          toolchain: stable
-      - name: Build binary
-        uses: actions-rs/cargo@v1
-        with:
-          command: build
+          prefix-key: "rust-${{ github.job }}"
+      - name: Test build
+        run: cargo build
