@@ -3,6 +3,8 @@
 A discord bot written in **Rust** with the help of [serenity](https://github.com/serenity-rs/serenity) and [songbird](https://github.com/serenity-rs/songbird).
 Initially this was intended to be a rust clone of [my typescript discord bot](https://github.com/jontze/Cadency) but currently **Cadency-rs** offers more features and is more up to date as it's already using the discord **slash commands**.
 
+> WARNING: Cadency is not production ready! It might eat your laundry.
+
 ## Installation
 
 The recommended way to install and run **Cadency-rs** is with Docker, as the Docker image installs several libraries and binaries that are required to use or build the bot.
@@ -23,8 +25,10 @@ Replace the TOKEN_HERE with your token:
 ```sh
 docker run --name cadency_rs -d -it --rm -e DISCORD_TOKEN=DISCORD_TOKEN_HERE ghcr.io/jontze/cadency_rs:develop
 ```
+
 This runs the container in detatched mode (background) and removes it when it stops running. This makes sure that you are always using an up-to-date version of cadency-rs.  
 To stop the container, execute the following command and substitute ID for the id that was returned when running the docker run command:
+
 ```sh
 docker stop ID
 ```
