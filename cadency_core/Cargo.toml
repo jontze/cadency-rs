@@ -25,5 +25,5 @@ features = ["builtin-queue", "yt-dlp"]
 mockall = "0.11.2"
 
 [dev-dependencies.tokio]
-version = "1.13.0"
+version = "1.25.0"
 features = ["macros", "rt-multi-thread"]
