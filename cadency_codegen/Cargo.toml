@@ -2,6 +2,9 @@
 name = "cadency_codegen"
 version = "0.3.0"
 edition = "2021"
+description = "Library with codegen macros for the cadency discord bot"
+license = "MIT"
+repository = "https://github.com/jontze/cadency-rs"
 
 [lib]
 proc_macro = true

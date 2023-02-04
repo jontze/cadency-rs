@@ -2,6 +2,9 @@
 name = "cadency_commands"
 version = "0.3.0"
 edition = "2021"
+description = "Library with a collection of some commands for the cadency discord bot"
+license = "MIT"
+repository = "https://github.com/jontze/cadency-rs"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -24,12 +27,15 @@ features = ["builtin-queue", "yt-dlp"]
 
 [dependencies.cadency_core]
 path = "../cadency_core"
+version = "0.3.0"
 
 [dependencies.cadency_codegen]
 path = "../cadency_codegen"
+version = "0.3.0"
 
 [dependencies.cadency_yt_playlist]
 path = "../cadency_yt_playlist"
+version = "0.3.0"
 
 [dev-dependencies.tokio]
 version = "1.13.0"

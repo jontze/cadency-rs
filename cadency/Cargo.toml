@@ -2,6 +2,9 @@
 name = "cadency"
 version = "0.3.0"
 edition = "2021"
+description = "An extensible discord bot with support with music commands"
+license = "MIT"
+repository = "https://github.com/jontze/cadency-rs"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -11,9 +14,11 @@ log = "0.4.14"
 
 [dependencies.cadency_core]
 path = "../cadency_core"
+version = "0.3.0"
 
 [dependencies.cadency_commands]
 path = "../cadency_commands"
+version = "0.3.0"
 
 [dependencies.tokio]
 version = "1.13.0"
