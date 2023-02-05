@@ -13,15 +13,15 @@ use serenity::{
 use songbird::events::Event;
 
 #[derive(CommandBaseline)]
+#[description = "Play a song from Youtube"]
+#[deferred = true]
 pub struct Play {
-    description: &'static str,
     options: Vec<CadencyCommandOption>,
 }
 
 impl std::default::Default for Play {
     fn default() -> Self {
         Self {
-            description: "Play a song from Youtube",
             options: vec![CadencyCommandOption {
                 name: "query",
                 description: "URL or search query like: 'Hey Jude Beatles'",
@@ -34,13 +34,11 @@ impl std::default::Default for Play {
 
 #[async_trait]
 impl CadencyCommand for Play {
-    #[command]
     async fn execute<'a>(
         &self,
         ctx: &Context,
         command: &'a mut ApplicationCommandInteraction,
     ) -> Result<(), CadencyError> {
-        utils::voice::create_deferred_response(ctx, command).await?;
         let search_data = utils::get_option_value_at_position(command.data.options.as_ref(), 0)
             .and_then(|option_value| {
                 if let CommandDataOptionValue::String(string_value) = option_value {

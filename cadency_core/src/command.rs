@@ -32,6 +32,7 @@ macro_rules! setup_commands {
 pub trait CadencyCommandBaseline {
     fn name(&self) -> String;
     fn description(&self) -> String;
+    fn deferred(&self) -> bool;
     fn options(&self) -> &Vec<CadencyCommandOption>;
 }
 

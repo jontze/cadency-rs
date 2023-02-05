@@ -32,15 +32,15 @@ struct UrbanResult {
 }
 
 #[derive(CommandBaseline)]
+#[description = "Searches the Urbandictionary for your query"]
+#[deferred = true]
 pub struct Urban {
-    description: &'static str,
     options: Vec<CadencyCommandOption>,
 }
 
 impl std::default::Default for Urban {
     fn default() -> Self {
         Self {
-            description: "Searches the Urbandictionary for your query",
             options: vec![CadencyCommandOption {
                 name: "query",
                 description: "Your search query",
@@ -92,13 +92,11 @@ impl Urban {
 
 #[async_trait]
 impl CadencyCommand for Urban {
-    #[command]
     async fn execute<'a>(
         &self,
         ctx: &Context,
         command: &'a mut ApplicationCommandInteraction,
     ) -> Result<(), CadencyError> {
-        utils::voice::create_deferred_response(ctx, command).await?;
         let query_option = utils::get_option_value_at_position(command.data.options.as_ref(), 0)
             .and_then(|option_value| {
                 if let CommandDataOptionValue::String(query) = option_value {

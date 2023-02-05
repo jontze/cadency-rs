@@ -4,19 +4,10 @@ use serenity::{
     model::application::interaction::application_command::ApplicationCommandInteraction,
 };
 
-#[derive(CommandBaseline)]
+#[derive(CommandBaseline, Default)]
+#[description = "Say something really inspiring!"]
 pub struct Inspire {
-    description: &'static str,
     options: Vec<CadencyCommandOption>,
-}
-
-impl std::default::Default for Inspire {
-    fn default() -> Self {
-        Self {
-            description: "Say something really inspiring!",
-            options: vec![],
-        }
-    }
 }
 
 impl Inspire {
@@ -31,7 +22,6 @@ impl Inspire {
 
 #[async_trait]
 impl CadencyCommand for Inspire {
-    #[command]
     async fn execute<'a>(
         &self,
         ctx: &Context,

@@ -37,7 +37,15 @@ impl EventHandler for Handler {
                 .iter()
                 .find(|cadency_command| cadency_command.name() == command_name);
             let cmd_execution = match cmd_target {
-                Some(target) => target.execute(&ctx, &mut command).await,
+                Some(target) => {
+                    info!("⚡ Execute {} command", target.name());
+                    if target.deferred() {
+                        utils::voice::create_deferred_response(&ctx, &mut command)
+                            .await
+                            .expect("Unable to deferre response");
+                    }
+                    target.execute(&ctx, &mut command).await
+                }
                 None => command_not_implemented(&ctx, &command).await,
             };
             if let Err(execution_err) = cmd_execution {

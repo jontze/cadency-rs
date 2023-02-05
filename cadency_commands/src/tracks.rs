@@ -5,31 +5,21 @@ use serenity::{
     utils::Color,
 };
 
-#[derive(CommandBaseline)]
+#[derive(CommandBaseline, Default)]
+#[description = "List all tracks in the queue"]
+#[deferred = true]
 pub struct Tracks {
-    description: &'static str,
     options: Vec<CadencyCommandOption>,
-}
-
-impl std::default::Default for Tracks {
-    fn default() -> Self {
-        Self {
-            description: "List all tracks in the queue",
-            options: vec![],
-        }
-    }
 }
 
 #[async_trait]
 impl CadencyCommand for Tracks {
-    #[command]
     async fn execute<'a>(
         &self,
         ctx: &Context,
         command: &'a mut ApplicationCommandInteraction,
     ) -> Result<(), CadencyError> {
         if let Some(guild_id) = command.guild_id {
-            utils::voice::create_deferred_response(ctx, command).await?;
             let manager = utils::voice::get_songbird(ctx).await;
             if let Some(call) = manager.get(guild_id) {
                 let handler = call.lock().await;

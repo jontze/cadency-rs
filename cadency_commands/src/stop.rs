@@ -4,31 +4,21 @@ use serenity::{
     model::application::interaction::application_command::ApplicationCommandInteraction,
 };
 
-#[derive(CommandBaseline)]
+#[derive(CommandBaseline, Default)]
+#[description = "Stop music and clear the track list"]
+#[deferred = true]
 pub struct Stop {
-    description: &'static str,
     options: Vec<CadencyCommandOption>,
-}
-
-impl std::default::Default for Stop {
-    fn default() -> Self {
-        Self {
-            description: "Stop music and clear the track list",
-            options: vec![],
-        }
-    }
 }
 
 #[async_trait]
 impl CadencyCommand for Stop {
-    #[command]
     async fn execute<'a>(
         &self,
         ctx: &Context,
         command: &'a mut ApplicationCommandInteraction,
     ) -> Result<(), CadencyError> {
         if let Some(guild_id) = command.guild_id {
-            utils::voice::create_deferred_response(ctx, command).await?;
             let manager = utils::voice::get_songbird(ctx).await;
             if let Some(call) = manager.get(guild_id) {
                 let handler = call.lock().await;

@@ -18,9 +18,8 @@ use serenity::{
 
 // This is your custom command with the name "hello"
 #[derive(CommandBaseline)]
+#[description = "Say Hello to a user"]
 struct Hello {
-    // Description of the command in the discord UI
-    description: String,
     // The allowed list of command arguments
     options: Vec<CadencyCommandOption>,
 }
@@ -28,7 +27,6 @@ struct Hello {
 impl std::default::Default for Hello {
     fn default() -> Self {
         Self {
-            description: "Say Hello to a user".to_string(),
             options: vec![CadencyCommandOption {
                 name: "user",
                 description: "The user to greet",
@@ -42,7 +40,6 @@ impl std::default::Default for Hello {
 #[async_trait]
 impl CadencyCommand for Hello {
     // The following code will get executed by the cadency command handler if the command is called
-    #[command]
     async fn execute<'a>(
         &self,
         ctx: &Context,

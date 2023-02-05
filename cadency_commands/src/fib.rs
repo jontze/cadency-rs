@@ -9,15 +9,14 @@ use serenity::{
 };
 
 #[derive(CommandBaseline)]
+#[description = "Calculate the nth number in the fibonacci sequence"]
 pub struct Fib {
-    description: &'static str,
     options: Vec<CadencyCommandOption>,
 }
 
 impl std::default::Default for Fib {
     fn default() -> Self {
         Self {
-            description: "Calculate the nth number in the fibonacci sequence",
             options: vec![CadencyCommandOption {
                 name: "number",
                 description: "The number in the fibonacci sequence",
@@ -40,7 +39,6 @@ impl Fib {
 
 #[async_trait]
 impl CadencyCommand for Fib {
-    #[command]
     async fn execute<'a>(
         &self,
         ctx: &Context,
