@@ -38,6 +38,7 @@ impl EventHandler for Handler {
                 .find(|cadency_command| cadency_command.name() == command_name);
             let cmd_execution = match cmd_target {
                 Some(target) => {
+                    info!("⚡ Execute {} command", target.name());
                     if target.deferred() {
                         utils::voice::create_deferred_response(&ctx, &mut command)
                             .await
