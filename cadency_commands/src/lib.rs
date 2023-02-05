@@ -38,7 +38,6 @@ mod test {
     fn impl_commandbaseline_trait_with_macro() {
         #[derive(cadency_codegen::CommandBaseline)]
         struct Test {
-            description: String,
             options: Vec<CadencyCommandOption>,
         }
         assert!(true)
@@ -47,12 +46,11 @@ mod test {
     #[test]
     fn return_lowercase_struct_name_as_name() {
         #[derive(cadency_codegen::CommandBaseline)]
+        #[description = "123"]
         struct Test {
-            description: String,
             options: Vec<CadencyCommandOption>,
         }
         let test = Test {
-            description: "123".to_string(),
             options: Vec::new(),
         };
         let name: String = test.name();
@@ -60,14 +58,31 @@ mod test {
     }
 
     #[test]
-    fn not_return_uppercase_struct_name_as_name() {
+    fn return_attribute_name_as_struct_name() {
         #[derive(cadency_codegen::CommandBaseline)]
+        #[name = "my_test"]
+        #[description = "123"]
         struct Test {
-            description: String,
             options: Vec<CadencyCommandOption>,
         }
         let test = Test {
-            description: "123".to_string(),
+            options: Vec::new(),
+        };
+        let name: String = test.name();
+        assert_eq!(
+            name, "my_test",
+            "Test command name should match with name attribute"
+        )
+    }
+
+    #[test]
+    fn not_return_uppercase_struct_name_as_name() {
+        #[derive(cadency_codegen::CommandBaseline)]
+        #[description = "123"]
+        struct Test {
+            options: Vec<CadencyCommandOption>,
+        }
+        let test = Test {
             options: Vec::new(),
         };
         let name: String = test.name();
@@ -75,5 +90,53 @@ mod test {
             name, "Test",
             "Testing that the first char is not uppercase: {name}"
         )
+    }
+
+    #[test]
+    fn return_attribute_description() {
+        #[derive(cadency_codegen::CommandBaseline)]
+        #[description = "123"]
+        struct Test {
+            options: Vec<CadencyCommandOption>,
+        }
+        let test = Test {
+            options: Vec::new(),
+        };
+        assert_eq!(
+            test.description(),
+            "123",
+            "Test command description should match"
+        )
+    }
+
+    #[test]
+    fn return_default_deferred_config() {
+        #[derive(cadency_codegen::CommandBaseline)]
+        #[description = "123"]
+        struct Test {
+            options: Vec<CadencyCommandOption>,
+        }
+        let test = Test {
+            options: Vec::new(),
+        };
+        assert_eq!(
+            test.deferred(),
+            false,
+            "Test command should not be deferred"
+        )
+    }
+
+    #[test]
+    fn return_deferred_attribute() {
+        #[derive(cadency_codegen::CommandBaseline)]
+        #[description = "123"]
+        #[deferred = true]
+        struct Test {
+            options: Vec<CadencyCommandOption>,
+        }
+        let test = Test {
+            options: Vec::new(),
+        };
+        assert!(test.deferred(), "Test command should be deferred")
     }
 }
