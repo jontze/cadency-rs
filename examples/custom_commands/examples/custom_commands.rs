@@ -40,7 +40,6 @@ impl std::default::Default for Hello {
 #[async_trait]
 impl CadencyCommand for Hello {
     // The following code will get executed by the cadency command handler if the command is called
-    #[command]
     async fn execute<'a>(
         &self,
         ctx: &Context,

@@ -13,7 +13,6 @@ pub struct Resume {
 
 #[async_trait]
 impl CadencyCommand for Resume {
-    #[command]
     async fn execute<'a>(
         &self,
         ctx: &Context,

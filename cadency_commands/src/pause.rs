@@ -13,7 +13,6 @@ pub struct Pause {
 
 #[async_trait]
 impl CadencyCommand for Pause {
-    #[command]
     async fn execute<'a>(
         &self,
         ctx: &Context,

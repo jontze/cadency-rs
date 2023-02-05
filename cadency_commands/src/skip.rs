@@ -13,7 +13,6 @@ pub struct Skip {
 
 #[async_trait]
 impl CadencyCommand for Skip {
-    #[command]
     async fn execute<'a>(
         &self,
         ctx: &Context,

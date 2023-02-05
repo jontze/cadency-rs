@@ -29,7 +29,6 @@ impl std::default::Default for Slap {
 
 #[async_trait]
 impl CadencyCommand for Slap {
-    #[command]
     async fn execute<'a>(
         &self,
         ctx: &Context,

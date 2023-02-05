@@ -12,7 +12,6 @@ pub struct Now {
 
 #[async_trait]
 impl CadencyCommand for Now {
-    #[command]
     async fn execute<'a>(
         &self,
         ctx: &Context,

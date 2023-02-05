@@ -12,7 +12,6 @@ pub struct Ping {
 
 #[async_trait]
 impl CadencyCommand for Ping {
-    #[command]
     async fn execute<'a>(
         &self,
         ctx: &Context,

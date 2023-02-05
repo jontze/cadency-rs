@@ -34,7 +34,6 @@ impl std::default::Default for Play {
 
 #[async_trait]
 impl CadencyCommand for Play {
-    #[command]
     async fn execute<'a>(
         &self,
         ctx: &Context,

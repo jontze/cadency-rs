@@ -13,7 +13,6 @@ pub struct Stop {
 
 #[async_trait]
 impl CadencyCommand for Stop {
-    #[command]
     async fn execute<'a>(
         &self,
         ctx: &Context,

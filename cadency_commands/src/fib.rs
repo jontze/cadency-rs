@@ -39,7 +39,6 @@ impl Fib {
 
 #[async_trait]
 impl CadencyCommand for Fib {
-    #[command]
     async fn execute<'a>(
         &self,
         ctx: &Context,

@@ -14,7 +14,6 @@ pub struct Tracks {
 
 #[async_trait]
 impl CadencyCommand for Tracks {
-    #[command]
     async fn execute<'a>(
         &self,
         ctx: &Context,

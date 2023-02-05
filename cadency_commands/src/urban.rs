@@ -92,7 +92,6 @@ impl Urban {
 
 #[async_trait]
 impl CadencyCommand for Urban {
-    #[command]
     async fn execute<'a>(
         &self,
         ctx: &Context,

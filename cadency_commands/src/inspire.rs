@@ -22,7 +22,6 @@ impl Inspire {
 
 #[async_trait]
 impl CadencyCommand for Inspire {
-    #[command]
     async fn execute<'a>(
         &self,
         ctx: &Context,
