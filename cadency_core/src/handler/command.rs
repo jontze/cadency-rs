@@ -69,15 +69,16 @@ impl EventHandler for Handler {
                         }
                         match command_error {
                             CadencyError::Command { message } => {
-                                error_res_builder.message(Some(message));
-                                error_res_builder.build()
+                                error_res_builder.message(Some(message))
                             }
-                            _ => error_res_builder
-                                .message(Some(
-                                    "**Oops! Something went terrible wrong.**".to_string(),
-                                ))
-                                .build(),
+                            CadencyError::Join => error_res_builder.message(Some(
+                                "❌ **I could not join your voice channel**".to_string(),
+                            )),
+                            _ => error_res_builder.message(Some(
+                                "**Oops! Something went terrible wrong.**".to_string(),
+                            )),
                         }
+                        .build()
                         .expect("Unable to build error response")
                         .submit(&ctx, &mut command)
                         .await

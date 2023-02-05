@@ -31,7 +31,9 @@ pub async fn join(
     CadencyError,
 > {
     let manager = get_songbird(ctx).await;
-    let guild_id = command.guild_id.ok_or(CadencyError::Join)?;
+    let guild_id = command.guild_id.ok_or(CadencyError::Command {
+        message: ":x: *To use this command, you must be on a server*".to_string(),
+    })?;
     let channel_id = ctx
         .cache
         .guild(guild_id)
