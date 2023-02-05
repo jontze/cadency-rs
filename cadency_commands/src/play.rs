@@ -40,7 +40,6 @@ impl CadencyCommand for Play {
         ctx: &Context,
         command: &'a mut ApplicationCommandInteraction,
     ) -> Result<(), CadencyError> {
-        utils::voice::create_deferred_response(ctx, command).await?;
         let search_data = utils::get_option_value_at_position(command.data.options.as_ref(), 0)
             .and_then(|option_value| {
                 if let CommandDataOptionValue::String(string_value) = option_value {

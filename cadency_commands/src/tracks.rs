@@ -21,7 +21,6 @@ impl CadencyCommand for Tracks {
         command: &'a mut ApplicationCommandInteraction,
     ) -> Result<(), CadencyError> {
         if let Some(guild_id) = command.guild_id {
-            utils::voice::create_deferred_response(ctx, command).await?;
             let manager = utils::voice::get_songbird(ctx).await;
             if let Some(call) = manager.get(guild_id) {
                 let handler = call.lock().await;
