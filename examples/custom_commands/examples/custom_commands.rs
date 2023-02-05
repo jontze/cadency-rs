@@ -6,37 +6,21 @@ extern crate cadency_codegen;
 use cadency_commands::Fib;
 use cadency_core::{
     response::{Response, ResponseBuilder},
-    setup_commands, utils, Cadency, CadencyCommand, CadencyCommandOption, CadencyError,
+    setup_commands, utils, Cadency, CadencyCommand, CadencyError,
 };
 use serenity::{
     async_trait,
     client::Context,
-    model::application::{
-        command::CommandOptionType,
-        interaction::application_command::{ApplicationCommandInteraction, CommandDataOptionValue},
+    model::application::interaction::application_command::{
+        ApplicationCommandInteraction, CommandDataOptionValue,
     },
 };
 
 // This is your custom command with the name "hello"
-#[derive(CommandBaseline)]
+#[derive(CommandBaseline, Default)]
 #[description = "Say Hello to a user"]
-struct Hello {
-    // The allowed list of command arguments
-    options: Vec<CadencyCommandOption>,
-}
-
-impl std::default::Default for Hello {
-    fn default() -> Self {
-        Self {
-            options: vec![CadencyCommandOption {
-                name: "user",
-                description: "The user to greet",
-                kind: CommandOptionType::User,
-                required: true,
-            }],
-        }
-    }
-}
+#[argument(name = "user", description = "The user to great", kind = "User")]
+struct Hello {}
 
 #[async_trait]
 impl CadencyCommand for Hello {

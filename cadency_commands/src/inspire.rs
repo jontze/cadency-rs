@@ -1,6 +1,6 @@
 use cadency_core::{
     response::{Response, ResponseBuilder},
-    CadencyCommand, CadencyCommandOption, CadencyError,
+    CadencyCommand, CadencyError,
 };
 use serenity::{
     async_trait, client::Context,
@@ -9,9 +9,7 @@ use serenity::{
 
 #[derive(CommandBaseline, Default)]
 #[description = "Say something really inspiring!"]
-pub struct Inspire {
-    options: Vec<CadencyCommandOption>,
-}
+pub struct Inspire {}
 
 impl Inspire {
     async fn request_inspire_image_url() -> Result<String, reqwest::Error> {

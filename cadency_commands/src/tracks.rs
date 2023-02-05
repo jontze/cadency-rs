@@ -1,6 +1,6 @@
 use cadency_core::{
     response::{Response, ResponseBuilder},
-    utils, CadencyCommand, CadencyCommandOption, CadencyError,
+    utils, CadencyCommand, CadencyError,
 };
 use serenity::{
     async_trait, builder::CreateEmbed, client::Context,
@@ -11,9 +11,7 @@ use serenity::{
 #[derive(CommandBaseline, Default)]
 #[description = "List all tracks in the queue"]
 #[deferred = true]
-pub struct Tracks {
-    options: Vec<CadencyCommandOption>,
-}
+pub struct Tracks {}
 
 #[async_trait]
 impl CadencyCommand for Tracks {

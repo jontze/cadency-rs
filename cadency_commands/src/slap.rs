@@ -1,34 +1,23 @@
 use cadency_core::{
     response::{Response, ResponseBuilder},
-    utils, CadencyCommand, CadencyCommandOption, CadencyError,
+    utils, CadencyCommand, CadencyError,
 };
 use serenity::{
     async_trait,
     client::Context,
-    model::application::{
-        command::CommandOptionType,
-        interaction::application_command::{ApplicationCommandInteraction, CommandDataOptionValue},
+    model::application::interaction::application_command::{
+        ApplicationCommandInteraction, CommandDataOptionValue,
     },
 };
 
-#[derive(CommandBaseline)]
+#[derive(CommandBaseline, Default)]
 #[description = "Slap someone with a large trout!"]
-pub struct Slap {
-    options: Vec<CadencyCommandOption>,
-}
-
-impl std::default::Default for Slap {
-    fn default() -> Self {
-        Self {
-            options: vec![CadencyCommandOption {
-                name: "target",
-                description: "The user you want to slap",
-                kind: CommandOptionType::User,
-                required: true,
-            }],
-        }
-    }
-}
+#[argument(
+    name = "target",
+    description = "The user you want to slap",
+    kind = "User"
+)]
+pub struct Slap {}
 
 #[async_trait]
 impl CadencyCommand for Slap {
