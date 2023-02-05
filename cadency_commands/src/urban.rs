@@ -97,52 +97,36 @@ impl CadencyCommand for Urban {
         ctx: &Context,
         command: &'a mut ApplicationCommandInteraction,
     ) -> Result<(), CadencyError> {
-        let query_option = utils::get_option_value_at_position(command.data.options.as_ref(), 0)
+        let query = utils::get_option_value_at_position(command.data.options.as_ref(), 0)
             .and_then(|option_value| {
                 if let CommandDataOptionValue::String(query) = option_value {
                     Some(query)
                 } else {
+                    error!("Urban command option empty");
                     None
                 }
-            });
-        match query_option {
-            Some(query) => {
-                let urbans_entrys = Self::request_urban_dictionary_entries(query).await;
-                match urbans_entrys {
-                    Ok(urbans) => {
-                        if urbans.is_empty() {
-                            utils::voice::edit_deferred_response(
-                                ctx,
-                                command,
-                                ":x: *Nothing found*",
-                            )
-                            .await?;
-                        } else {
-                            utils::voice::edit_deferred_response_with_embeded(
-                                ctx,
-                                command,
-                                Self::create_embed(urbans),
-                            )
-                            .await?;
-                        }
-                    }
-                    Err(err) => {
-                        error!("Failed to request urban dictionary entries : {:?}", err);
-                        utils::voice::edit_deferred_response(
-                            ctx,
-                            command,
-                            ":x: *Failed to request urban dictionary*",
-                        )
-                        .await?;
-                    }
+            })
+            .ok_or(CadencyError::Command {
+                message: ":x: *Empty or invalid query*".to_string(),
+            })?;
+        let urbans = Self::request_urban_dictionary_entries(query)
+            .await
+            .map_err(|err| {
+                error!("Failed to request urban dictionary entries : {:?}", err);
+                CadencyError::Command {
+                    message: ":x: *Failed to request urban dictionary*".to_string(),
                 }
-            }
-            None => {
-                error!("Urban command option empty");
-                utils::voice::edit_deferred_response(ctx, command, ":x: *Empty or invalid query*")
-                    .await?;
-            }
-        };
+            })?;
+        if urbans.is_empty() {
+            utils::voice::edit_deferred_response(ctx, command, ":x: *Nothing found*").await?;
+        } else {
+            utils::voice::edit_deferred_response_with_embeded(
+                ctx,
+                command,
+                Self::create_embed(urbans),
+            )
+            .await?;
+        }
         Ok(())
     }
 }
