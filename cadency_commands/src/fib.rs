@@ -1,34 +1,23 @@
 use cadency_core::{
     response::{Response, ResponseBuilder},
-    utils, CadencyCommand, CadencyCommandOption, CadencyError,
+    utils, CadencyCommand, CadencyError,
 };
 use serenity::{
     async_trait,
     client::Context,
-    model::application::{
-        command::CommandOptionType,
-        interaction::application_command::{ApplicationCommandInteraction, CommandDataOptionValue},
+    model::application::interaction::application_command::{
+        ApplicationCommandInteraction, CommandDataOptionValue,
     },
 };
 
-#[derive(CommandBaseline)]
+#[derive(CommandBaseline, Default)]
 #[description = "Calculate the nth number in the fibonacci sequence"]
-pub struct Fib {
-    options: Vec<CadencyCommandOption>,
-}
-
-impl std::default::Default for Fib {
-    fn default() -> Self {
-        Self {
-            options: vec![CadencyCommandOption {
-                name: "number",
-                description: "The number in the fibonacci sequence",
-                kind: CommandOptionType::Integer,
-                required: true,
-            }],
-        }
-    }
-}
+#[argument(
+    name = "number",
+    description = "The number in the fibonacci sequence",
+    kind = "Integer"
+)]
+pub struct Fib {}
 
 impl Fib {
     fn calc(n: &i64) -> f64 {

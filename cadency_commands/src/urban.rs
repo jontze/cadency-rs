@@ -1,14 +1,13 @@
 use cadency_core::{
     response::{Response, ResponseBuilder},
-    utils, CadencyCommand, CadencyCommandOption, CadencyError,
+    utils, CadencyCommand, CadencyError,
 };
 use serenity::{
     async_trait,
     builder::CreateEmbed,
     client::Context,
-    model::application::{
-        command::CommandOptionType,
-        interaction::application_command::{ApplicationCommandInteraction, CommandDataOptionValue},
+    model::application::interaction::application_command::{
+        ApplicationCommandInteraction, CommandDataOptionValue,
     },
     utils::Color,
 };
@@ -32,25 +31,11 @@ struct UrbanResult {
     pub list: Vec<UrbanEntry>,
 }
 
-#[derive(CommandBaseline)]
+#[derive(CommandBaseline, Default)]
 #[description = "Searches the Urbandictionary for your query"]
 #[deferred = true]
-pub struct Urban {
-    options: Vec<CadencyCommandOption>,
-}
-
-impl std::default::Default for Urban {
-    fn default() -> Self {
-        Self {
-            options: vec![CadencyCommandOption {
-                name: "query",
-                description: "Your search query",
-                kind: CommandOptionType::String,
-                required: true,
-            }],
-        }
-    }
-}
+#[argument(name = "query", description = "Your search query", kind = "String")]
+pub struct Urban {}
 
 impl Urban {
     async fn request_urban_dictionary_entries(

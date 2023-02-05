@@ -1,6 +1,6 @@
 use cadency_core::{
     response::{Response, ResponseBuilder},
-    utils, CadencyCommand, CadencyCommandOption, CadencyError,
+    utils, CadencyCommand, CadencyError,
 };
 use serenity::{
     async_trait, client::Context,
@@ -10,9 +10,7 @@ use serenity::{
 #[derive(CommandBaseline, Default)]
 #[description = "Skip current song"]
 #[deferred = true]
-pub struct Skip {
-    options: Vec<CadencyCommandOption>,
-}
+pub struct Skip {}
 
 #[async_trait]
 impl CadencyCommand for Skip {

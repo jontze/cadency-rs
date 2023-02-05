@@ -1,6 +1,6 @@
 use cadency_core::{
     response::{Response, ResponseBuilder},
-    CadencyCommand, CadencyCommandOption, CadencyError,
+    CadencyCommand, CadencyError,
 };
 use serenity::{
     async_trait, client::Context,
@@ -9,9 +9,7 @@ use serenity::{
 
 #[derive(CommandBaseline, Default)]
 #[description = "Play Ping-Pong"]
-pub struct Ping {
-    options: Vec<CadencyCommandOption>,
-}
+pub struct Ping {}
 
 #[async_trait]
 impl CadencyCommand for Ping {

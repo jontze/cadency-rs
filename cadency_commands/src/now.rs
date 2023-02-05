@@ -1,6 +1,6 @@
 use cadency_core::{
     response::{Response, ResponseBuilder},
-    utils, CadencyCommand, CadencyCommandOption, CadencyError,
+    utils, CadencyCommand, CadencyError,
 };
 use serenity::{
     async_trait, client::Context,
@@ -9,9 +9,7 @@ use serenity::{
 
 #[derive(CommandBaseline, Default)]
 #[description = "Shows current song"]
-pub struct Now {
-    options: Vec<CadencyCommandOption>,
-}
+pub struct Now {}
 
 #[async_trait]
 impl CadencyCommand for Now {

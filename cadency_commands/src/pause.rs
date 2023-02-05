@@ -1,6 +1,6 @@
 use cadency_core::{
     response::{Response, ResponseBuilder},
-    utils, CadencyCommand, CadencyCommandOption, CadencyError,
+    utils, CadencyCommand, CadencyError,
 };
 use serenity::{
     async_trait, client::Context,
@@ -10,9 +10,7 @@ use serenity::{
 #[derive(CommandBaseline, Default)]
 #[description = "Pause the current song"]
 #[deferred = true]
-pub struct Pause {
-    options: Vec<CadencyCommandOption>,
-}
+pub struct Pause {}
 
 #[async_trait]
 impl CadencyCommand for Pause {

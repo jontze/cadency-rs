@@ -1,38 +1,27 @@
 use cadency_core::{
     handler::voice::InactiveHandler,
     response::{Response, ResponseBuilder},
-    utils, CadencyCommand, CadencyCommandOption, CadencyError,
+    utils, CadencyCommand, CadencyError,
 };
 use reqwest::Url;
 use serenity::{
     async_trait,
     client::Context,
-    model::application::{
-        command::CommandOptionType,
-        interaction::application_command::{ApplicationCommandInteraction, CommandDataOptionValue},
+    model::application::interaction::application_command::{
+        ApplicationCommandInteraction, CommandDataOptionValue,
     },
 };
 use songbird::events::Event;
 
-#[derive(CommandBaseline)]
+#[derive(CommandBaseline, Default)]
 #[description = "Play a song from Youtube"]
 #[deferred = true]
-pub struct Play {
-    options: Vec<CadencyCommandOption>,
-}
-
-impl std::default::Default for Play {
-    fn default() -> Self {
-        Self {
-            options: vec![CadencyCommandOption {
-                name: "query",
-                description: "URL or search query like: 'Hey Jude Beatles'",
-                kind: CommandOptionType::String,
-                required: true,
-            }],
-        }
-    }
-}
+#[argument(
+    name = "quiery",
+    description = "URL or search query like: 'Hey Jude Beatles'",
+    kind = "String"
+)]
+pub struct Play {}
 
 #[async_trait]
 impl CadencyCommand for Play {
