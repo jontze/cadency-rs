@@ -1,13 +1,9 @@
-use crate::{command::Commands, error::CadencyError, CadencyCommand};
+use crate::{command::Commands, CadencyCommand};
 use serenity::{
-    builder::CreateEmbed,
     client::Context,
     model::{
-        application::interaction::{
-            application_command::{
-                ApplicationCommandInteraction, CommandDataOption, CommandDataOptionValue,
-            },
-            InteractionResponseType,
+        application::interaction::application_command::{
+            CommandDataOption, CommandDataOptionValue,
         },
         gateway::Activity,
         user::OnlineStatus,
@@ -39,45 +35,4 @@ pub fn get_option_value_at_position(
     options
         .get(position)
         .and_then(|option| option.resolved.as_ref())
-}
-
-pub async fn create_response<'a>(
-    ctx: &Context,
-    interaction: &mut ApplicationCommandInteraction,
-    content: &str,
-) -> Result<(), CadencyError> {
-    interaction
-        .create_interaction_response(&ctx.http, |response| {
-            response
-                .kind(InteractionResponseType::ChannelMessageWithSource)
-                .interaction_response_data(|message| message.content(content))
-        })
-        .await
-        .map_err(|err| {
-            error!("Failed to submit response: {}", err);
-            CadencyError::Response
-        })
-}
-
-pub async fn create_response_with_embed<'a>(
-    ctx: &Context,
-    interaction: &mut ApplicationCommandInteraction,
-    embeds: Vec<CreateEmbed>,
-) -> Result<(), CadencyError> {
-    interaction
-        .create_interaction_response(&ctx.http, |response| {
-            response
-                .kind(InteractionResponseType::ChannelMessageWithSource)
-                .interaction_response_data(|message| {
-                    for embed in embeds {
-                        message.add_embed(embed);
-                    }
-                    message
-                })
-        })
-        .await
-        .map_err(|err| {
-            error!("Failed to submit embed response: {}", err);
-            CadencyError::Response
-        })
 }

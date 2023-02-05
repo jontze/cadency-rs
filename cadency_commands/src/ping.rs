@@ -1,4 +1,7 @@
-use cadency_core::{utils, CadencyCommand, CadencyCommandOption, CadencyError};
+use cadency_core::{
+    response::{Response, ResponseBuilder},
+    CadencyCommand, CadencyCommandOption, CadencyError,
+};
 use serenity::{
     async_trait, client::Context,
     model::application::interaction::application_command::ApplicationCommandInteraction,
@@ -14,10 +17,12 @@ pub struct Ping {
 impl CadencyCommand for Ping {
     async fn execute<'a>(
         &self,
-        ctx: &Context,
-        command: &'a mut ApplicationCommandInteraction,
-    ) -> Result<(), CadencyError> {
-        utils::create_response(ctx, command, "Pong!").await?;
-        Ok(())
+        _ctx: &Context,
+        _command: &'a mut ApplicationCommandInteraction,
+        response_builder: &'a mut ResponseBuilder,
+    ) -> Result<Response, CadencyError> {
+        Ok(response_builder
+            .message(Some("Pong!".to_string()))
+            .build()?)
     }
 }
