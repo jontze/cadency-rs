@@ -38,7 +38,9 @@ impl EventHandler for Handler {
 
             if let Some(cmd) = cmd_target {
                 info!("⚡ Execute '{}' command", cmd.name());
+                let mut prepared_response = ResponseBuilder::new(ResponseTiming::Instant);
                 if cmd.deferred() {
+                    prepared_response.timing(ResponseTiming::Deferred);
                     ResponseBuilder::new(ResponseTiming::DeferredInfo)
                         .build()
                         .expect("Failed to build response")
@@ -46,32 +48,44 @@ impl EventHandler for Handler {
                         .await
                         .expect("Unable to submit deferred info");
                 }
-                if let Err(command_error) = cmd.execute(&ctx, &mut command).await {
-                    error!("❌ Command execution failed: {command_error:?}");
-                    let mut error_res_builder = ResponseBuilder::default();
-                    if cmd.deferred() {
-                        error_res_builder.timing(ResponseTiming::Deferred);
-                    } else {
-                        error_res_builder.timing(ResponseTiming::Instant);
-                    }
-                    match command_error {
-                        CadencyError::Command { message } => {
-                            error_res_builder.message(Some(message));
-                            error_res_builder.build()
-                        }
-                        _ => error_res_builder
-                            .message(Some("**Oops! Something went terrible wrong.**".to_string()))
-                            .build(),
-                    }
-                    .expect("Unable to build error response")
-                    .submit(&ctx, &mut command)
+                match cmd
+                    .execute(&ctx, &mut command, &mut prepared_response)
                     .await
-                    .map_err(|err| {
-                        error!("❌ Fatal error! Is discord down? {:?}", err);
-                    })
-                    .expect("Unable to send error response");
-                } else {
-                    info!("✅ Command '{}' was successful", cmd.name())
+                {
+                    Ok(response) => {
+                        response
+                            .submit(&ctx, &mut command)
+                            .await
+                            .expect("To submit the command response");
+                        info!("✅ Command '{}' was successful", cmd.name());
+                    }
+                    Err(command_error) => {
+                        error!("❌ Command execution failed: {command_error:?}");
+                        let mut error_res_builder = ResponseBuilder::default();
+                        if cmd.deferred() {
+                            error_res_builder.timing(ResponseTiming::Deferred);
+                        } else {
+                            error_res_builder.timing(ResponseTiming::Instant);
+                        }
+                        match command_error {
+                            CadencyError::Command { message } => {
+                                error_res_builder.message(Some(message));
+                                error_res_builder.build()
+                            }
+                            _ => error_res_builder
+                                .message(Some(
+                                    "**Oops! Something went terrible wrong.**".to_string(),
+                                ))
+                                .build(),
+                        }
+                        .expect("Unable to build error response")
+                        .submit(&ctx, &mut command)
+                        .await
+                        .map_err(|err| {
+                            error!("❌ Fatal error! Is discord down? {:?}", err);
+                        })
+                        .expect("Unable to send error response");
+                    }
                 }
             } else {
                 command_not_implemented(&ctx, &command)

@@ -1,4 +1,7 @@
-use cadency_core::{utils, CadencyCommand, CadencyCommandOption, CadencyError};
+use cadency_core::{
+    response::{Response, ResponseBuilder},
+    CadencyCommand, CadencyCommandOption, CadencyError,
+};
 use serenity::{
     async_trait, client::Context,
     model::application::interaction::application_command::ApplicationCommandInteraction,
@@ -24,16 +27,16 @@ impl Inspire {
 impl CadencyCommand for Inspire {
     async fn execute<'a>(
         &self,
-        ctx: &Context,
-        command: &'a mut ApplicationCommandInteraction,
-    ) -> Result<(), CadencyError> {
+        _ctx: &Context,
+        _command: &'a mut ApplicationCommandInteraction,
+        response_builder: &'a mut ResponseBuilder,
+    ) -> Result<Response, CadencyError> {
         let inspire_url = Self::request_inspire_image_url().await.map_err(|err| {
             error!("{:?}", err);
             CadencyError::Command {
                 message: "**The source of my inspiration is currently unavailable :(**".to_string(),
             }
         })?;
-        utils::create_response(ctx, command, &inspire_url).await?;
-        Ok(())
+        Ok(response_builder.message(Some(inspire_url)).build()?)
     }
 }

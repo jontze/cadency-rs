@@ -1,4 +1,7 @@
-use cadency_core::{utils, CadencyCommand, CadencyCommandOption, CadencyError};
+use cadency_core::{
+    response::{Response, ResponseBuilder},
+    utils, CadencyCommand, CadencyCommandOption, CadencyError,
+};
 use serenity::{
     async_trait, builder::CreateEmbed, client::Context,
     model::application::interaction::application_command::ApplicationCommandInteraction,
@@ -18,7 +21,8 @@ impl CadencyCommand for Tracks {
         &self,
         ctx: &Context,
         command: &'a mut ApplicationCommandInteraction,
-    ) -> Result<(), CadencyError> {
+        response_builder: &'a mut ResponseBuilder,
+    ) -> Result<Response, CadencyError> {
         let guild_id = command.guild_id.ok_or(CadencyError::Command {
             message: ":x: **This command can only be executed on a server**".to_string(),
         })?;
@@ -27,9 +31,8 @@ impl CadencyCommand for Tracks {
             message: ":x: **No active voice session on the server**".to_string(),
         })?;
         let handler = call.lock().await;
-        if handler.queue().is_empty() {
-            utils::voice::edit_deferred_response(ctx, command, ":x: **No tracks in the queue**")
-                .await?;
+        let response_builder = if handler.queue().is_empty() {
+            response_builder.message(Some(":x: **No tracks in the queue**".to_string()))
         } else {
             let queue_snapshot = handler.queue().current_queue();
             let mut embeded_tracks = CreateEmbed::default();
@@ -52,9 +55,8 @@ impl CadencyCommand for Tracks {
                     false,
                 );
             }
-            utils::voice::edit_deferred_response_with_embeded(ctx, command, vec![embeded_tracks])
-                .await?;
-        }
-        Ok(())
+            response_builder.embeds(vec![embeded_tracks])
+        };
+        Ok(response_builder.build()?)
     }
 }

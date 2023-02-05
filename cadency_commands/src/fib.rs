@@ -1,4 +1,7 @@
-use cadency_core::{utils, CadencyCommand, CadencyCommandOption, CadencyError};
+use cadency_core::{
+    response::{Response, ResponseBuilder},
+    utils, CadencyCommand, CadencyCommandOption, CadencyError,
+};
 use serenity::{
     async_trait,
     client::Context,
@@ -41,9 +44,10 @@ impl Fib {
 impl CadencyCommand for Fib {
     async fn execute<'a>(
         &self,
-        ctx: &Context,
+        _ctx: &Context,
         command: &'a mut ApplicationCommandInteraction,
-    ) -> Result<(), CadencyError> {
+        response_builder: &'a mut ResponseBuilder,
+    ) -> Result<Response, CadencyError> {
         let number = utils::get_option_value_at_position(command.data.options.as_ref(), 0)
             .and_then(|option_value| {
                 if let CommandDataOptionValue::Integer(fib_value) = option_value {
@@ -61,7 +65,6 @@ impl CadencyCommand for Fib {
                 message: "Invalid number input".to_string(),
             })?;
         let fib_msg = Self::calc(number).to_string();
-        utils::create_response(ctx, command, &fib_msg).await?;
-        Ok(())
+        Ok(response_builder.message(Some(fib_msg)).build()?)
     }
 }

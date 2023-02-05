@@ -1,5 +1,7 @@
 use cadency_core::{
-    handler::voice::InactiveHandler, utils, CadencyCommand, CadencyCommandOption, CadencyError,
+    handler::voice::InactiveHandler,
+    response::{Response, ResponseBuilder},
+    utils, CadencyCommand, CadencyCommandOption, CadencyError,
 };
 use reqwest::Url;
 use serenity::{
@@ -38,7 +40,8 @@ impl CadencyCommand for Play {
         &self,
         ctx: &Context,
         command: &'a mut ApplicationCommandInteraction,
-    ) -> Result<(), CadencyError> {
+        response_builder: &'a mut ResponseBuilder,
+    ) -> Result<Response, CadencyError> {
         let (search_payload, is_url, is_playlist) =
             utils::get_option_value_at_position(command.data.options.as_ref(), 0)
                 .and_then(|option_value| {
@@ -68,7 +71,7 @@ impl CadencyCommand for Play {
             let call_handler = call.lock().await;
             call_handler.queue().is_empty()
         };
-        if is_playlist {
+        let response_builder = if is_playlist {
             let playlist_items =
                 cadency_yt_playlist::fetch_playlist_songs(search_payload.clone()).unwrap();
             playlist_items
@@ -110,14 +113,9 @@ impl CadencyCommand for Play {
                 InactiveHandler { guild_id, manager },
             );
             drop(handler);
-            utils::voice::edit_deferred_response(
-                ctx,
-                command,
-                &format!(
-                    ":white_check_mark: **Added ___{amount}___ songs to the queue with a duration of ___{total_duration:.2}___ mins** \n**Playing** :notes: `{search_payload}`",
-                ),
-            )
-            .await?;
+            response_builder.message(Some(format!(
+                ":white_check_mark: **Added ___{amount}___ songs to the queue with a duration of ___{total_duration:.2}___ mins** \n**Playing** :notes: `{search_payload}`",
+            )))
         } else {
             let added_song = utils::voice::add_song(
                 call.clone(),
@@ -146,19 +144,15 @@ impl CadencyCommand for Play {
                     .as_ref()
                     .map_or("unknown url", |url| url)
             };
-            utils::voice::edit_deferred_response(
-                ctx,
-                command,
-                &format!(
-                        ":white_check_mark: **Added song to the queue and started playing:** \n:notes: `{}` \n:link: `{}`",
-                        song_url,
-                        added_song
-                            .title
-                            .as_ref()
-                            .map_or(":x: **Unknown title**", |title| title)
-                ),
-            ).await?;
-        }
-        Ok(())
+            response_builder.message(Some(format!(
+                ":white_check_mark: **Added song to the queue and started playing:** \n:notes: `{}` \n:link: `{}`",
+                song_url,
+                added_song
+                    .title
+                    .as_ref()
+                    .map_or(":x: **Unknown title**", |title| title)
+        )))
+        };
+        Ok(response_builder.build()?)
     }
 }

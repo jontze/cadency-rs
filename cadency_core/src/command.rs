@@ -1,4 +1,8 @@
-use crate::{error::CadencyError, utils};
+use crate::{
+    error::CadencyError,
+    response::{Response, ResponseBuilder},
+    utils,
+};
 use serenity::{
     async_trait,
     client::Context,
@@ -68,7 +72,8 @@ pub trait CadencyCommand: Sync + Send + CadencyCommandBaseline {
         &self,
         ctx: &Context,
         command: &'a mut ApplicationCommandInteraction,
-    ) -> Result<(), CadencyError>;
+        response_builder: &'a mut ResponseBuilder,
+    ) -> Result<Response, CadencyError>;
 }
 
 pub(crate) struct Commands;

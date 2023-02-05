@@ -1,4 +1,7 @@
-use cadency_core::{utils, CadencyCommand, CadencyCommandOption, CadencyError};
+use cadency_core::{
+    response::{Response, ResponseBuilder},
+    utils, CadencyCommand, CadencyCommandOption, CadencyError,
+};
 use serenity::{
     async_trait,
     builder::CreateEmbed,
@@ -94,9 +97,10 @@ impl Urban {
 impl CadencyCommand for Urban {
     async fn execute<'a>(
         &self,
-        ctx: &Context,
+        _ctx: &Context,
         command: &'a mut ApplicationCommandInteraction,
-    ) -> Result<(), CadencyError> {
+        respone_builder: &'a mut ResponseBuilder,
+    ) -> Result<Response, CadencyError> {
         let query = utils::get_option_value_at_position(command.data.options.as_ref(), 0)
             .and_then(|option_value| {
                 if let CommandDataOptionValue::String(query) = option_value {
@@ -117,16 +121,11 @@ impl CadencyCommand for Urban {
                     message: ":x: *Failed to request urban dictionary*".to_string(),
                 }
             })?;
-        if urbans.is_empty() {
-            utils::voice::edit_deferred_response(ctx, command, ":x: *Nothing found*").await?;
+        let respone_builder = if urbans.is_empty() {
+            respone_builder.message(Some(":x: *Nothing found*".to_string()))
         } else {
-            utils::voice::edit_deferred_response_with_embeded(
-                ctx,
-                command,
-                Self::create_embed(urbans),
-            )
-            .await?;
-        }
-        Ok(())
+            respone_builder.embeds(Self::create_embed(urbans))
+        };
+        Ok(respone_builder.build()?)
     }
 }

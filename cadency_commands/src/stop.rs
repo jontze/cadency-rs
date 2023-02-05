@@ -1,4 +1,7 @@
-use cadency_core::{utils, CadencyCommand, CadencyCommandOption, CadencyError};
+use cadency_core::{
+    response::{Response, ResponseBuilder},
+    utils, CadencyCommand, CadencyCommandOption, CadencyError,
+};
 use serenity::{
     async_trait, client::Context,
     model::application::interaction::application_command::ApplicationCommandInteraction,
@@ -17,7 +20,8 @@ impl CadencyCommand for Stop {
         &self,
         ctx: &Context,
         command: &'a mut ApplicationCommandInteraction,
-    ) -> Result<(), CadencyError> {
+        response_builder: &'a mut ResponseBuilder,
+    ) -> Result<Response, CadencyError> {
         let guild_id = command.guild_id.ok_or(CadencyError::Command {
             message: ":x: **This command can only be executed on a server**".to_string(),
         })?;
@@ -27,17 +31,12 @@ impl CadencyCommand for Stop {
         })?;
 
         let handler = call.lock().await;
-        if handler.queue().is_empty() {
-            utils::voice::edit_deferred_response(ctx, command, ":x: **Nothing to stop**").await?;
+        let response_builder = if handler.queue().is_empty() {
+            response_builder.message(Some(":x: **Nothing to stop**".to_string()))
         } else {
             handler.queue().stop();
-            utils::voice::edit_deferred_response(
-                        ctx,
-                        command,
-                        ":white_check_mark: :wastebasket: **Successfully stopped and cleared the playlist**",
-                    )
-                    .await?;
-        }
-        Ok(())
+            response_builder.message(Some(":white_check_mark: :wastebasket: **Successfully stopped and cleared the playlist**".to_string()))
+        };
+        Ok(response_builder.build()?)
     }
 }

@@ -1,4 +1,7 @@
-use cadency_core::{utils, CadencyCommand, CadencyCommandOption, CadencyError};
+use cadency_core::{
+    response::{Response, ResponseBuilder},
+    utils, CadencyCommand, CadencyCommandOption, CadencyError,
+};
 use serenity::{
     async_trait,
     client::Context,
@@ -31,9 +34,10 @@ impl std::default::Default for Slap {
 impl CadencyCommand for Slap {
     async fn execute<'a>(
         &self,
-        ctx: &Context,
+        _ctx: &Context,
         command: &'a mut ApplicationCommandInteraction,
-    ) -> Result<(), CadencyError> {
+        response_builder: &'a mut ResponseBuilder,
+    ) -> Result<Response, CadencyError> {
         let user = utils::get_option_value_at_position(command.data.options.as_ref(), 0)
             .and_then(|option_value| {
                 if let CommandDataOptionValue::User(user, _) = option_value {
@@ -47,34 +51,22 @@ impl CadencyCommand for Slap {
                 message: ":x: *Invalid user provided*".to_string(),
             })?;
 
-        if user.id == command.user.id {
-            utils::create_response(
-                ctx,
-                command,
-                &format!("**Why do you want to slap yourself, {}?**", command.user),
-            )
-            .await?;
+        let response_builder = if user.id == command.user.id {
+            response_builder.message(Some(format!(
+                "**Why do you want to slap yourself, {}?**",
+                command.user
+            )))
         } else if user.id.0 == command.application_id.0 {
-            utils::create_response(
-                ctx,
-                command,
-                &format!(
-                    "**Nope!\n{} slaps {} around a bit with a large trout!**",
-                    user, command.user
-                ),
-            )
-            .await?;
+            response_builder.message(Some(format!(
+                "**Nope!\n{} slaps {} around a bit with a large trout!**",
+                user, command.user
+            )))
         } else {
-            utils::create_response(
-                ctx,
-                command,
-                &format!(
-                    "**{} slaps {} around a bit with a large trout!**",
-                    command.user, user
-                ),
-            )
-            .await?;
-        }
-        Ok(())
+            response_builder.message(Some(format!(
+                "**{} slaps {} around a bit with a large trout!**",
+                command.user, user
+            )))
+        };
+        Ok(response_builder.build()?)
     }
 }

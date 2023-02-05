@@ -5,6 +5,7 @@ extern crate cadency_codegen;
 
 use cadency_commands::Fib;
 use cadency_core::{
+    response::{Response, ResponseBuilder},
     setup_commands, utils, Cadency, CadencyCommand, CadencyCommandOption, CadencyError,
 };
 use serenity::{
@@ -42,9 +43,10 @@ impl CadencyCommand for Hello {
     // The following code will get executed by the cadency command handler if the command is called
     async fn execute<'a>(
         &self,
-        ctx: &Context,
+        _ctx: &Context,
         command: &'a mut ApplicationCommandInteraction,
-    ) -> Result<(), CadencyError> {
+        response_builder: &'a mut ResponseBuilder,
+    ) -> Result<Response, CadencyError> {
         let user_arg = utils::get_option_value_at_position(command.data.options.as_ref(), 0)
             .and_then(|option_value| {
                 if let CommandDataOptionValue::User(user, _) = option_value {
@@ -55,8 +57,9 @@ impl CadencyCommand for Hello {
                 }
             })
             .expect("A user as command argument");
-        utils::create_response(ctx, command, &format!("**Hello {user_arg}!**",)).await?;
-        Ok(())
+        Ok(response_builder
+            .message(Some(format!("**Hello {user_arg}!**")))
+            .build()?)
     }
 }
 

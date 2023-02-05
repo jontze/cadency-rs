@@ -1,4 +1,7 @@
-use cadency_core::{utils, CadencyCommand, CadencyCommandOption, CadencyError};
+use cadency_core::{
+    response::{Response, ResponseBuilder},
+    utils, CadencyCommand, CadencyCommandOption, CadencyError,
+};
 use serenity::{
     async_trait, client::Context,
     model::application::interaction::application_command::ApplicationCommandInteraction,
@@ -17,7 +20,8 @@ impl CadencyCommand for Pause {
         &self,
         ctx: &Context,
         command: &'a mut ApplicationCommandInteraction,
-    ) -> Result<(), CadencyError> {
+        response_builder: &'a mut ResponseBuilder,
+    ) -> Result<Response, CadencyError> {
         let guild_id = command.guild_id.ok_or(CadencyError::Command {
             message: ":x: **This command can only be executed on a server**".to_string(),
         })?;
@@ -27,7 +31,7 @@ impl CadencyCommand for Pause {
         })?;
         let handler = call.lock().await;
         if handler.queue().is_empty() {
-            utils::voice::edit_deferred_response(ctx, command, ":x: **Nothing to pause**").await?;
+            response_builder.message(Some(":x: **Nothing to pause**".to_string()));
         } else {
             handler.queue().pause().map_err(|err| {
                 error!("Failed to pause: {err:?}");
@@ -35,8 +39,8 @@ impl CadencyCommand for Pause {
                     message: ":x: **Could not pause the track**".to_string(),
                 }
             })?;
-            utils::voice::edit_deferred_response(ctx, command, ":pause_button: **Paused**").await?;
+            response_builder.message(Some(":pause_button: **Paused**".to_string()));
         }
-        Ok(())
+        Ok(response_builder.build()?)
     }
 }
