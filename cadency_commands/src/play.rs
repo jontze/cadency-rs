@@ -13,15 +13,15 @@ use serenity::{
 use songbird::events::Event;
 
 #[derive(CommandBaseline)]
+#[description = "Play a song from Youtube"]
+#[deferred = true]
 pub struct Play {
-    description: &'static str,
     options: Vec<CadencyCommandOption>,
 }
 
 impl std::default::Default for Play {
     fn default() -> Self {
         Self {
-            description: "Play a song from Youtube",
             options: vec![CadencyCommandOption {
                 name: "query",
                 description: "URL or search query like: 'Hey Jude Beatles'",

@@ -4,19 +4,10 @@ use serenity::{
     model::application::interaction::application_command::ApplicationCommandInteraction,
 };
 
-#[derive(CommandBaseline)]
+#[derive(CommandBaseline, Default)]
+#[description = "Shows current song"]
 pub struct Now {
-    description: &'static str,
     options: Vec<CadencyCommandOption>,
-}
-
-impl std::default::Default for Now {
-    fn default() -> Self {
-        Self {
-            description: "Shows current song",
-            options: vec![],
-        }
-    }
 }
 
 #[async_trait]

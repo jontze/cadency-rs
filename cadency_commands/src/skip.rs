@@ -4,19 +4,11 @@ use serenity::{
     model::application::interaction::application_command::ApplicationCommandInteraction,
 };
 
-#[derive(CommandBaseline)]
+#[derive(CommandBaseline, Default)]
+#[description = "Skip current song"]
+#[deferred = true]
 pub struct Skip {
-    description: &'static str,
     options: Vec<CadencyCommandOption>,
-}
-
-impl std::default::Default for Skip {
-    fn default() -> Self {
-        Self {
-            description: "Skip current song",
-            options: vec![],
-        }
-    }
 }
 
 #[async_trait]

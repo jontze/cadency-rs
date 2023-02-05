@@ -5,19 +5,11 @@ use serenity::{
     utils::Color,
 };
 
-#[derive(CommandBaseline)]
+#[derive(CommandBaseline, Default)]
+#[description = "List all tracks in the queue"]
+#[deferred = true]
 pub struct Tracks {
-    description: &'static str,
     options: Vec<CadencyCommandOption>,
-}
-
-impl std::default::Default for Tracks {
-    fn default() -> Self {
-        Self {
-            description: "List all tracks in the queue",
-            options: vec![],
-        }
-    }
 }
 
 #[async_trait]

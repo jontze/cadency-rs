@@ -4,19 +4,11 @@ use serenity::{
     model::application::interaction::application_command::ApplicationCommandInteraction,
 };
 
-#[derive(CommandBaseline)]
+#[derive(CommandBaseline, Default)]
+#[description = "Pause the current song"]
+#[deferred = true]
 pub struct Pause {
-    description: &'static str,
     options: Vec<CadencyCommandOption>,
-}
-
-impl std::default::Default for Pause {
-    fn default() -> Self {
-        Self {
-            description: "Pause the current song",
-            options: vec![],
-        }
-    }
 }
 
 #[async_trait]

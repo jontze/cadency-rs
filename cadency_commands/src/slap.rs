@@ -9,15 +9,14 @@ use serenity::{
 };
 
 #[derive(CommandBaseline)]
+#[description = "Slap someone with a large trout!"]
 pub struct Slap {
-    description: &'static str,
     options: Vec<CadencyCommandOption>,
 }
 
 impl std::default::Default for Slap {
     fn default() -> Self {
         Self {
-            description: "Slap someone with a large trout!",
             options: vec![CadencyCommandOption {
                 name: "target",
                 description: "The user you want to slap",
