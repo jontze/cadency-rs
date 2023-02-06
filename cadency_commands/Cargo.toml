@@ -1,6 +1,6 @@
 [package]
 name = "cadency_commands"
-version = "0.3.0"
+version = "0.3.1"
 edition = "2021"
 description = "Library with a collection of some commands for the cadency discord bot"
 license = "MIT"
@@ -27,15 +27,15 @@ features = ["builtin-queue", "yt-dlp"]
 
 [dependencies.cadency_core]
 path = "../cadency_core"
-version = "0.3.0"
+version = "0.3.1"
 
 [dependencies.cadency_codegen]
 path = "../cadency_codegen"
-version = "0.3.0"
+version = "0.3.1"
 
 [dependencies.cadency_yt_playlist]
 path = "../cadency_yt_playlist"
-version = "0.3.0"
+version = "0.3.1"
 
 [dev-dependencies.tokio]
 version = "1.25.0"
