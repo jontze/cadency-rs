@@ -1,4 +1,8 @@
-use crate::{error::CadencyError, utils};
+use crate::{
+    error::CadencyError,
+    response::{Response, ResponseBuilder},
+    utils,
+};
 use serenity::{
     async_trait,
     client::Context,
@@ -32,7 +36,8 @@ macro_rules! setup_commands {
 pub trait CadencyCommandBaseline {
     fn name(&self) -> String;
     fn description(&self) -> String;
-    fn options(&self) -> &Vec<CadencyCommandOption>;
+    fn deferred(&self) -> bool;
+    fn options(&self) -> Vec<CadencyCommandOption>;
 }
 
 pub struct CadencyCommandOption {
@@ -67,7 +72,8 @@ pub trait CadencyCommand: Sync + Send + CadencyCommandBaseline {
         &self,
         ctx: &Context,
         command: &'a mut ApplicationCommandInteraction,
-    ) -> Result<(), CadencyError>;
+        response_builder: &'a mut ResponseBuilder,
+    ) -> Result<Response, CadencyError>;
 }
 
 pub(crate) struct Commands;
@@ -90,7 +96,7 @@ pub(crate) async fn setup_commands(ctx: &Context) -> Result<(), serenity::Error>
 
 pub(crate) async fn command_not_implemented(
     ctx: &Context,
-    command: ApplicationCommandInteraction,
+    command: &ApplicationCommandInteraction,
 ) -> Result<(), CadencyError> {
     error!("The following command is not known: {:?}", command);
     command

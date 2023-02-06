@@ -1,15 +1,15 @@
+use crate::{
+    command::{command_not_implemented, setup_commands},
+    response::{ResponseBuilder, ResponseTiming},
+    utils,
+    utils::set_bot_presence,
+    CadencyError,
+};
 use serenity::{
     async_trait,
     client::{Context, EventHandler},
     model::{application::interaction::Interaction, event::ResumedEvent, gateway::Ready},
 };
-
-use crate::{
-    command::{command_not_implemented, setup_commands},
-    utils,
-};
-
-use crate::utils::set_bot_presence;
 
 pub(crate) struct Handler;
 
@@ -31,17 +31,67 @@ impl EventHandler for Handler {
 
     async fn interaction_create(&self, ctx: Context, interaction: Interaction) {
         if let Interaction::ApplicationCommand(mut command) = interaction {
-            let cadency_commands = utils::get_commands(&ctx).await;
-            let command_name = command.data.name.as_str();
-            let cmd_target = cadency_commands
-                .iter()
-                .find(|cadency_command| cadency_command.name() == command_name);
-            let cmd_execution = match cmd_target {
-                Some(target) => target.execute(&ctx, &mut command).await,
-                None => command_not_implemented(&ctx, command).await,
-            };
-            if let Err(execution_err) = cmd_execution {
-                error!("❌ Command execution failed: {execution_err:?}");
+            let cmd_target = utils::get_commands(&ctx)
+                .await
+                .into_iter()
+                .find(|cadency_command| cadency_command.name() == command.data.name.as_str());
+
+            if let Some(cmd) = cmd_target {
+                info!("⚡ Execute '{}' command", cmd.name());
+                let mut prepared_response = ResponseBuilder::new(ResponseTiming::Instant);
+                if cmd.deferred() {
+                    prepared_response.timing(ResponseTiming::Deferred);
+                    ResponseBuilder::new(ResponseTiming::DeferredInfo)
+                        .build()
+                        .expect("Failed to build response")
+                        .submit(&ctx, &mut command)
+                        .await
+                        .expect("Unable to submit deferred info");
+                }
+                match cmd
+                    .execute(&ctx, &mut command, &mut prepared_response)
+                    .await
+                {
+                    Ok(response) => {
+                        response
+                            .submit(&ctx, &mut command)
+                            .await
+                            .expect("To submit the command response");
+                        info!("✅ Command '{}' was successful", cmd.name());
+                    }
+                    Err(command_error) => {
+                        error!("❌ Command execution failed: {command_error:?}");
+                        let mut error_res_builder = ResponseBuilder::default();
+                        if cmd.deferred() {
+                            error_res_builder.timing(ResponseTiming::Deferred);
+                        } else {
+                            error_res_builder.timing(ResponseTiming::Instant);
+                        }
+                        match command_error {
+                            CadencyError::Command { message } => {
+                                error_res_builder.message(Some(message))
+                            }
+                            CadencyError::Join => error_res_builder.message(Some(
+                                "❌ **I could not join your voice channel**".to_string(),
+                            )),
+                            _ => error_res_builder.message(Some(
+                                "**Oops! Something went terrible wrong.**".to_string(),
+                            )),
+                        }
+                        .build()
+                        .expect("Unable to build error response")
+                        .submit(&ctx, &mut command)
+                        .await
+                        .map_err(|err| {
+                            error!("❌ Fatal error! Is discord down? {:?}", err);
+                        })
+                        .expect("Unable to send error response");
+                    }
+                }
+            } else {
+                command_not_implemented(&ctx, &command)
+                    .await
+                    .expect("Failed to submit not-implemented error");
             }
         };
     }

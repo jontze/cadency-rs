@@ -1,32 +1,23 @@
-use cadency_core::{utils, CadencyCommand, CadencyCommandOption, CadencyError};
+use cadency_core::{
+    response::{Response, ResponseBuilder},
+    utils, CadencyCommand, CadencyError,
+};
 use serenity::{
     async_trait,
     client::Context,
-    model::application::{
-        command::CommandOptionType,
-        interaction::application_command::{ApplicationCommandInteraction, CommandDataOptionValue},
+    model::application::interaction::application_command::{
+        ApplicationCommandInteraction, CommandDataOptionValue,
     },
 };
 
-#[derive(CommandBaseline)]
-pub struct Fib {
-    description: &'static str,
-    options: Vec<CadencyCommandOption>,
-}
-
-impl std::default::Default for Fib {
-    fn default() -> Self {
-        Self {
-            description: "Calculate the nth number in the fibonacci sequence",
-            options: vec![CadencyCommandOption {
-                name: "number",
-                description: "The number in the fibonacci sequence",
-                kind: CommandOptionType::Integer,
-                required: true,
-            }],
-        }
-    }
-}
+#[derive(CommandBaseline, Default)]
+#[description = "Calculate the nth number in the fibonacci sequence"]
+#[argument(
+    name = "number",
+    description = "The number in the fibonacci sequence",
+    kind = "Integer"
+)]
+pub struct Fib {}
 
 impl Fib {
     fn calc(n: &i64) -> f64 {
@@ -40,13 +31,13 @@ impl Fib {
 
 #[async_trait]
 impl CadencyCommand for Fib {
-    #[command]
     async fn execute<'a>(
         &self,
-        ctx: &Context,
+        _ctx: &Context,
         command: &'a mut ApplicationCommandInteraction,
-    ) -> Result<(), CadencyError> {
-        let number_option = utils::get_option_value_at_position(command.data.options.as_ref(), 0)
+        response_builder: &'a mut ResponseBuilder,
+    ) -> Result<Response, CadencyError> {
+        let number = utils::get_option_value_at_position(command.data.options.as_ref(), 0)
             .and_then(|option_value| {
                 if let CommandDataOptionValue::Integer(fib_value) = option_value {
                     Some(fib_value)
@@ -58,12 +49,11 @@ impl CadencyCommand for Fib {
                     );
                     None
                 }
-            });
-        let fib_msg = match number_option {
-            Some(number) => Self::calc(number).to_string(),
-            None => "Invalid number input!".to_string(),
-        };
-        utils::create_response(ctx, command, &fib_msg).await?;
-        Ok(())
+            })
+            .ok_or(CadencyError::Command {
+                message: "Invalid number input".to_string(),
+            })?;
+        let fib_msg = Self::calc(number).to_string();
+        Ok(response_builder.message(Some(fib_msg)).build()?)
     }
 }

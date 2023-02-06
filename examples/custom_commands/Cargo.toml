@@ -1,6 +1,6 @@
 [package]
 name = "custom_commands"
-version = "0.3.0"
+version = "0.3.1"
 edition = "2021"
 description = "An example how to integrate custom commands into cadency_rs"
 license = "MIT"
@@ -22,15 +22,15 @@ features = ["client", "gateway", "rustls_backend", "model", "voice", "cache"]
 
 [dependencies.cadency_core]
 path = "../../cadency_core"
-version = "0.3.0"
+version = "0.3.1"
 
 [dependencies.cadency_codegen]
 path = "../../cadency_codegen"
-version = "0.3.0"
+version = "0.3.1"
 
 [dependencies.cadency_commands]
 path = "../../cadency_commands"
-version = "0.3.0"
+version = "0.3.1"
 
 [dependencies.tokio]
 version = "1.25.0"

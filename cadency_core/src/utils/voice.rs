@@ -1,15 +1,10 @@
-use crate::error::CadencyError;
-use crate::utils;
+use crate::{error::CadencyError, utils};
 use reqwest::Url;
-use serenity::model;
 use serenity::{
-    builder::CreateEmbed,
     client::Context,
-    model::application::interaction::{
-        application_command::{
-            ApplicationCommandInteraction, CommandDataOption, CommandDataOptionValue,
-        },
-        InteractionResponseType,
+    model,
+    model::application::interaction::application_command::{
+        ApplicationCommandInteraction, CommandDataOption, CommandDataOptionValue,
     },
 };
 use songbird::{input::Input, input::Restartable};
@@ -36,7 +31,9 @@ pub async fn join(
     CadencyError,
 > {
     let manager = get_songbird(ctx).await;
-    let guild_id = command.guild_id.ok_or(CadencyError::Join)?;
+    let guild_id = command.guild_id.ok_or(CadencyError::Command {
+        message: ":x: *To use this command, you must be on a server*".to_string(),
+    })?;
     let channel_id = ctx
         .cache
         .guild(guild_id)
@@ -99,53 +96,4 @@ pub async fn get_songbird(ctx: &Context) -> std::sync::Arc<songbird::Songbird> {
     songbird::get(ctx)
         .await
         .expect("Failed to get songbird manager")
-}
-
-pub async fn create_deferred_response<'a>(
-    ctx: &Context,
-    interaction: &mut ApplicationCommandInteraction,
-) -> Result<(), CadencyError> {
-    interaction
-        .create_interaction_response(&ctx.http, |response| {
-            response.kind(InteractionResponseType::DeferredChannelMessageWithSource)
-        })
-        .await
-        .map_err(|err| {
-            error!("Failed to submit deferred message: {err}");
-            CadencyError::Response
-        })
-}
-
-pub async fn edit_deferred_response<'a>(
-    ctx: &Context,
-    interaction: &'a mut ApplicationCommandInteraction,
-    content: &str,
-) -> Result<(), CadencyError> {
-    interaction
-        .edit_original_interaction_response(&ctx.http, |previous_response| {
-            previous_response.content(content)
-        })
-        .await
-        .map_err(|err| {
-            error!("Failed to edit deferred message: {err}");
-            CadencyError::Response
-        })?;
-    Ok(())
-}
-
-pub async fn edit_deferred_response_with_embeded<'a>(
-    ctx: &Context,
-    interaction: &mut ApplicationCommandInteraction,
-    embeded_content: Vec<CreateEmbed>,
-) -> Result<(), CadencyError> {
-    interaction
-        .edit_original_interaction_response(&ctx.http, |previous_response| {
-            previous_response.add_embeds(embeded_content)
-        })
-        .await
-        .map_err(|err| {
-            error!("Failed to edit deferred message with embeded content: {err}");
-            CadencyError::Response
-        })?;
-    Ok(())
 }
