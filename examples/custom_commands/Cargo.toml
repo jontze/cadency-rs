@@ -12,13 +12,10 @@ repository = "https://github.com/jontze/cadency-rs"
 name = "custom_commands"
 
 [dependencies]
-env_logger = "0.10.0"
-log = "0.4.17"
-
-[dependencies.serenity]
-version = "0.11.5"
-default-features = false
-features = ["client", "gateway", "rustls_backend", "model", "voice", "cache"]
+serenity = { workspace = true }
+tokio = { workspace = true }
+env_logger = { workspace = true }
+log = { workspace = true }
 
 [dependencies.cadency_core]
 path = "../../cadency_core"
@@ -31,7 +28,3 @@ version = "0.3.1"
 [dependencies.cadency_commands]
 path = "../../cadency_commands"
 version = "0.3.1"
-
-[dependencies.tokio]
-version = "1.25.0"
-features = ["macros", "rt-multi-thread"]
