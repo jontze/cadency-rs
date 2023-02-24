@@ -9,8 +9,9 @@ repository = "https://github.com/jontze/cadency-rs"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-env_logger = "0.10.0"
-log = "0.4.17"
+env_logger = { workspace = true }
+log = { workspace = true }
+tokio = { workspace = true }
 
 [dependencies.cadency_core]
 path = "../cadency_core"
@@ -19,7 +20,3 @@ version = "0.3.1"
 [dependencies.cadency_commands]
 path = "../cadency_commands"
 version = "0.3.1"
-
-[dependencies.tokio]
-version = "1.25.0"
-features = ["macros", "rt-multi-thread"]
