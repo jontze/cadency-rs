@@ -18,7 +18,8 @@ RUN cargo build --release --bin cadency
 
 FROM bitnami/minideb:bullseye as packages
 # Downloads both ffmpeg and yt-dlp
-WORKDIR packages
+WORKDIR /packages
+COPY --from=builder /cadency/.yt-dlprc .
 # tar: (x) extract, (J) from .xz, (f) a file. (--wildcards */bin/ffmpeg) any path with /bin/ffmpeg, (--transform) remove all previous paths
 # FFMPEG is staticly compiled, so platform specific
 # If statement: converts architecture from docker to a correct link. Default is amd64 = desktop 64 bit
@@ -31,7 +32,8 @@ RUN if [ "$TARGETARCH" = "arm64" ]; then \
   apt-get update && apt-get install -y curl tar xz-utils && \
   curl -L $LINK > ffmpeg.tar.xz && \
   tar -xJf ffmpeg.tar.xz --wildcards */bin/ffmpeg --transform='s/^.*\///' && rm ffmpeg.tar.xz
-RUN curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux > yt-dlp && chmod +x yt-dlp
+RUN YTDLP_VERSION=$(cat .yt-dlprc) && \
+  curl -L https://github.com/yt-dlp/yt-dlp/releases/download/$YTDLP_VERSION/yt-dlp_linux > yt-dlp && chmod +x yt-dlp
 
 FROM bitnami/minideb:bullseye as python-builder
 # Based on: https://github.com/zarmory/docker-python-minimal/blob/master/Dockerfile
