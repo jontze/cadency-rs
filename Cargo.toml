@@ -7,3 +7,28 @@ members = [
     "cadency",
     "examples/*"
 ]
+
+[workspace.dependencies]
+env_logger = "0.10.0"
+log = "0.4.17"
+reqwest = "0.11.14"
+thiserror = "1.0.38"
+serde_json = "1.0.91"
+derive_builder = "0.12.0"
+
+[workspace.dependencies.serenity]
+version = "0.11.5"
+default-features = false
+features = ["client", "gateway", "rustls_backend", "model", "voice", "cache"]
+
+[workspace.dependencies.songbird]
+version = "0.3.0"
+features = ["builtin-queue", "yt-dlp"]
+
+[workspace.dependencies.tokio]
+version = "1.25.0"
+features = ["macros", "rt-multi-thread"]
+
+[workspace.dependencies.serde]
+version = "1.0.152"
+features = ["derive"]

@@ -1,0 +1,43 @@
+name: Bump Yt-Dlp
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        required: true
+        description: The new yt-dlp version
+        type: string
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        description: The new yt-dlp version
+        type: string
+
+env:
+  YTDLP_VERSION_FILE: .yt-dlprc
+
+jobs:
+  update:
+    name: Update Version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Update .yt-dlprc
+        run: |
+          rm $YTDLP_VERSION_FILE
+          echo "${{ inputs.version }}" >> $YTDLP_VERSION_FILE
+          cat $YTDLP_VERSION_FILE
+      - name: Create PR
+        uses: peter-evans/create-pull-request@v4
+        with:
+          title: "Update yt-dlp to version `${{ inputs.version }}`"
+          branch: "fix/yt-dlp-version-update"
+          base: main
+          add-paths: |
+            ${{ env.YTDLP_VERSION_FILE }}
+          commit-message: "fix(yt-dlp): Update yt-dlp to `${{ inputs.version }}`"
+          delete-branch: true
+          body: This is an automated Pull Request to update the yt-dlp versions that is used in the docker image.
+          labels: dependencies
+          assignees: ${{ github.repository_owner }}
+          reviewers: ${{ github.repository_owner }}

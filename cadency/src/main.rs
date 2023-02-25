@@ -27,11 +27,12 @@ async fn main() {
         Tracks::default(),
         Urban::default(),
     ];
-    let mut cadency = Cadency::default()
-        .await
-        .expect("To init Cadency")
-        .with_commands(commands)
-        .await;
+    let cadency = Cadency::builder()
+        .token(std::env::var("DISCORD_TOKEN").expect("Discord token to be present"))
+        .commands(commands)
+        .build()
+        .expect("To build cadency");
+
     if let Err(why) = cadency.start().await {
         error!("Client error: {:?}", why);
     }

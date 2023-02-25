@@ -30,10 +30,11 @@ jobs:
         with:
           prefix-key: "rust-${{ github.job }}"
       - name: Setup yt-dlp
-        run: >
-          wget https://github.com/yt-dlp/yt-dlp/releases/download/2022.09.01/yt-dlp &&
-          chmod a+x yt-dlp &&
-          mv yt-dlp /usr/local/bin &&
+        run: |
+          VERSION=$(cat .yt-dlprc)
+          wget https://github.com/yt-dlp/yt-dlp/releases/download/$VERSION/yt-dlp 
+          chmod a+x yt-dlp
+          mv yt-dlp /usr/local/bin
           yt-dlp --version
       - name: Run tests
         run: cargo test --all

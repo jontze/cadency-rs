@@ -59,12 +59,12 @@ async fn main() {
     let commands = setup_commands![Fib::default(), Hello::default()];
 
     // Init cadency with a valid discord bot token
-    let mut cadency = Cadency::new("<your_discord_bot_token>".to_string())
-        .await
-        .expect("To init cadency")
+    let cadency = Cadency::builder()
+        .token("<your_discord_bot_token>".to_string())
         // Add the commands array to cadency
-        .with_commands(commands)
-        .await;
+        .commands(commands)
+        .build()
+        .expect("To build cadency");
 
     // Start cadency - this will submit and register the commands to discord
     if let Err(why) = cadency.start().await {

@@ -1,6 +1,6 @@
 [package]
 name = "cadency_commands"
-version = "0.3.1"
+version = "0.3.2"
 edition = "2021"
 description = "Library with a collection of some commands for the cadency discord bot"
 license = "MIT"
@@ -9,37 +9,21 @@ repository = "https://github.com/jontze/cadency-rs"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-log = "0.4.17"
-reqwest = "0.11.14"
-
-[dependencies.serde]
-version = "1.0.152"
-features = ["derive"]
-
-[dependencies.serenity]
-version = "0.11.5"
-default-features = false
-features = ["client", "gateway", "rustls_backend", "model", "voice", "cache"]
-
-[dependencies.songbird]
-version = "0.3.0"
-features = ["builtin-queue", "yt-dlp"]
+log = { workspace = true }
+serenity = { workspace = true }
+songbird = { workspace = true }
+tokio = { workspace = true }
+reqwest = { workspace = true }
+serde = { workspace = true }
 
 [dependencies.cadency_core]
 path = "../cadency_core"
-version = "0.3.1"
+version = "0.3.2"
 
 [dependencies.cadency_codegen]
 path = "../cadency_codegen"
-version = "0.3.1"
+version = "0.3.2"
 
 [dependencies.cadency_yt_playlist]
 path = "../cadency_yt_playlist"
-version = "0.3.1"
-
-[dev-dependencies.tokio]
-version = "1.25.0"
-features = ["macros", "rt-multi-thread"]
-
-
-
+version = "0.3.2"
