@@ -17,7 +17,7 @@ use songbird::events::Event;
 #[description = "Play a song from Youtube"]
 #[deferred = true]
 #[argument(
-    name = "quiery",
+    name = "query",
     description = "URL or search query like: 'Hey Jude Beatles'",
     kind = "String"
 )]
