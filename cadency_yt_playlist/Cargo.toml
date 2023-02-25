@@ -1,6 +1,6 @@
 [package]
 name = "cadency_yt_playlist"
-version = "0.3.1"
+version = "0.3.2"
 edition = "2021"
 description = "Library of the cadency discord bot to interact with youtube playlists"
 license = "MIT"
