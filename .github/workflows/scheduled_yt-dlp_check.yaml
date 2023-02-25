@@ -1,0 +1,49 @@
+name: Yt-dlp Updater
+on:
+  push: # FIXME: Remve after testing is finished
+  workflow_dispatch:
+  schedule:
+    - cron: 57 7 * * * # At 07:57 on every day
+
+jobs:
+  check:
+    name: Check Latest Version
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.latest.outputs.release }}
+      isNew: ${{ steps.summary.outputs.isNew }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Read current Yt-dlp Version
+        id: current
+        run: |
+          echo "version=$(cat .yt-dlprc)" >> $GITHUB_OUTPUT
+      - name: Latest Release
+        id: latest
+        uses: pozetroninc/github-action-get-latest-release@v0.7.0
+        with:
+          repo: yt-dlp
+          owner: yt-dlp
+      - name: Summary
+        id: summary
+        run: |
+          echo "# Yt-dlp Version Check" >> $GITHUB_STEP_SUMMARY
+          echo "The **currently** used yt-dlp version is \`${{ steps.current.outputs.version }}\`." >> $GITHUB_STEP_SUMMARY
+          echo "The **latest** yt-dlp version is \`${{ steps.latest.outputs.release }}\`." >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.current.outputs.version }}" = "${{ steps.latest.outputs.release }}" ]; then
+            echo "isNew=false" >> $GITHUB_OUTPUT
+            echo "The version is up to date. No update was triggered" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "isNew=true" >> $GITHUB_OUTPUT
+            echo "A new version is available. An update was triggered." >> $GITHUB_STEP_SUMMARY
+          fi
+
+  update:
+    name: Update Version
+    needs:
+      - check
+    if: needs.check.outputs.isNew == 'true'
+    uses: ./.github/workflows/yt-dlp_update.yaml
+    secrets: inherit
+    with:
+      version: ${{ needs.check.outputs.version }}
