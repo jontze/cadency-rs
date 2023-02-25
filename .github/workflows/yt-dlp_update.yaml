@@ -32,7 +32,7 @@ jobs:
         with:
           title: "Update yt-dlp to version `${{ inputs.version }}`"
           branch: "fix/yt-dlp-version-update"
-          base: chore/simplify-version-management
+          base: main
           add-paths: |
             ${{ env.YTDLP_VERSION_FILE }}
           commit-message: "fix(yt-dlp): Update yt-dlp to `${{ inputs.version }}`"
