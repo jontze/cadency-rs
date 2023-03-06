@@ -23,6 +23,7 @@ jobs:
         with:
           repo: yt-dlp
           owner: yt-dlp
+          excludes: prerelease,draft
       - name: Summary
         id: summary
         run: |
