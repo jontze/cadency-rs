@@ -1,0 +1,40 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "cadency.fullname" . }}
+  labels:
+    {{- include "cadency.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "cadency.selectorLabels" . | nindent 6 }}
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        {{- include "cadency.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | indent 8 }}
+      {{- end }}
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.image.name }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        env:
+          - name: RUST_LOG
+            valueFrom:
+              configMapKeyRef:
+                name: {{ include "cadency.fullname" . }}-config
+                key: logLevel
+                optional: true
+          - name: DISCORD_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: {{ include "cadency.fullname" . }}-secrets
+                key: token
+                optional: false
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}

@@ -1,0 +1,19 @@
+image:
+  # name of the image to use
+  name: ghcr.io/jontze/cadency_rs
+  pullPolicy: IfNotPresent
+  # tag Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+nameOverride: ""
+fullnameOverride: ""
+
+cadency:
+  # logLevel of the cadency application
+  logLevel: cadency=info
+  # discordToken that is used to connect to discord
+  # This variable is required to use the chart.
+  discordToken:
+
+resources: {}
+nodeSelector: {}
