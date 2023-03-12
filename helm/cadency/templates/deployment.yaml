@@ -17,7 +17,7 @@ spec:
     spec:
       {{- with .Values.nodeSelector }}
       nodeSelector:
-        {{- toYaml . | indent 8 }}
+        {{ toYaml . | indent 8 }}
       {{- end }}
       containers:
       - name: {{ .Chart.Name }}
