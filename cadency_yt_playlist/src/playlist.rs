@@ -16,7 +16,6 @@ pub fn fetch_playlist_songs(
     let mut failed_deserializing: Vec<Message> = Vec::new();
     let deserialized_items: Vec<PlaylistItem> = String::from_utf8(ytdl_output.stdout)?
         .split('\n')
-        .into_iter()
         .filter_map(|string_output| {
             if string_output.is_empty() {
                 None

@@ -1,129 +1,176 @@
 use proc_macro::TokenStream;
-use syn::{DeriveInput, Lit, Meta, NestedMeta};
+use syn::{punctuated::Punctuated, spanned::Spanned, DeriveInput, Expr, Lit, Meta, Token};
+
+use crate::{argument::Argument, command::Command};
 
 pub(crate) fn impl_command_baseline(derive_input: DeriveInput) -> TokenStream {
     let struct_name = derive_input.ident;
-    let mut command_name = struct_name.to_string().to_lowercase();
-    let mut description = "".to_string();
-    let mut deferred = false;
-    let mut arguments: Vec<(String, String, String, bool)> = vec![];
+    let mut command = Command::new(struct_name.to_string().to_lowercase());
     for attr in derive_input.attrs.iter() {
-        let attr_meta = attr.parse_meta().unwrap();
-        match attr_meta {
+        match attr.meta.to_owned() {
             Meta::NameValue(derive_attr) => {
                 match derive_attr.path.get_ident().unwrap().to_string().as_str() {
+                    // #[name = "name"]
                     "name" => {
-                        if let Lit::Str(name_attr_value) = derive_attr.lit {
-                            command_name = name_attr_value.value();
-                        } else {
-                            return syn::Error::new(
-                                derive_attr.lit.span(),
-                                "'name' attribute must be a string",
-                            )
-                            .to_compile_error()
-                            .into();
+                        if let Expr::Lit(name_lit) = derive_attr.value {
+                            if let Lit::Str(name_lit) = name_lit.lit {
+                                command.name(name_lit.value());
+                            } else {
+                                return syn::Error::new(
+                                    name_lit.lit.span(),
+                                    "'name' attribute must be a string",
+                                )
+                                .to_compile_error()
+                                .into();
+                            }
                         }
                     }
+                    // #[description = "description"]
                     "description" => {
-                        if let Lit::Str(description_attr_value) = derive_attr.lit {
-                            description = description_attr_value.value();
-                        } else {
-                            return syn::Error::new(
-                                derive_attr.lit.span(),
-                                "'description' attribute must be a string",
-                            )
-                            .to_compile_error()
-                            .into();
+                        if let Expr::Lit(description_lit) = derive_attr.value {
+                            if let Lit::Str(description_lit) = description_lit.lit {
+                                command.description(description_lit.value());
+                            } else {
+                                return syn::Error::new(
+                                    description_lit.lit.span(),
+                                    "'description' attribute must be a string",
+                                )
+                                .to_compile_error()
+                                .into();
+                            }
                         }
                     }
+                    // #[deferred = true]
                     "deferred" => {
-                        if let Lit::Bool(deferred_attr_value) = derive_attr.lit {
-                            deferred = deferred_attr_value.value();
-                        } else {
-                            return syn::Error::new(
-                                derive_attr.lit.span(),
-                                "'deferred' attribute must be a bool",
-                            )
-                            .to_compile_error()
-                            .into();
+                        if let Expr::Lit(deferred_lit) = derive_attr.value {
+                            if let Lit::Bool(deferred_lit) = deferred_lit.lit {
+                                if deferred_lit.value {
+                                    command.is_deferred();
+                                }
+                            } else {
+                                return syn::Error::new(
+                                    deferred_lit.lit.span(),
+                                    "'deferred' attribute must be a bool",
+                                )
+                                .to_compile_error()
+                                .into();
+                            }
                         }
                     }
                     _ => (),
                 }
             }
             Meta::List(derive_attr_list) => {
-                if derive_attr_list
-                    .path
-                    .get_ident()
-                    .unwrap()
-                    .to_string()
-                    .as_str()
-                    == "argument"
-                {
+                // #[argument(..., ...)]
+                if derive_attr_list.path.is_ident("argument") {
                     let mut name: Option<String> = None;
                     let mut description: Option<String> = None;
                     let mut kind: Option<String> = None;
                     let mut required = true;
 
-                    for arguments_attr_meta in derive_attr_list.nested.iter() {
-                        if let NestedMeta::Meta(Meta::NameValue(argument_item)) =
-                            arguments_attr_meta
-                        {
-                            match argument_item.path.get_ident().unwrap().to_string().as_str() {
+                    let nested = attr
+                        .parse_args_with(Punctuated::<Meta, Token![,]>::parse_terminated)
+                        .unwrap();
+
+                    for meta in nested {
+                        match meta {
+                            Meta::NameValue(name_value_arg) => {
+                                match name_value_arg.path.get_ident().unwrap().to_string().as_str() {
+                                    // #[argument(name = "name")]
                                     "name" => {
-                                        if let Lit::Str(argument_name) = argument_item.lit.to_owned() {
-                                            name = Some(argument_name.value());
-                                        } else {
-                                            return syn::Error::new(argument_item.lit.span(), "Name must be a string").to_compile_error().into()
+                                        if let Expr::Lit(argument_name_lit) = name_value_arg.value {
+                                            if let Lit::Str(argument_name_lit) = argument_name_lit.lit {
+                                                name = Some(argument_name_lit.value());
+                                            } else {
+                                                return syn::Error::new(
+                                                    argument_name_lit.lit.span(),
+                                                    "Name must be a string",
+                                                )
+                                                .to_compile_error()
+                                                .into();
+                                            }
                                         }
                                     }
+                                    // #[argument(description = "description")]
                                     "description" => {
-                                        if let Lit::Str(argument_description) = argument_item.lit.to_owned() {
-                                            description = Some(argument_description.value());
-                                        } else {
-                                            return syn::Error::new(argument_item.lit.span(), "Description must be a string").to_compile_error().into()
+                                        if let Expr::Lit(argument_description_lit) = name_value_arg.value {
+                                            if let Lit::Str(argument_description_lit) = argument_description_lit.lit {
+                                                description = Some(argument_description_lit.value());
+                                            } else {
+                                                return syn::Error::new(
+                                                    argument_description_lit.lit.span(),
+                                                    "Description must be a string",
+                                                )
+                                                .to_compile_error()
+                                                .into();
+                                            }
                                         }
                                     }
+                                    // #[argument(kind = "kind")]
                                     "kind" => {
-                                        if let Lit::Str(argument_kind) = argument_item.lit.to_owned() {
-                                            kind = Some(argument_kind.value());
-                                        } else {
-                                            return syn::Error::new(argument_item.lit.span(), "Kind must be a string").to_compile_error().into()
+                                        if let Expr::Lit(argument_kind_lit) = name_value_arg.value {
+                                            if let Lit::Str(argument_kind_lit) = argument_kind_lit.lit {
+                                                kind = Some(argument_kind_lit.value());
+                                            } else {
+                                                return syn::Error::new(
+                                                    argument_kind_lit.lit.span(),
+                                                    "Kind must be a string",
+                                                )
+                                                .to_compile_error()
+                                                .into();
+                                            }
                                         }
                                     }
+                                    // #[argument(required = true)]
                                     "required" => {
-                                        if let Lit::Bool(argument_required) = argument_item.lit.to_owned() {
-                                            required = argument_required.value();
+                                        if let Expr::Lit(argument_required_lit) = name_value_arg.value {
+                                            if let Lit::Bool(argument_required_lit) = argument_required_lit.lit {
+                                                required = argument_required_lit.value;
+                                            } else {
+                                                return syn::Error::new(
+                                                    argument_required_lit.lit.span(),
+                                                    "Required must be a bool",
+                                                )
+                                                .to_compile_error()
+                                                .into();
+                                            }
                                         }
                                     }
                                     _ => {
-                                        return syn::Error::new(argument_item.path.get_ident().unwrap().span(), "Only 'name', 'description', 'kind' and 'required' are supported")
+                                        return syn::Error::new(name_value_arg.path.get_ident().unwrap().span(), "Only 'name', 'description', 'kind' and 'required' are supported")
                                             .to_compile_error()
                                             .into()
                                     }
                                 }
+                            }
+                            Meta::List(_) => {}
+                            Meta::Path(_) => {}
                         }
                     }
-                    match (name, description, kind) {
-                        (Some(name), Some(description), Some(kind)) => {
-                            arguments.push((name, description, kind, required));
+                    if let (Some(name), Some(description), Some(kind)) = (name, description, kind) {
+                        let mut argument = Argument::new(name, description, kind);
+                        if !required {
+                            argument.is_optional();
                         }
-                        _ => {
-                            return syn::Error::new(
-                                derive_attr_list.path.get_ident().unwrap().span(),
-                                "You need to specify at least 'name', 'description' and 'kind'",
-                            )
-                            .to_compile_error()
-                            .into();
-                        }
+                        command.add_argument(argument);
+                    } else {
+                        return syn::Error::new(
+                            derive_attr_list.path.get_ident().span(),
+                            "All arguments must have a name, description and kind",
+                        )
+                        .to_compile_error()
+                        .into();
                     }
                 }
             }
             _ => (),
         }
     }
-    let argument_tokens = arguments.iter().map(|(name, description, kind, required)| {
-        let kind_token: proc_macro2::TokenStream = kind.parse().unwrap();
+    let argument_tokens = command.arguments.iter().map(|arg| {
+        let name = &arg.name;
+        let description = &arg.description;
+        let kind_token: proc_macro2::TokenStream = arg.kind.parse().unwrap();
+        let required = arg.required;
         quote! {
             __CadencyCommandOption {
                 name: #name,
@@ -133,6 +180,10 @@ pub(crate) fn impl_command_baseline(derive_input: DeriveInput) -> TokenStream {
             }
         }
     });
+
+    let command_name = &command.name;
+    let description = &command.description;
+    let deferred = command.deferred;
     quote! {
         use cadency_core::{CadencyCommandBaseline as __CadencyCommandBaseline, CadencyCommandOption as __CadencyCommandOption};
         use serenity::model::application::command::CommandOptionType as __CommandOptionType;
