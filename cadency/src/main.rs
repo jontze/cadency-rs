@@ -4,7 +4,7 @@ extern crate log;
 extern crate cadency_core;
 
 use cadency_commands::{
-    Fib, Inspire, Now, Pause, Ping, Play, Resume, Skip, Slap, Stop, Tracks, Urban,
+    Fib, Inspire, Now, Pause, Ping, Play, Resume, Skip, Slap, Stop, TrackLoop, Tracks, Urban,
 };
 use cadency_core::Cadency;
 use settings::CadencySettings;
@@ -34,6 +34,7 @@ async fn main() {
         Stop::default(),
         Tracks::default(),
         Urban::default(),
+        TrackLoop::default()
     ];
     let cadency = Cadency::builder()
         .token(std::env::var("DISCORD_TOKEN").expect("Discord token to be present"))
