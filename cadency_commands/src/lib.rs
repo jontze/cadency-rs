@@ -29,6 +29,8 @@ mod tracks;
 pub use tracks::Tracks;
 mod urban;
 pub use urban::Urban;
+mod track_loop;
+pub use track_loop::TrackLoop;
 
 #[cfg(test)]
 mod test {
