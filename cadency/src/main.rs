@@ -7,11 +7,16 @@ use cadency_commands::{
     Fib, Inspire, Now, Pause, Ping, Play, Resume, Skip, Slap, Stop, Tracks, Urban,
 };
 use cadency_core::Cadency;
+use settings::CadencySettings;
+
+mod settings;
 
 #[tokio::main]
 async fn main() {
     let env = env_logger::Env::default().filter_or("RUST_LOG", "cadency=info");
     env_logger::init_from_env(env);
+
+    let settings = CadencySettings::parse();
 
     let commands = setup_commands![
         Fib::default(),
@@ -19,7 +24,10 @@ async fn main() {
         Now::default(),
         Pause::default(),
         Ping::default(),
-        Play::default(),
+        Play::new(
+            settings.play.playlist_song_limit,
+            settings.play.song_length_limit
+        ),
         Resume::default(),
         Skip::default(),
         Slap::default(),
