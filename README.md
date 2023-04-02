@@ -44,6 +44,14 @@ docker stop ID
 - Calculate a number in the **fibonacci** sequence
 - And play a classic game of **ping pong**
 
+## Environment Variables
+
+| Variable Name                 | Default Value  | Description                                               |
+| ----------------------------- | -------------- | --------------------------------------------------------- |
+| `RUST_LOG`                    | `cadency=info` | Log Level                                                 |
+| `CADENCY_PLAYLIST_SONG_LIMIT` | `30`           | Maximum amount of songs that can be added from a playlist |
+| `CADENCY_SONG_LENGTH_LIMIT`   | `600.00`       | Maximum allowed song length in seconds                    |
+
 ## Contributing
 
 1. Install the latest stable rust toolchain: https://www.rust-lang.org/tools/install
