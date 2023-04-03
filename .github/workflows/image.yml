@@ -7,6 +7,11 @@ on:
         default: false
         type: boolean
         description: "If image should be pushed"
+      cache_tag:
+        required: false
+        default: main
+        type: string
+        description: "Branch or tag to use for caching"
     secrets:
       GHCR_USER:
         required: true
@@ -52,8 +57,8 @@ jobs:
           push: ${{ inputs.push }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          platforms: linux/amd64,linux/arm64
-          cache-from: type=registry,ref=${{ env.IMAGE_NAME }}:main
+          platforms: linux/arm64,linux/amd64
+          cache-from: type=registry,ref=${{ env.IMAGE_NAME }}:${{ inputs.cache_tag }}
           cache-to: type=inline
       - name: Image pushed
         if: inputs.push
