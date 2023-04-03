@@ -15,6 +15,7 @@ jobs:
     uses: ./.github/workflows/image.yml
     with:
       push: true
+      cache_tag: main
     secrets:
       GHCR_USER: ${{ secrets.GHCR_USER }}
       GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
