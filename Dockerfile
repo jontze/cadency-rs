@@ -1,6 +1,6 @@
 FROM lukemathwalker/cargo-chef:latest-rust-1.68-slim-bullseye as build_base
 
-FROM base as planner
+FROM build_base as planner
 WORKDIR /cadency
 COPY . .
 RUN cargo chef prepare --recipe-path recipe.json
