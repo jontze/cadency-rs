@@ -6,7 +6,15 @@ RUN cargo chef prepare --recipe-path recipe.json
 FROM lukemathwalker/cargo-chef:latest-rust-1.67 as cacher
 WORKDIR /cadency
 COPY --from=planner /cadency/recipe.json recipe.json
-RUN apt-get update && apt-get install -y cmake && apt-get autoremove -y && \
+ENV RUSTUP_MAX_RETRIES=100
+ENV CARGO_INCREMENTAL=0
+ENV CARGO_NET_RETRY=100
+ENV CARGO_TERM_COLOR=always
+ARG TARGETARCH
+RUN if [ "$TARGETARCH" = "arm64" ]; then \
+  export CARGO_NET_GIT_FETCH_WITH_CLI="true"; \
+  fi && \
+  apt-get update && apt-get install -y cmake && apt-get autoremove -y && \
   cargo chef cook --release --recipe-path recipe.json
 
 FROM lukemathwalker/cargo-chef:latest-rust-1.67 as builder
@@ -14,6 +22,10 @@ WORKDIR /cadency
 COPY . .
 COPY --from=cacher /cadency/target target
 COPY --from=cacher $CARGO_HOME $CARGO_HOME
+ENV RUSTUP_MAX_RETRIES=100
+ENV CARGO_INCREMENTAL=0
+ENV CARGO_NET_RETRY=100
+ENV CARGO_TERM_COLOR=always
 RUN cargo build --release --bin cadency
 
 FROM bitnami/minideb:bullseye as packages
