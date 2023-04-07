@@ -28,7 +28,7 @@ jobs:
           echo "${{ inputs.version }}" >> $YTDLP_VERSION_FILE
           cat $YTDLP_VERSION_FILE
       - name: Create PR
-        uses: peter-evans/create-pull-request@v4
+        uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.PR_AUTOMATION }}
           title: "Update yt-dlp to version `${{ inputs.version }}`"
