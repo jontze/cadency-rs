@@ -21,7 +21,7 @@ default-features = false
 features = ["client", "gateway", "rustls_backend", "model", "voice", "cache"]
 
 [workspace.dependencies.songbird]
-version = "0.3.0"
+version = "0.3.2"
 features = ["builtin-queue", "yt-dlp"]
 
 [workspace.dependencies.tokio]
