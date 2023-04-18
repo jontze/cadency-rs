@@ -66,10 +66,7 @@ impl CadencyCommand for Play {
                 .ok_or(CadencyError::Command {
                     message: ":x: **No search string provided**".to_string(),
                 })?;
-        let (manager, guild_id, _channel_id) = utils::voice::join(ctx, command).await?;
-        let call = manager.get(guild_id).ok_or(CadencyError::Command {
-            message: ":x: **No active voice session on the server**".to_string(),
-        })?;
+        let (manager, call, guild_id) = utils::voice::join(ctx, command).await?;
         let mut is_queue_empty = {
             let call_handler = call.lock().await;
             call_handler.queue().is_empty()
