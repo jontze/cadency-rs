@@ -29,6 +29,8 @@ mod tracks;
 pub use tracks::Tracks;
 mod urban;
 pub use urban::Urban;
+mod track_loop;
+pub use track_loop::TrackLoop;
 
 #[cfg(test)]
 mod test {
@@ -98,7 +100,7 @@ mod test {
         assert_eq!(
             test.deferred(),
             false,
-            "Test command should not be deferred"
+            "Test command should not be deferred by default"
         )
     }
 
@@ -117,7 +119,11 @@ mod test {
         #[derive(cadency_codegen::CommandBaseline)]
         struct Test {}
         let test = Test {};
-        assert_eq!(test.options().len(), 0);
+        let options_amount = test.options().len();
+        assert_eq!(
+            options_amount, 0,
+            "Command optins should be empty by default but had {options_amount} options"
+        );
     }
 
     #[test]
@@ -148,9 +154,14 @@ mod test {
         struct Test {}
         let test = Test {};
         let arguments = test.options();
-        assert_eq!(arguments.len(), 1);
+        let amount_of_arguments = arguments.len();
+        assert_eq!(
+            amount_of_arguments, 1,
+            "Command should have 1 argument, but had {}",
+            amount_of_arguments
+        );
         let argument = arguments.get(0).unwrap();
-        assert!(argument.required);
+        assert!(argument.required, "Command argument should be required");
     }
 
     #[test]

@@ -4,6 +4,8 @@ extern crate quote;
 use proc_macro::TokenStream;
 use syn::{parse_macro_input, DeriveInput};
 
+mod argument;
+mod command;
 mod derive;
 
 #[proc_macro_derive(CommandBaseline, attributes(name, description, deferred, argument))]

@@ -7,7 +7,7 @@ use serenity::{
         ApplicationCommandInteraction, CommandDataOption, CommandDataOptionValue,
     },
 };
-use songbird::{input::Input, input::Restartable};
+use songbird::{input::Input, input::Restartable, Songbird};
 
 pub fn get_active_voice_channel_id(
     guild: model::guild::Guild,
@@ -24,9 +24,9 @@ pub async fn join(
     command: &ApplicationCommandInteraction,
 ) -> Result<
     (
-        std::sync::Arc<songbird::Songbird>,
+        std::sync::Arc<Songbird>,
+        std::sync::Arc<serenity::prelude::Mutex<songbird::Call>>,
         serenity::model::id::GuildId,
-        serenity::model::id::ChannelId,
     ),
     CadencyError,
 > {
@@ -40,21 +40,24 @@ pub async fn join(
         .and_then(|guild| utils::voice::get_active_voice_channel_id(guild, command.user.id))
         .ok_or(CadencyError::Join)?;
     debug!("Try to join guild with id: {:?}", guild_id);
+    // Skip channel join if already connected
     if let Some(call) = manager.get(guild_id) {
-        let handler = call.lock().await;
-        let has_current_connection = handler.current_connection().is_some();
+        let has_current_connection = {
+            let handler = call.lock().await;
+            handler.current_connection().is_some()
+        };
         if has_current_connection {
             debug!("Bot is already connected to a channel in the guild.");
-            return Ok((manager, guild_id, channel_id));
+            return Ok((manager, call, guild_id));
         }
     }
     // join the channel
-    manager
-        .join(guild_id, channel_id)
-        .await
-        .1
-        .map_err(|_err| CadencyError::Join)?;
-    Ok((manager, guild_id, channel_id))
+    let (call, join) = manager.join(guild_id, channel_id).await;
+    join.map_err(|err| {
+        error!("Voice channel join failed: {err:?}");
+        CadencyError::Join
+    })?;
+    Ok((manager, call, guild_id))
 }
 
 pub async fn add_song(

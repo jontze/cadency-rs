@@ -13,7 +13,7 @@ use serenity::{
 };
 use songbird::events::Event;
 
-#[derive(CommandBaseline, Default)]
+#[derive(CommandBaseline)]
 #[description = "Play a song from Youtube"]
 #[deferred = true]
 #[argument(
@@ -21,7 +21,21 @@ use songbird::events::Event;
     description = "URL or search query like: 'Hey Jude Beatles'",
     kind = "String"
 )]
-pub struct Play {}
+pub struct Play {
+    /// The maximum number of songs that can be added to the queue from a playlist
+    playlist_song_limit: i32,
+    /// The maximum length of a single song in seconds
+    song_length_limit: f32,
+}
+
+impl Play {
+    pub fn new(playlist_song_limit: i32, song_length_limit: f32) -> Self {
+        Self {
+            playlist_song_limit,
+            song_length_limit,
+        }
+    }
+}
 
 #[async_trait]
 impl CadencyCommand for Play {
@@ -52,10 +66,7 @@ impl CadencyCommand for Play {
                 .ok_or(CadencyError::Command {
                     message: ":x: **No search string provided**".to_string(),
                 })?;
-        let (manager, guild_id, _channel_id) = utils::voice::join(ctx, command).await?;
-        let call = manager.get(guild_id).ok_or(CadencyError::Command {
-            message: ":x: **No active voice session on the server**".to_string(),
-        })?;
+        let (manager, call, guild_id) = utils::voice::join(ctx, command).await?;
         let mut is_queue_empty = {
             let call_handler = call.lock().await;
             call_handler.queue().is_empty()
@@ -68,12 +79,14 @@ impl CadencyCommand for Play {
                 .iter()
                 .for_each(|entry| debug!("🚧 Unable to parse song from playlist: {entry:?}",));
             let songs = playlist_items.data;
-            let mut amount = 0;
-            let mut total_duration = 0_f32;
+            let mut amount_added_playlist_songs = 0;
+            let mut amount_total_added_playlist_duration = 0_f32;
             for song in songs {
                 // Add max the first 30 songs of the playlist
                 // and only if the duration of the song is below 10mins
-                if amount <= 30 && song.duration <= 600_f32 {
+                if amount_added_playlist_songs <= self.playlist_song_limit
+                    && song.duration <= self.song_length_limit
+                {
                     match utils::voice::add_song(
                         call.clone(),
                         song.url,
@@ -83,8 +96,8 @@ impl CadencyCommand for Play {
                     .await
                     {
                         Ok(added_song) => {
-                            amount += 1;
-                            total_duration += song.duration;
+                            amount_added_playlist_songs += 1;
+                            amount_total_added_playlist_duration += song.duration;
                             is_queue_empty = false;
                             debug!("➕ Added song '{:?}' from playlist", added_song.title);
                         }
@@ -94,7 +107,7 @@ impl CadencyCommand for Play {
                     }
                 }
             }
-            total_duration /= 60_f32;
+            amount_total_added_playlist_duration /= 60_f32;
             let mut handler = call.lock().await;
             handler.remove_all_global_events();
             handler.add_global_event(
@@ -103,7 +116,7 @@ impl CadencyCommand for Play {
             );
             drop(handler);
             response_builder.message(Some(format!(
-                ":white_check_mark: **Added ___{amount}___ songs to the queue with a duration of ___{total_duration:.2}___ mins** \n**Playing** :notes: `{search_payload}`",
+                ":white_check_mark: **Added ___{amount_added_playlist_songs}___ songs to the queue with a duration of ___{amount_total_added_playlist_duration:.2}___ mins** \n**Playing** :notes: `{search_payload}`",
             )))
         } else {
             let added_song = utils::voice::add_song(

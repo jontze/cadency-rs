@@ -1,19 +1,31 @@
-FROM lukemathwalker/cargo-chef:latest-rust-1.67 as planner
+FROM lukemathwalker/cargo-chef:latest-rust-1.68-slim-bullseye as build_base
+
+FROM build_base as planner
 WORKDIR /cadency
 COPY . .
 RUN cargo chef prepare --recipe-path recipe.json
 
-FROM lukemathwalker/cargo-chef:latest-rust-1.67 as cacher
+FROM build_base as cacher
 WORKDIR /cadency
 COPY --from=planner /cadency/recipe.json recipe.json
-RUN apt-get update && apt-get install -y cmake && apt-get autoremove -y && \
-  cargo chef cook --release --recipe-path recipe.json
+ENV RUSTUP_MAX_RETRIES=100
+ENV CARGO_INCREMENTAL=0
+ENV CARGO_NET_RETRY=100
+ENV CARGO_TERM_COLOR=always
+RUN apt-get update && apt-get install -y cmake && apt-get autoremove -y
+# Build dependencies - this is the dependencies caching layer
+RUN cargo chef cook --release --recipe-path recipe.json 
 
-FROM lukemathwalker/cargo-chef:latest-rust-1.67 as builder
+FROM build_base as builder
 WORKDIR /cadency
 COPY . .
 COPY --from=cacher /cadency/target target
 COPY --from=cacher $CARGO_HOME $CARGO_HOME
+ENV RUSTUP_MAX_RETRIES=100
+ENV CARGO_INCREMENTAL=0
+ENV CARGO_NET_RETRY=100
+ENV CARGO_TERM_COLOR=always
+# Build and cache only the cadency app with the previously builded dependencies
 RUN cargo build --release --bin cadency
 
 FROM bitnami/minideb:bullseye as packages
@@ -47,11 +59,10 @@ RUN apt-get update && apt-get install -y python3-minimal binutils && \
   find /usr/local/bin -not -name 'python*' \( -type f -o -type l \) -exec rm {} \;&& \
   rm -rf /usr/local/share/*
 
-FROM bitnami/minideb:bullseye
+FROM bitnami/minideb:bullseye as runtime
 LABEL org.opencontainers.image.source="https://github.com/jontze/cadency-rs"
 WORKDIR /cadency
 COPY --from=builder /cadency/target/release/cadency cadency
 COPY --from=packages /packages /usr/bin
 COPY --from=python-builder /usr/local/ /usr/local/
-
 CMD [ "./cadency" ]

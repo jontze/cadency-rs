@@ -1,0 +1,11 @@
+apiVersion: v2
+name: cadency
+description: Helm chart for the cadency discord bot
+version: 0.1.0
+appVersion: "0.3.3"
+type: application
+maintainers:
+  - name: Jontze
+sources:
+  - "https://github.com/jontze/cadency-rs"
+home: https://github.com/jontze/cadency-rs
