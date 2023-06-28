@@ -25,7 +25,7 @@ version = "0.3.2"
 features = ["builtin-queue", "yt-dlp"]
 
 [workspace.dependencies.tokio]
-version = "1.25.0"
+version = "1.29.0"
 features = ["macros", "rt-multi-thread"]
 
 [workspace.dependencies.serde]
