@@ -41,4 +41,3 @@ jobs:
           body: This is an automated Pull Request to update the yt-dlp versions that is used in the docker image.
           labels: dependencies
           assignees: ${{ github.repository_owner }}
-          reviewers: ${{ github.repository_owner }}

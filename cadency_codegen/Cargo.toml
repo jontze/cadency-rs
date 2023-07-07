@@ -1,6 +1,6 @@
 [package]
 name = "cadency_codegen"
-version = "0.4.1"
+version = "0.4.2"
 edition = "2021"
 description = "Library with codegen macros for the cadency discord bot"
 license = "MIT"
@@ -12,6 +12,6 @@ proc_macro = true
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-proc-macro2 = "1.0.55"
-quote = "1.0.26"
-syn = "2.0.13"
+proc-macro2 = "1.0.63"
+quote = "1.0.28"
+syn = "2.0.22"
