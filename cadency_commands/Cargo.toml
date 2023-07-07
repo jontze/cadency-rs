@@ -1,6 +1,6 @@
 [package]
 name = "cadency_commands"
-version = "0.4.1"
+version = "0.4.2"
 edition = "2021"
 description = "Library with a collection of some commands for the cadency discord bot"
 license = "MIT"
@@ -18,12 +18,12 @@ serde = { workspace = true }
 
 [dependencies.cadency_core]
 path = "../cadency_core"
-version = "0.4.1"
+version = "0.4.2"
 
 [dependencies.cadency_codegen]
 path = "../cadency_codegen"
-version = "0.4.1"
+version = "0.4.2"
 
 [dependencies.cadency_yt_playlist]
 path = "../cadency_yt_playlist"
-version = "0.4.1"
+version = "0.4.2"

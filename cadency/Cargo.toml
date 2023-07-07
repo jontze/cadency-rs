@@ -1,6 +1,6 @@
 [package]
 name = "cadency"
-version = "0.4.1"
+version = "0.4.2"
 edition = "2021"
 description = "An extensible discord bot with support with music commands"
 license = "MIT"
@@ -15,8 +15,8 @@ tokio = { workspace = true }
 
 [dependencies.cadency_core]
 path = "../cadency_core"
-version = "0.4.1"
+version = "0.4.2"
 
 [dependencies.cadency_commands]
 path = "../cadency_commands"
-version = "0.4.1"
+version = "0.4.2"
