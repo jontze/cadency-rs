@@ -31,7 +31,7 @@ docker pull ghcr.io/jontze/cadency_rs:main
 
 ## Permissions
 
-Cadency requires the `bot` **scope** and several permissions on a server to work properly Therefore, ensure to set these in the developer portal during the creation of the invite link:
+Cadency requires the `bot` **scope** and several permissions on a server to work properly. Therefore, ensure to set these in the developer portal during the creation of the invite link:
 
 - `Send Messages`
 - `Connect`
@@ -42,7 +42,7 @@ Cadency requires the `bot` **scope** and several permissions on a server to work
 Replace the TOKEN_HERE with your token:
 
 ```sh
-docker run --name cadency_rs -d -it --rm -e DISCORD_TOKEN=DISCORD_TOKEN_HERE ghcr.io/jontze/cadency_rs:develop
+docker run --name cadency_rs -d -it --rm -e DISCORD_TOKEN=DISCORD_TOKEN_HERE ghcr.io/jontze/cadency_rs:main
 ```
 
 This runs the container in detatched mode (background) and removes it when it stops running. This makes sure that you are always using an up-to-date version of cadency-rs.  
