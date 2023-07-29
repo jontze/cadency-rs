@@ -5,9 +5,20 @@ Initially this was intended to be a rust clone of [my typescript discord bot](ht
 
 > WARNING: Cadency is not production ready! It might eat your laundry.
 
+## Features
+
+- **Play songs** from Youtube using a url or a search phrase
+- Add complete Youtube **playlists** to the song queue
+- **Maintain a queue** of songs which you can pause, skip and resume.
+- Look for a phrase or word in the **Urban Dictionary**
+- Let **Cadency-rs** say something **inspiring**
+- Slap someone with a **trout**
+- Calculate a number in the **fibonacci** sequence
+- And play a classic game of **ping pong**
+
 ## Installation
 
-The recommended way to install and run **Cadency-rs** is with Docker, as the Docker image installs several libraries and binaries that are required to use or build the bot.
+The recommended way to install and run **Cadency-rs** is with Docker, as the Docker image installs several libraries and executables that are required to use the bot.
 
 1. Pull the image from the **ghcr.io** registry (`main` pulls the latest stable build, `develop` latest development build, `vX.X.X` pulls a fixed version)
 
@@ -15,8 +26,16 @@ The recommended way to install and run **Cadency-rs** is with Docker, as the Doc
 docker pull ghcr.io/jontze/cadency_rs:main
 ```
 
-2. Start a container and pass your discord bot token to the container by setting the `DISCORD_TOKEN` environment variable and optional specify the log level e.g. `RUST_LOG="cadency=info"`.
+2. Start a container and pass your discord bot token to the container by setting the `DISCORD_TOKEN` environment variable and optional specify the log level e.g. `RUST_LOG="cadency=debug"`.
 3. Invite the bot to your discord server, discord offers great [documentation](https://discord.com/developers/docs/getting-started) on how to do this.
+
+## Permissions
+
+Cadency requires the `bot` **scope** and several permissions on a server to work properly Therefore, ensure to set these in the developer portal during the creation of the invite link:
+
+- `Send Messages`
+- `Connect`
+- `Speak`
 
 ## Example docker setup
 
@@ -33,21 +52,11 @@ To stop the container, execute the following command and substitute ID for the i
 docker stop ID
 ```
 
-## Features
-
-- **Play songs** from Youtube using a url or a search phrase
-- Add complete Youtube **playlists** to the song queue
-- **Maintain a queue** of songs which you can pause, skip and resume.
-- Look for a phrase or word in the **Urban Dictionary**
-- Let **Cadency-rs** say something **inspiring**
-- Slap someone with a **trout**
-- Calculate a number in the **fibonacci** sequence
-- And play a classic game of **ping pong**
-
 ## Environment Variables
 
 | Variable Name                 | Default Value  | Description                                               |
 | ----------------------------- | -------------- | --------------------------------------------------------- |
+| `DISCORD_TOKEN`               |                | Discord bot token                                         |
 | `RUST_LOG`                    | `cadency=info` | Log Level                                                 |
 | `CADENCY_PLAYLIST_SONG_LIMIT` | `30`           | Maximum amount of songs that can be added from a playlist |
 | `CADENCY_SONG_LENGTH_LIMIT`   | `600.00`       | Maximum allowed song length in seconds                    |
