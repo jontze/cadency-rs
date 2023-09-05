@@ -6,7 +6,7 @@ jobs:
   clippy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Setup Cache for Rust
         uses: Swatinem/rust-cache@v2
         with:
@@ -17,14 +17,14 @@ jobs:
   format:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Run fmt
         run: cargo fmt --all --check
 
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Setup Cache for Rust
         uses: Swatinem/rust-cache@v2
         with:
@@ -42,7 +42,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Setup Cache for Rust
         uses: Swatinem/rust-cache@v2
         with:

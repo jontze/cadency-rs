@@ -12,7 +12,7 @@ jobs:
       version: ${{ steps.latest.outputs.release }}
       isNew: ${{ steps.summary.outputs.isNew }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Read current Yt-dlp Version
         id: current
         run: |
