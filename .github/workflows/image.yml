@@ -30,7 +30,7 @@ jobs:
         with:
           platforms: arm64,amd64
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
       - name: Extract docker meta data
         id: meta
         uses: docker/metadata-action@v5
