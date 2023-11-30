@@ -1,14 +1,14 @@
 use crate::{
     command::{command_not_implemented, setup_commands},
     response::{ResponseBuilder, ResponseTiming},
-    utils,
-    utils::set_bot_presence,
-    CadencyError,
+    utils, CadencyError,
 };
 use serenity::{
+    all::OnlineStatus,
     async_trait,
     client::{Context, EventHandler},
-    model::{application::interaction::Interaction, event::ResumedEvent, gateway::Ready},
+    gateway::ActivityData,
+    model::{application::Interaction, event::ResumedEvent, gateway::Ready},
 };
 
 pub(crate) struct Handler;
@@ -17,7 +17,9 @@ pub(crate) struct Handler;
 impl EventHandler for Handler {
     async fn ready(&self, ctx: Context, _data_about_bot: Ready) {
         info!("🚀 Start Cadency Discord Bot");
-        set_bot_presence(&ctx).await;
+        // Set the bot presence to "Listening to music"
+        ctx.set_presence(Some(ActivityData::listening("music")), OnlineStatus::Online);
+
         info!("⏳ Started to submit commands, please wait...");
         match setup_commands(&ctx).await {
             Ok(_) => info!("✅ Application commands submitted"),
@@ -30,7 +32,7 @@ impl EventHandler for Handler {
     }
 
     async fn interaction_create(&self, ctx: Context, interaction: Interaction) {
-        if let Interaction::ApplicationCommand(mut command) = interaction {
+        if let Interaction::Command(mut command) = interaction {
             let cmd_target = utils::get_commands(&ctx)
                 .await
                 .into_iter()

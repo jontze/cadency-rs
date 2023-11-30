@@ -186,7 +186,7 @@ pub(crate) fn impl_command_baseline(derive_input: DeriveInput) -> TokenStream {
     let deferred = command.deferred;
     quote! {
         use cadency_core::{CadencyCommandBaseline as __CadencyCommandBaseline, CadencyCommandOption as __CadencyCommandOption};
-        use serenity::model::application::command::CommandOptionType as __CommandOptionType;
+        use serenity::model::application::CommandOptionType as __CommandOptionType;
         impl __CadencyCommandBaseline for #struct_name {
             fn name(&self) -> String {
                 String::from(#command_name)

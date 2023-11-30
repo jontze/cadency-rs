@@ -1,11 +1,9 @@
 use cadency_core::{
     response::{Response, ResponseBuilder},
-    utils, CadencyCommand, CadencyError,
+    utils::{self, voice::TrackMetaKey},
+    CadencyCommand, CadencyError,
 };
-use serenity::{
-    async_trait, client::Context,
-    model::application::interaction::application_command::ApplicationCommandInteraction,
-};
+use serenity::{async_trait, client::Context, model::application::CommandInteraction};
 
 #[derive(CommandBaseline, Default)]
 #[description = "Shows current song"]
@@ -16,7 +14,7 @@ impl CadencyCommand for Now {
     async fn execute<'a>(
         &self,
         ctx: &Context,
-        command: &'a mut ApplicationCommandInteraction,
+        command: &'a mut CommandInteraction,
         response_builder: &'a mut ResponseBuilder,
     ) -> Result<Response, CadencyError> {
         let guild_id = command.guild_id.ok_or(CadencyError::Command {
@@ -30,11 +28,20 @@ impl CadencyCommand for Now {
         let track = handler.queue().current().ok_or(CadencyError::Command {
             message: ":x: **No song is playing**".to_string(),
         })?;
-        Ok(response_builder
-            .message(Some(track.metadata().title.as_ref().map_or(
+
+        // Create message from track metadata. This is scoped to drop the read lock on the
+        // trackmeta as soon as possible.
+        let message = {
+            let track_map = track.typemap().read().await;
+            let metadata = track_map
+                .get::<TrackMetaKey>()
+                .expect("Metadata to be present in track map");
+            metadata.title.as_ref().map_or(
                 String::from(":x: **Could not add audio source to the queue!**"),
                 |title| format!(":newspaper: `{title}`"),
-            )))
-            .build()?)
+            )
+        };
+
+        Ok(response_builder.message(Some(message)).build()?)
     }
 }

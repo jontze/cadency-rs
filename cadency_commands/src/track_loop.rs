@@ -3,11 +3,8 @@ use cadency_core::{
     utils, CadencyCommand, CadencyError,
 };
 use serenity::{
-    async_trait,
-    client::Context,
-    model::application::{
-        command::CommandOptionType, interaction::application_command::ApplicationCommandInteraction,
-    },
+    all::CommandDataOptionValue, async_trait, client::Context,
+    model::application::CommandInteraction,
 };
 
 #[derive(Default, CommandBaseline)]
@@ -32,7 +29,7 @@ impl CadencyCommand for TrackLoop {
     async fn execute<'a>(
         &self,
         ctx: &Context,
-        command: &'a mut ApplicationCommandInteraction,
+        command: &'a mut CommandInteraction,
         response_builder: &'a mut ResponseBuilder,
     ) -> Result<Response, CadencyError> {
         // Validate if command can be executed
@@ -53,14 +50,28 @@ impl CadencyCommand for TrackLoop {
             .data
             .options
             .iter()
-            .find(|option| option.kind == CommandOptionType::Integer)
-            .and_then(|option_amount| option_amount.value.as_ref().unwrap().as_u64());
+            .find(|option| option.name == "amount")
+            .and_then(|option_amount| {
+                if let CommandDataOptionValue::Integer(amount) = option_amount.value {
+                    Some(amount)
+                } else {
+                    error!("Command option 'amount' is not a integer");
+                    None
+                }
+            });
         let stop_argument = command
             .data
             .options
             .iter()
-            .find(|option| option.kind == CommandOptionType::Boolean)
-            .and_then(|option_stop| option_stop.value.as_ref().unwrap().as_bool());
+            .find(|option| option.name == "stop")
+            .and_then(|option_stop| {
+                if let CommandDataOptionValue::Boolean(stop) = option_stop.value {
+                    Some(stop)
+                } else {
+                    error!("Command option 'stop' is not a boolean");
+                    None
+                }
+            });
 
         // Cancel looping if the stop argument is true
         if let Some(stop) = stop_argument {
