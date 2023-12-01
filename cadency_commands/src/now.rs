@@ -4,6 +4,7 @@ use cadency_core::{
     CadencyCommand, CadencyError,
 };
 use serenity::{async_trait, client::Context, model::application::CommandInteraction};
+use songbird::tracks::LoopState;
 
 #[derive(CommandBaseline, Default)]
 #[description = "Shows current song"]
@@ -29,6 +30,9 @@ impl CadencyCommand for Now {
             message: ":x: **No song is playing**".to_string(),
         })?;
 
+        // Extract Loop State from Track
+        let loop_state = track.get_info().await.unwrap().loops;
+
         // Create message from track metadata. This is scoped to drop the read lock on the
         // trackmeta as soon as possible.
         let message = {
@@ -36,9 +40,23 @@ impl CadencyCommand for Now {
             let metadata = track_map
                 .get::<TrackMetaKey>()
                 .expect("Metadata to be present in track map");
+
             metadata.title.as_ref().map_or(
                 String::from(":x: **Could not add audio source to the queue!**"),
-                |title| format!(":newspaper: `{title}`"),
+                |title| {
+                    let mut track_info = format!(":newspaper: `{title}`");
+                    match loop_state {
+                        LoopState::Infinite => {
+                            track_info.push_str("\n:repeat: `Infinite`");
+                        }
+                        LoopState::Finite(loop_amount) => {
+                            if loop_amount > 0 {
+                                track_info.push_str(&format!("\n:repeat: `{}`", loop_amount));
+                            }
+                        }
+                    }
+                    track_info
+                },
             )
         };
 
