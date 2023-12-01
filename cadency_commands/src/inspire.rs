@@ -2,10 +2,7 @@ use cadency_core::{
     response::{Response, ResponseBuilder},
     CadencyCommand, CadencyError,
 };
-use serenity::{
-    async_trait, client::Context,
-    model::application::interaction::application_command::ApplicationCommandInteraction,
-};
+use serenity::{async_trait, client::Context, model::application::CommandInteraction};
 
 #[derive(CommandBaseline, Default)]
 #[description = "Say something really inspiring!"]
@@ -26,7 +23,7 @@ impl CadencyCommand for Inspire {
     async fn execute<'a>(
         &self,
         _ctx: &Context,
-        _command: &'a mut ApplicationCommandInteraction,
+        _command: &'a mut CommandInteraction,
         response_builder: &'a mut ResponseBuilder,
     ) -> Result<Response, CadencyError> {
         let inspire_url = Self::request_inspire_image_url().await.map_err(|err| {

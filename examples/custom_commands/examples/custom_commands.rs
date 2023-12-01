@@ -9,11 +9,10 @@ use cadency_core::{
     setup_commands, utils, Cadency, CadencyCommand, CadencyError,
 };
 use serenity::{
+    all::Mentionable,
     async_trait,
     client::Context,
-    model::application::interaction::application_command::{
-        ApplicationCommandInteraction, CommandDataOptionValue,
-    },
+    model::application::{CommandDataOptionValue, CommandInteraction},
 };
 
 // This is your custom command with the name "hello"
@@ -28,13 +27,13 @@ impl CadencyCommand for Hello {
     async fn execute<'a>(
         &self,
         _ctx: &Context,
-        command: &'a mut ApplicationCommandInteraction,
+        command: &'a mut CommandInteraction,
         response_builder: &'a mut ResponseBuilder,
     ) -> Result<Response, CadencyError> {
         let user_arg = utils::get_option_value_at_position(command.data.options.as_ref(), 0)
             .and_then(|option_value| {
-                if let CommandDataOptionValue::User(user, _) = option_value {
-                    Some(user)
+                if let CommandDataOptionValue::User(user_id) = option_value {
+                    Some(user_id)
                 } else {
                     error!("Command argument is not a user");
                     None
@@ -42,7 +41,7 @@ impl CadencyCommand for Hello {
             })
             .expect("A user as command argument");
         Ok(response_builder
-            .message(Some(format!("**Hello {user_arg}!**")))
+            .message(Some(format!("**Hello {}!**", user_arg.mention())))
             .build()?)
     }
 }

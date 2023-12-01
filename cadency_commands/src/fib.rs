@@ -5,9 +5,7 @@ use cadency_core::{
 use serenity::{
     async_trait,
     client::Context,
-    model::application::interaction::application_command::{
-        ApplicationCommandInteraction, CommandDataOptionValue,
-    },
+    model::application::{CommandDataOptionValue, CommandInteraction},
 };
 
 #[derive(CommandBaseline, Default)]
@@ -34,7 +32,7 @@ impl CadencyCommand for Fib {
     async fn execute<'a>(
         &self,
         _ctx: &Context,
-        command: &'a mut ApplicationCommandInteraction,
+        command: &'a mut CommandInteraction,
         response_builder: &'a mut ResponseBuilder,
     ) -> Result<Response, CadencyError> {
         let number = utils::get_option_value_at_position(command.data.options.as_ref(), 0)
