@@ -95,13 +95,15 @@ impl CadencyCommand for Play {
                 }
             }
             amount_total_added_playlist_duration /= 60_f32;
-            let mut handler = call.lock().await;
-            handler.remove_all_global_events();
-            handler.add_global_event(
-                Event::Periodic(std::time::Duration::from_secs(120), None),
-                InactiveHandler { guild_id, manager },
-            );
-            drop(handler);
+            // This call interaction is scoped to drop the mutex lock as soon as possible
+            {
+                let mut handler = call.lock().await;
+                handler.remove_all_global_events();
+                handler.add_global_event(
+                    Event::Periodic(std::time::Duration::from_secs(120), None),
+                    InactiveHandler { guild_id, manager },
+                );
+            }
             response_builder.message(Some(format!(
                 ":white_check_mark: **Added ___{amount_added_playlist_songs}___ songs to the queue with a duration of ___{amount_total_added_playlist_duration:.2}___ mins** \n**Playing** :notes: `{search_payload}`",
             )))
@@ -115,12 +117,16 @@ impl CadencyCommand for Play {
                             message: ":x: **Couldn't add audio source to the queue!**".to_string(),
                         }
                     })?;
-            let mut handler = call.lock().await;
-            handler.remove_all_global_events();
-            handler.add_global_event(
-                Event::Periodic(std::time::Duration::from_secs(120), None),
-                InactiveHandler { guild_id, manager },
-            );
+            // This call interaction is scoped to drop the mutex lock as soon as possible
+            {
+                let mut handler = call.lock().await;
+                handler.remove_all_global_events();
+                handler.add_global_event(
+                    Event::Periodic(std::time::Duration::from_secs(120), None),
+                    InactiveHandler { guild_id, manager },
+                );
+            }
+
             let song_url = if is_url {
                 search_payload
             } else {
