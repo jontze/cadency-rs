@@ -37,3 +37,7 @@ features = ["derive"]
 version = "0.11.18"
 default-features = false
 features = ["rustls-tls", "json"]
+
+[workspace.dependencies.symphonia]
+version = "0.5"
+features = ["all-formats"]
