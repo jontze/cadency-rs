@@ -33,6 +33,7 @@ FROM bitnami/minideb:bullseye as packages
 WORKDIR /packages
 COPY --from=builder /cadency/.yt-dlprc .
 RUN YTDLP_VERSION=$(cat .yt-dlprc) && \
+  apt-get update && apt-get install -y curl && \
   curl -L https://github.com/yt-dlp/yt-dlp/releases/download/$YTDLP_VERSION/yt-dlp_linux > yt-dlp && chmod +x yt-dlp
 
 # Based on: https://github.com/zarmory/docker-python-minimal/blob/master/Dockerfile
