@@ -22,7 +22,7 @@ impl EventHandler for Handler {
 
         info!("⏳ Started to submit commands, please wait...");
         match setup_commands(&ctx).await {
-            Ok(_) => info!("✅ Application commands submitted"),
+            Ok(()) => info!("✅ Application commands submitted"),
             Err(err) => error!("❌ Failed to submit application commands: {:?}", err),
         };
     }

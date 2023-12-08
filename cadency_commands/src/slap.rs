@@ -1,12 +1,9 @@
 use cadency_core::{
     response::{Response, ResponseBuilder},
-    utils, CadencyCommand, CadencyError,
+    CadencyCommand, CadencyError,
 };
 use serenity::{
-    all::Mentionable,
-    async_trait,
-    client::Context,
-    model::application::{CommandDataOptionValue, CommandInteraction},
+    all::Mentionable, async_trait, client::Context, model::application::CommandInteraction,
 };
 use std::num::NonZeroU64;
 
@@ -27,25 +24,14 @@ impl CadencyCommand for Slap {
         command: &'a mut CommandInteraction,
         response_builder: &'a mut ResponseBuilder,
     ) -> Result<Response, CadencyError> {
-        let user_id = utils::get_option_value_at_position(command.data.options.as_ref(), 0)
-            .and_then(|option_value| {
-                if let CommandDataOptionValue::User(user_id) = option_value {
-                    Some(user_id)
-                } else {
-                    error!("Command option is not a user");
-                    None
-                }
-            })
-            .ok_or(CadencyError::Command {
-                message: ":x: *Invalid user provided*".to_string(),
-            })?;
+        let user_id = self.arg_target(command);
 
-        let response_builder = if user_id == &command.user.id {
+        let response_builder = if user_id == command.user.id {
             response_builder.message(Some(format!(
                 "**Why do you want to slap yourself, {}?**",
                 command.user.mention()
             )))
-        } else if NonZeroU64::from(*user_id) == NonZeroU64::from(command.application_id) {
+        } else if NonZeroU64::from(user_id) == NonZeroU64::from(command.application_id) {
             response_builder.message(Some(format!(
                 "**Nope!\n{} slaps {} around a bit with a large trout!**",
                 user_id.mention(),

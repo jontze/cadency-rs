@@ -16,6 +16,7 @@ pub struct Cadency {
 }
 
 impl Cadency {
+    #[must_use]
     pub fn builder() -> CadencyBuilder {
         CadencyBuilder::default()
     }

@@ -4,11 +4,7 @@ use cadency_core::{
     utils, CadencyCommand, CadencyError,
 };
 use reqwest::Url;
-use serenity::{
-    async_trait,
-    client::Context,
-    model::application::{CommandDataOptionValue, CommandInteraction},
-};
+use serenity::{async_trait, client::Context, model::application::CommandInteraction};
 use songbird::events::Event;
 
 #[derive(CommandBaseline)]
@@ -43,27 +39,19 @@ impl CadencyCommand for Play {
         command: &'a mut CommandInteraction,
         response_builder: &'a mut ResponseBuilder,
     ) -> Result<Response, CadencyError> {
-        let (search_payload, is_url, is_playlist) =
-            utils::get_option_value_at_position(command.data.options.as_ref(), 0)
-                .and_then(|option_value| {
-                    if let CommandDataOptionValue::String(string_value) = option_value {
-                        let (is_valid_url, is_playlist): (bool, bool) = Url::parse(string_value)
-                            .ok()
-                            .map_or((false, false), |valid_url| {
-                                let is_playlist: bool = valid_url
-                                    .query_pairs()
-                                    .find(|(key, _)| key == "list")
-                                    .map_or(false, |_| true);
-                                (true, is_playlist)
-                            });
-                        Some((string_value, is_valid_url, is_playlist))
-                    } else {
-                        None
-                    }
-                })
-                .ok_or(CadencyError::Command {
-                    message: ":x: **No search string provided**".to_string(),
-                })?;
+        let (search_payload, is_url, is_playlist) = {
+            let query = self.arg_query(command);
+            let (is_valid_url, is_playlist): (bool, bool) =
+                Url::parse(&query).ok().map_or((false, false), |valid_url| {
+                    let is_playlist: bool = valid_url
+                        .query_pairs()
+                        .find(|(key, _)| key == "list")
+                        .map_or(false, |_| true);
+                    (true, is_playlist)
+                });
+            (query, is_valid_url, is_playlist)
+        };
+
         let (manager, call, guild_id) = utils::voice::join(ctx, command).await?;
 
         let response_builder = if is_playlist {
@@ -133,7 +121,7 @@ impl CadencyCommand for Play {
                 added_song_meta
                     .source_url
                     .as_ref()
-                    .map_or("unknown url", |url| url)
+                    .map_or("unknown url".to_string(), |url| url.to_owned())
             };
             response_builder.message(Some(format!(
                 ":white_check_mark: **Added song to the queue and started playing:** \n:notes: `{}` \n:link: `{}`",

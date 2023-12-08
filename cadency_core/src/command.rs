@@ -80,7 +80,7 @@ impl TypeMapKey for Commands {
 pub(crate) async fn setup_commands(ctx: &Context) -> Result<(), serenity::Error> {
     let commands = utils::get_commands(ctx).await;
     // No need to run this in parallel as serenity will enforce one-by-one execution
-    for command in commands.iter() {
+    for command in &commands {
         command.register(ctx).await?;
     }
     Ok(())
