@@ -1,11 +1,10 @@
 use crate::{error::CadencyError, http::get_http_client, utils};
-use reqwest::Url;
 use serenity::{
     all::{Guild, GuildId},
     cache::CacheRef,
     client::Context,
     model,
-    model::application::{CommandDataOption, CommandDataOptionValue, CommandInteraction},
+    model::application::CommandInteraction,
 };
 use songbird::{
     input::{AuxMetadata, Input, YoutubeDl},
@@ -109,20 +108,6 @@ pub async fn add_song(
         .insert::<TrackMetaKey>(metadata.clone());
 
     Ok((metadata, track_handle))
-}
-
-pub fn parse_valid_url(command_options: &[CommandDataOption]) -> Option<reqwest::Url> {
-    match utils::get_option_value_at_position(command_options, 0) {
-        Some(value) => {
-            if let CommandDataOptionValue::String(url) = value {
-                Some(url)
-            } else {
-                None
-            }
-        }
-        None => None,
-    }
-    .and_then(|url| Url::parse(url).ok())
 }
 
 pub async fn get_songbird(ctx: &Context) -> std::sync::Arc<songbird::Songbird> {
