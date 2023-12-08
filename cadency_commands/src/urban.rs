@@ -1,15 +1,12 @@
 use cadency_core::{
     response::{Response, ResponseBuilder},
-    utils, CadencyCommand, CadencyError,
+    CadencyCommand, CadencyError,
 };
 use serenity::{
     async_trait,
     builder::CreateEmbed,
     client::Context,
-    model::{
-        application::{CommandDataOptionValue, CommandInteraction},
-        Color,
-    },
+    model::{application::CommandInteraction, Color},
 };
 
 #[derive(Deserialize, Debug)]
@@ -84,19 +81,8 @@ impl CadencyCommand for Urban {
         command: &'a mut CommandInteraction,
         respone_builder: &'a mut ResponseBuilder,
     ) -> Result<Response, CadencyError> {
-        let query = utils::get_option_value_at_position(command.data.options.as_ref(), 0)
-            .and_then(|option_value| {
-                if let CommandDataOptionValue::String(query) = option_value {
-                    Some(query)
-                } else {
-                    error!("Urban command option empty");
-                    None
-                }
-            })
-            .ok_or(CadencyError::Command {
-                message: ":x: *Empty or invalid query*".to_string(),
-            })?;
-        let urbans = Self::request_urban_dictionary_entries(query)
+        let query = self.arg_query(command);
+        let urbans = Self::request_urban_dictionary_entries(&query)
             .await
             .map_err(|err| {
                 error!("Failed to request urban dictionary entries : {:?}", err);

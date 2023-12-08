@@ -2,10 +2,7 @@ use cadency_core::{
     response::{Response, ResponseBuilder},
     utils, CadencyCommand, CadencyError,
 };
-use serenity::{
-    all::CommandDataOptionValue, async_trait, client::Context,
-    model::application::CommandInteraction,
-};
+use serenity::{async_trait, client::Context, model::application::CommandInteraction};
 
 #[derive(Default, CommandBaseline)]
 #[name = "loop"]
@@ -46,32 +43,8 @@ impl CadencyCommand for TrackLoop {
         })?;
 
         // Extract the loop amount and stop argument from the command
-        let loop_amount = command
-            .data
-            .options
-            .iter()
-            .find(|option| option.name == "amount")
-            .and_then(|option_amount| {
-                if let CommandDataOptionValue::Integer(amount) = option_amount.value {
-                    Some(amount)
-                } else {
-                    error!("Command option 'amount' is not a integer");
-                    None
-                }
-            });
-        let stop_argument = command
-            .data
-            .options
-            .iter()
-            .find(|option| option.name == "stop")
-            .and_then(|option_stop| {
-                if let CommandDataOptionValue::Boolean(stop) = option_stop.value {
-                    Some(stop)
-                } else {
-                    error!("Command option 'stop' is not a boolean");
-                    None
-                }
-            });
+        let loop_amount = self.arg_amount(command);
+        let stop_argument = self.arg_stop(command);
 
         // Cancel looping if the stop argument is true
         if let Some(stop) = stop_argument {
