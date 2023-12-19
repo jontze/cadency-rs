@@ -31,6 +31,8 @@ mod urban;
 pub use urban::Urban;
 mod track_loop;
 pub use track_loop::TrackLoop;
+mod roll;
+pub use roll::Roll;
 
 #[cfg(test)]
 mod test {
