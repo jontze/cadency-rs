@@ -1,25 +1,20 @@
+use super::dice::{RollDice, Throw};
 use cadency_core::{
     response::{Response, ResponseBuilder},
     CadencyCommand, CadencyError,
 };
-use rand::Rng;
 use serenity::{async_trait, client::Context, model::application::CommandInteraction};
 
 #[derive(CommandBaseline, Default)]
 #[description = "Roll a dice of n sides"]
 #[argument(
-    name = "sides",
-    description = "The number of sides on the dice",
-    kind = "Integer"
+    name = "roll",
+    description = "Dice(s) to roll. Only the following patterns are supported: `d6`, `2d6`, 2d6+1` or `2d6-1`",
+    kind = "String"
 )]
 pub struct Roll {}
 
-impl Roll {
-    fn roll_dice(&self, sides: &i64) -> i64 {
-        let mut rng = rand::thread_rng();
-        rng.gen_range(1..=*sides) as i64
-    }
-}
+impl Roll {}
 
 #[async_trait]
 impl CadencyCommand for Roll {
@@ -29,8 +24,14 @@ impl CadencyCommand for Roll {
         command: &'a mut CommandInteraction,
         response_builder: &'a mut ResponseBuilder,
     ) -> Result<Response, CadencyError> {
-        let roll = self.roll_dice(&self.arg_sides(command));
-        let roll_msg = format!("**:dice_cube: You rolled a `{roll}`**");
+        let throw_str = self.arg_roll(command);
+        let throw = throw_str.parse::<Throw>()?;
+
+        throw.validate()?;
+
+        let roll = throw.roll();
+
+        let roll_msg = format!("**{throw_str} :ice_cube: You rolled a `{roll}`**");
         Ok(response_builder.message(Some(roll_msg)).build()?)
     }
 }
