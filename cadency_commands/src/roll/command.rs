@@ -31,7 +31,7 @@ impl CadencyCommand for Roll {
 
         let roll = throw.roll();
 
-        let roll_msg = format!("**{throw_str} :ice_cube: You rolled a `{roll}`**");
+        let roll_msg = format!("**`{throw_str}` :ice_cube: You rolled a `{roll}`**");
         Ok(response_builder.message(Some(roll_msg)).build()?)
     }
 }
