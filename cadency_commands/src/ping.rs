@@ -2,10 +2,7 @@ use cadency_core::{
     response::{Response, ResponseBuilder},
     CadencyCommand, CadencyError,
 };
-use serenity::{
-    async_trait, client::Context,
-    model::application::interaction::application_command::ApplicationCommandInteraction,
-};
+use serenity::{async_trait, client::Context, model::application::CommandInteraction};
 
 #[derive(CommandBaseline, Default)]
 #[description = "Play Ping-Pong"]
@@ -16,7 +13,7 @@ impl CadencyCommand for Ping {
     async fn execute<'a>(
         &self,
         _ctx: &Context,
-        _command: &'a mut ApplicationCommandInteraction,
+        _command: &'a mut CommandInteraction,
         response_builder: &'a mut ResponseBuilder,
     ) -> Result<Response, CadencyError> {
         Ok(response_builder

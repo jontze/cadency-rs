@@ -5,16 +5,12 @@ use crate::{
 };
 use serenity::{
     async_trait,
-    client::Context,
-    model::{
-        application::{
-            command::Command,
-            interaction::{
-                application_command::ApplicationCommandInteraction, InteractionResponseType,
-            },
-        },
-        prelude::command::CommandOptionType,
+    builder::{
+        CreateCommand, CreateCommandOption, CreateInteractionResponse,
+        CreateInteractionResponseMessage,
     },
+    client::Context,
+    model::application::{Command, CommandInteraction, CommandOptionType},
     prelude::TypeMapKey,
 };
 use std::sync::Arc;
@@ -51,27 +47,23 @@ pub struct CadencyCommandOption {
 pub trait CadencyCommand: Sync + Send + CadencyCommandBaseline {
     /// Construct the slash command that will be submited to the discord api
     async fn register(&self, ctx: &Context) -> Result<Command, serenity::Error> {
-        Ok(
-            Command::create_global_application_command(&ctx.http, |command| {
-                let command_builder = command.name(self.name()).description(self.description());
-                for cadency_option in self.options() {
-                    command_builder.create_option(|option_res| {
-                        option_res
-                            .name(cadency_option.name)
-                            .description(cadency_option.description)
-                            .kind(cadency_option.kind)
-                            .required(cadency_option.required)
-                    });
-                }
-                command_builder
+        let command_options: Vec<CreateCommandOption> = self
+            .options()
+            .into_iter()
+            .map(|option| {
+                CreateCommandOption::new(option.kind, option.name, option.description)
+                    .required(option.required)
             })
-            .await?,
-        )
+            .collect();
+        let command_builder = CreateCommand::new(self.name())
+            .description(self.description())
+            .set_options(command_options);
+        Ok(Command::create_global_command(&ctx.http, command_builder).await?)
     }
     async fn execute<'a>(
         &self,
         ctx: &Context,
-        command: &'a mut ApplicationCommandInteraction,
+        command: &'a mut CommandInteraction,
         response_builder: &'a mut ResponseBuilder,
     ) -> Result<Response, CadencyError>;
 }
@@ -88,7 +80,7 @@ impl TypeMapKey for Commands {
 pub(crate) async fn setup_commands(ctx: &Context) -> Result<(), serenity::Error> {
     let commands = utils::get_commands(ctx).await;
     // No need to run this in parallel as serenity will enforce one-by-one execution
-    for command in commands.iter() {
+    for command in &commands {
         command.register(ctx).await?;
     }
     Ok(())
@@ -96,15 +88,17 @@ pub(crate) async fn setup_commands(ctx: &Context) -> Result<(), serenity::Error>
 
 pub(crate) async fn command_not_implemented(
     ctx: &Context,
-    command: &ApplicationCommandInteraction,
+    command: &CommandInteraction,
 ) -> Result<(), CadencyError> {
     error!("The following command is not known: {:?}", command);
+
     command
-        .create_interaction_response(&ctx.http, |response| {
-            response
-                .kind(InteractionResponseType::ChannelMessageWithSource)
-                .interaction_response_data(|message| message.content("Unknown command"))
-        })
+        .create_response(
+            &ctx.http,
+            CreateInteractionResponse::Message(
+                CreateInteractionResponseMessage::new().content("Unknown command"),
+            ),
+        )
         .await
         .map_err(|err| {
             error!("Interaction response failed: {}", err);

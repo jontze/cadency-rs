@@ -1,4 +1,4 @@
-FROM lukemathwalker/cargo-chef:latest-rust-1.68-slim-bullseye as build_base
+FROM lukemathwalker/cargo-chef:latest-rust-1.75-slim-bullseye as build_base
 
 FROM build_base as planner
 WORKDIR /cadency
@@ -28,28 +28,17 @@ ENV CARGO_TERM_COLOR=always
 # Build and cache only the cadency app with the previously builded dependencies
 RUN cargo build --release --bin cadency
 
+# Downloads yt-dlp
 FROM bitnami/minideb:bullseye as packages
-# Downloads both ffmpeg and yt-dlp
 WORKDIR /packages
 COPY --from=builder /cadency/.yt-dlprc .
-# tar: (x) extract, (J) from .xz, (f) a file. (--wildcards */bin/ffmpeg) any path with /bin/ffmpeg, (--transform) remove all previous paths
-# FFMPEG is staticly compiled, so platform specific
-# If statement: converts architecture from docker to a correct link. Default is amd64 = desktop 64 bit
-ARG TARGETARCH
-RUN if [ "$TARGETARCH" = "arm64" ]; then \
-  export LINK="https://github.com/yt-dlp/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-linuxarm64-gpl.tar.xz"; \
-  else \
-  export LINK="https://github.com/yt-dlp/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-linux64-gpl.tar.xz"; \
-  fi && \
-  apt-get update && apt-get install -y curl tar xz-utils && \
-  curl -L $LINK > ffmpeg.tar.xz && \
-  tar -xJf ffmpeg.tar.xz --wildcards */bin/ffmpeg --transform='s/^.*\///' && rm ffmpeg.tar.xz
 RUN YTDLP_VERSION=$(cat .yt-dlprc) && \
+  apt-get update && apt-get install -y curl && \
   curl -L https://github.com/yt-dlp/yt-dlp/releases/download/$YTDLP_VERSION/yt-dlp_linux > yt-dlp && chmod +x yt-dlp
 
-FROM bitnami/minideb:bullseye as python-builder
 # Based on: https://github.com/zarmory/docker-python-minimal/blob/master/Dockerfile
 # Removes Python build and developmenttools like pip.
+FROM bitnami/minideb:bullseye as python-builder
 RUN apt-get update && apt-get install -y python3-minimal binutils && \
   rm -rf /usr/local/lib/python*/ensurepip && \
   rm -rf /usr/local/lib/python*/idlelib && \

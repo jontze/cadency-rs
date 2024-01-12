@@ -1,6 +1,6 @@
 [package]
 name = "cadency_core"
-version = "0.4.2"
+version = "0.5.0"
 edition = "2021"
 description = "Library with the core logic for the cadency discord bot"
 license = "MIT"
@@ -14,3 +14,4 @@ tokio = { workspace = true }
 reqwest = { workspace = true }
 thiserror = { workspace = true }
 derive_builder = { workspace = true }
+symphonia = { workspace = true }

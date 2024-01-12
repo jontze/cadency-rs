@@ -1,15 +1,12 @@
 use cadency_core::{
     response::{Response, ResponseBuilder},
-    utils, CadencyCommand, CadencyError,
+    CadencyCommand, CadencyError,
 };
 use serenity::{
     async_trait,
     builder::CreateEmbed,
     client::Context,
-    model::application::interaction::application_command::{
-        ApplicationCommandInteraction, CommandDataOptionValue,
-    },
-    utils::Color,
+    model::{application::CommandInteraction, Color},
 };
 
 #[derive(Deserialize, Debug)]
@@ -52,24 +49,24 @@ impl Urban {
             if index >= 3 {
                 break;
             }
-            let mut embed_urban_entry = CreateEmbed::default();
-            embed_urban_entry.color(Color::from_rgb(255, 255, 0));
-            embed_urban_entry.title(&urban.word.replace(['[', ']'], ""));
-            embed_urban_entry.url(&urban.permalink);
-            embed_urban_entry.field(
-                "Definition",
-                &urban.definition.replace(['[', ']'], ""),
-                false,
-            );
-            embed_urban_entry.field("Example", &urban.example.replace(['[', ']'], ""), false);
-            embed_urban_entry.field(
-                "Rating",
-                format!(
-                    "{} :thumbsup:  {} :thumbsdown:",
-                    urban.thumbs_up, urban.thumbs_down
-                ),
-                false,
-            );
+            let embed_urban_entry = CreateEmbed::default()
+                .color(Color::from_rgb(255, 255, 0))
+                .title(&urban.word.replace(['[', ']'], ""))
+                .url(&urban.permalink)
+                .field(
+                    "Definition",
+                    &urban.definition.replace(['[', ']'], ""),
+                    false,
+                )
+                .field("Example", &urban.example.replace(['[', ']'], ""), false)
+                .field(
+                    "Rating",
+                    format!(
+                        "{} :thumbsup:  {} :thumbsdown:",
+                        urban.thumbs_up, urban.thumbs_down
+                    ),
+                    false,
+                );
             embeds.push(embed_urban_entry);
         }
         embeds
@@ -81,22 +78,11 @@ impl CadencyCommand for Urban {
     async fn execute<'a>(
         &self,
         _ctx: &Context,
-        command: &'a mut ApplicationCommandInteraction,
+        command: &'a mut CommandInteraction,
         respone_builder: &'a mut ResponseBuilder,
     ) -> Result<Response, CadencyError> {
-        let query = utils::get_option_value_at_position(command.data.options.as_ref(), 0)
-            .and_then(|option_value| {
-                if let CommandDataOptionValue::String(query) = option_value {
-                    Some(query)
-                } else {
-                    error!("Urban command option empty");
-                    None
-                }
-            })
-            .ok_or(CadencyError::Command {
-                message: ":x: *Empty or invalid query*".to_string(),
-            })?;
-        let urbans = Self::request_urban_dictionary_entries(query)
+        let query = self.arg_query(command);
+        let urbans = Self::request_urban_dictionary_entries(&query)
             .await
             .map_err(|err| {
                 error!("Failed to request urban dictionary entries : {:?}", err);

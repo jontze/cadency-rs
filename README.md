@@ -1,7 +1,6 @@
 # Cadency-rs
 
-A discord bot written in **Rust** with the help of [serenity](https://github.com/serenity-rs/serenity) and [songbird](https://github.com/serenity-rs/songbird).
-Initially this was intended to be a rust clone of [my typescript discord bot](https://github.com/jontze/Cadency) but currently **Cadency-rs** offers more features and is more up to date as it's already using the discord **slash commands**.
+A discord bot that's using **slash commands** written in **Rust** with the help of [serenity](https://github.com/serenity-rs/serenity) and [songbird](https://github.com/serenity-rs/songbird).
 
 > WARNING: Cadency is not production ready! It might eat your laundry.
 
@@ -9,11 +8,12 @@ Initially this was intended to be a rust clone of [my typescript discord bot](ht
 
 - **Play songs** from Youtube using a url or a search phrase
 - Add complete Youtube **playlists** to the song queue
-- **Maintain a queue** of songs which you can pause, skip and resume.
-- Look for a phrase or word in the **Urban Dictionary**
+- **Maintain a queue** of songs which you can **pause**, **skip**, **resume**, **loop**, ...
+- Look something up in the **Urban Dictionary**
 - Let **Cadency-rs** say something **inspiring**
-- Slap someone with a **trout**
+- Slap someone with a **trout** _(old IRC gag)_
 - Calculate a number in the **fibonacci** sequence
+- Roll a **dice** e.g. `2d6+3`
 - And play a classic game of **ping pong**
 
 ## Installation
@@ -54,22 +54,21 @@ docker stop ID
 
 ## Environment Variables
 
-| Variable Name                 | Default Value  | Description                                               |
-| ----------------------------- | -------------- | --------------------------------------------------------- |
-| `DISCORD_TOKEN`               |                | Discord bot token                                         |
-| `RUST_LOG`                    | `cadency=info` | Log Level                                                 |
-| `CADENCY_PLAYLIST_SONG_LIMIT` | `30`           | Maximum amount of songs that can be added from a playlist |
-| `CADENCY_SONG_LENGTH_LIMIT`   | `600.00`       | Maximum allowed song length in seconds                    |
+| Variable Name                 | Default Value  | Description                                               | Required |
+| ----------------------------- | -------------- | --------------------------------------------------------- | -------- |
+| `DISCORD_TOKEN`               |                | Discord bot token                                         | `true`   |
+| `RUST_LOG`                    | `cadency=info` | Log Level                                                 | `false`  |
+| `CADENCY_PLAYLIST_SONG_LIMIT` | `30`           | Maximum amount of songs that can be added from a playlist | `false`  |
+| `CADENCY_SONG_LENGTH_LIMIT`   | `600.00`       | Maximum allowed song length in seconds                    | `false`  |
 
 ## Contributing
 
-1. Install the latest stable rust toolchain: https://www.rust-lang.org/tools/install
+1. Install the latest stable [rust toolchain](https://www.rust-lang.org/tools/install)
 2. Intall [yt-dlp](https://github.com/yt-dlp/yt-dlp#installation)
 3. Clone the repository
-4. Install [ffmpeg](https://ffmpeg.org/). It is reccomended you install the [yt-dlp build](https://github.com/yt-dlp/FFmpeg-Builds), as this is used in the Docker image as well and includes additional bug-fixes.
-5. Create a discord bot so you can run the bot local on your computer
-6. Set the environment variables that are listed as example in [.env.example](./.env.example)
-7. You should be able to run `cargo test` and `cargo run` successfully
+4. Create a [discord bot in the discord developer portal](https://discord.com/developers/docs/getting-started) so you can run the bot local on your computer
+5. Set the environment variables in your shell that are listed as example in [.env.example](./.env.example)
+6. You should be able to run `cargo test` and `cargo run` successfully
 
 ## Note
 

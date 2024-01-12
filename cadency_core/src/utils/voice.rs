@@ -1,16 +1,26 @@
-use crate::{error::CadencyError, utils};
-use reqwest::Url;
+use crate::{error::CadencyError, http::get_http_client, utils};
 use serenity::{
+    all::{Guild, GuildId},
+    cache::CacheRef,
     client::Context,
     model,
-    model::application::interaction::application_command::{
-        ApplicationCommandInteraction, CommandDataOption, CommandDataOptionValue,
-    },
+    model::application::CommandInteraction,
 };
-use songbird::{input::Input, input::Restartable, Songbird};
+use songbird::{
+    input::{AuxMetadata, Input, YoutubeDl},
+    tracks::TrackHandle,
+    typemap::TypeMapKey,
+    Songbird,
+};
+
+pub struct TrackMetaKey;
+
+impl TypeMapKey for TrackMetaKey {
+    type Value = AuxMetadata;
+}
 
 pub fn get_active_voice_channel_id(
-    guild: model::guild::Guild,
+    guild: CacheRef<'_, GuildId, Guild>,
     user_id: model::id::UserId,
 ) -> Option<model::id::ChannelId> {
     guild
@@ -21,7 +31,7 @@ pub fn get_active_voice_channel_id(
 
 pub async fn join(
     ctx: &Context,
-    command: &ApplicationCommandInteraction,
+    command: &CommandInteraction,
 ) -> Result<
     (
         std::sync::Arc<Songbird>,
@@ -37,7 +47,9 @@ pub async fn join(
     let channel_id = ctx
         .cache
         .guild(guild_id)
-        .and_then(|guild| utils::voice::get_active_voice_channel_id(guild, command.user.id))
+        .and_then(|guild_cache_ref| {
+            utils::voice::get_active_voice_channel_id(guild_cache_ref, command.user.id)
+        })
         .ok_or(CadencyError::Join)?;
     debug!("Try to join guild with id: {:?}", guild_id);
     // Skip channel join if already connected
@@ -51,48 +63,51 @@ pub async fn join(
             return Ok((manager, call, guild_id));
         }
     }
-    // join the channel
-    let (call, join) = manager.join(guild_id, channel_id).await;
-    join.map_err(|err| {
-        error!("Voice channel join failed: {err:?}");
+    // Construct the call for the channel, don't join just yet
+    let call = manager.join(guild_id, channel_id).await.map_err(|err| {
+        error!("Unable to construct call for channel: {err:?}");
         CadencyError::Join
     })?;
+    // Join the channel, this is scoped to drop the lock as soon as possible
+    {
+        let mut locked_call = call.lock().await;
+        locked_call.join(channel_id).await.map_err(|err| {
+            error!("Voice channel join failed: {err:?}");
+            CadencyError::Join
+        })?;
+    }
     Ok((manager, call, guild_id))
 }
 
 pub async fn add_song(
+    context: &Context,
     call: std::sync::Arc<serenity::prelude::Mutex<songbird::Call>>,
     payload: String,
     is_url: bool,
-    add_lazy: bool,
-) -> Result<songbird::input::Metadata, songbird::input::error::Error> {
+) -> Result<(songbird::input::AuxMetadata, TrackHandle), songbird::input::AuxMetadataError> {
     debug!("Add song to playlist: '{payload}'");
+    let request_client = get_http_client(context).await;
+    // Create the YoutubeDL source from url or search string
     let source = if is_url {
-        Restartable::ytdl(payload, add_lazy).await?
+        YoutubeDl::new(request_client, payload)
     } else {
-        Restartable::ytdl_search(payload, add_lazy).await?
+        YoutubeDl::new(request_client, format!("ytsearch1:{payload}"))
     };
     let mut handler = call.lock().await;
-    let track: Input = source.into();
-    let metadata = *track.metadata.clone();
-    handler.enqueue_source(track);
-    Ok(metadata)
-}
 
-pub fn parse_valid_url(command_options: &[CommandDataOption]) -> Option<reqwest::Url> {
-    command_options
-        .get(0)
-        .and_then(|option| match option.resolved.as_ref() {
-            Some(value) => {
-                if let CommandDataOptionValue::String(url) = value {
-                    Some(url)
-                } else {
-                    None
-                }
-            }
-            None => None,
-        })
-        .and_then(|url| Url::parse(url).ok())
+    // Extract metadata and enqueue the source
+    let mut input: Input = source.into();
+    let metadata = input.aux_metadata().await?;
+
+    let track_handle = handler.enqueue_input(input).await;
+    // Store the metadata for later use
+    track_handle
+        .typemap()
+        .write()
+        .await
+        .insert::<TrackMetaKey>(metadata.clone());
+
+    Ok((metadata, track_handle))
 }
 
 pub async fn get_songbird(ctx: &Context) -> std::sync::Arc<songbird::Songbird> {

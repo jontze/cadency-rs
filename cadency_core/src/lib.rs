@@ -9,6 +9,7 @@ pub use command::{CadencyCommand, CadencyCommandBaseline, CadencyCommandOption};
 mod error;
 pub use error::CadencyError;
 pub mod handler;
+pub mod http;
 mod intents;
 pub mod response;
 pub mod utils;
