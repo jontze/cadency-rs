@@ -1,10 +1,11 @@
 use crate::CadencyError;
 use derive_builder::Builder;
 use serenity::{
-    builder::CreateEmbed,
-    model::prelude::interaction::{
-        application_command::ApplicationCommandInteraction, InteractionResponseType,
+    builder::{
+        CreateEmbed, CreateInteractionResponse, CreateInteractionResponseMessage,
+        EditInteractionResponse,
     },
+    model::prelude::CommandInteraction,
     prelude::Context,
 };
 
@@ -37,39 +38,45 @@ impl Response {
     pub async fn submit<'a>(
         self,
         ctx: &Context,
-        command: &'a mut ApplicationCommandInteraction,
+        command: &'a mut CommandInteraction,
     ) -> Result<(), CadencyError> {
         match self.timing {
+            // Create a regular text response that might has embeds
             ResponseTiming::Instant => {
+                let response = if let Some(msg) = self.message {
+                    CreateInteractionResponseMessage::new()
+                        .content(msg)
+                        .add_embeds(self.embeds)
+                } else {
+                    CreateInteractionResponseMessage::new().add_embeds(self.embeds)
+                };
                 command
-                    .create_interaction_response(&ctx.http, |response| {
-                        response
-                            .kind(InteractionResponseType::ChannelMessageWithSource)
-                            .interaction_response_data(|message| {
-                                if let Some(msg) = self.message {
-                                    message.content(msg);
-                                }
-                                message.add_embeds(self.embeds)
-                            })
-                    })
+                    .create_response(&ctx.http, CreateInteractionResponse::Message(response))
                     .await
             }
+            // Just indicate that the command is being processed
             ResponseTiming::DeferredInfo => {
                 command
-                    .create_interaction_response(&ctx.http, |response| {
-                        response.kind(InteractionResponseType::DeferredChannelMessageWithSource)
-                    })
+                    .create_response(
+                        &ctx.http,
+                        CreateInteractionResponse::Defer(CreateInteractionResponseMessage::new()),
+                    )
                     .await
             }
-            ResponseTiming::Deferred => command
-                .edit_original_interaction_response(&ctx.http, |previous_response| {
-                    if let Some(msg) = self.message {
-                        previous_response.content(msg);
-                    }
-                    previous_response.add_embeds(self.embeds)
-                })
-                .await
-                .map(|_| ()),
+            // Edit the deferred response with the actual response
+            ResponseTiming::Deferred => {
+                let edit_response = if let Some(msg) = self.message {
+                    EditInteractionResponse::new()
+                        .content(msg)
+                        .add_embeds(self.embeds)
+                } else {
+                    EditInteractionResponse::new().add_embeds(self.embeds)
+                };
+                command
+                    .edit_response(&ctx.http, edit_response)
+                    .await
+                    .map(|_| ())
+            }
         }
         .map_err(|err| {
             error!("Failed to submit response: {}", err);

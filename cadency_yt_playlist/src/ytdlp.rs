@@ -33,7 +33,7 @@ impl YtDlp {
         self.command
             .args(self.args.clone())
             .spawn()
-            .and_then(|child| child.wait_with_output())
+            .and_then(std::process::Child::wait_with_output)
     }
 }
 

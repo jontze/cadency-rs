@@ -31,6 +31,8 @@ mod urban;
 pub use urban::Urban;
 mod track_loop;
 pub use track_loop::TrackLoop;
+mod roll;
+pub use roll::Roll;
 
 #[cfg(test)]
 mod test {
@@ -38,7 +40,6 @@ mod test {
     fn impl_commandbaseline_trait_with_macro() {
         #[derive(cadency_codegen::CommandBaseline)]
         struct Test {}
-        assert!(true)
     }
 
     #[test]
@@ -97,9 +98,8 @@ mod test {
         #[description = "123"]
         struct Test {}
         let test = Test {};
-        assert_eq!(
-            test.deferred(),
-            false,
+        assert!(
+            !test.deferred(),
             "Test command should not be deferred by default"
         )
     }
@@ -128,7 +128,7 @@ mod test {
 
     #[test]
     fn return_derived_option() {
-        use serenity::model::application::command::CommandOptionType;
+        use serenity::model::application::CommandOptionType;
         #[derive(cadency_codegen::CommandBaseline)]
         #[argument(
             name = "say",
@@ -144,7 +144,7 @@ mod test {
         assert_eq!(argument.name, "say");
         assert_eq!(argument.description, "Word to say");
         assert_eq!(argument.kind, CommandOptionType::String);
-        assert_eq!(argument.required, false);
+        assert!(!argument.required);
     }
 
     #[test]
@@ -166,7 +166,7 @@ mod test {
 
     #[test]
     fn return_multiple_options() {
-        use serenity::model::application::command::CommandOptionType;
+        use serenity::model::application::CommandOptionType;
 
         #[derive(cadency_codegen::CommandBaseline)]
         #[argument(name = "say", description = "Word to say", kind = "String")]

@@ -1,6 +1,6 @@
 use crate::{
-    command::Commands, error::CadencyError, handler::command::Handler, intents::CadencyIntents,
-    CadencyCommand,
+    command::Commands, error::CadencyError, handler::command::Handler, http::HttpClientKey,
+    intents::CadencyIntents, CadencyCommand,
 };
 use serenity::{client::Client, model::gateway::GatewayIntents};
 use songbird::SerenityInit;
@@ -16,6 +16,7 @@ pub struct Cadency {
 }
 
 impl Cadency {
+    #[must_use]
     pub fn builder() -> CadencyBuilder {
         CadencyBuilder::default()
     }
@@ -25,12 +26,10 @@ impl Cadency {
         let mut client = Client::builder(self.token, self.intents)
             .event_handler(Handler)
             .register_songbird()
+            .type_map_insert::<Commands>(self.commands)
+            .type_map_insert::<HttpClientKey>(reqwest::Client::new())
             .await
             .map_err(|err| CadencyError::Start { source: err })?;
-        {
-            let mut data = client.data.write().await;
-            data.insert::<Commands>(self.commands);
-        }
         client
             .start()
             .await

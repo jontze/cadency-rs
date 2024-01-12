@@ -1,14 +1,8 @@
 use cadency_core::{
     response::{Response, ResponseBuilder},
-    utils, CadencyCommand, CadencyError,
+    CadencyCommand, CadencyError,
 };
-use serenity::{
-    async_trait,
-    client::Context,
-    model::application::interaction::application_command::{
-        ApplicationCommandInteraction, CommandDataOptionValue,
-    },
-};
+use serenity::{async_trait, client::Context, model::application::CommandInteraction};
 
 #[derive(CommandBaseline, Default)]
 #[description = "Calculate the nth number in the fibonacci sequence"]
@@ -34,26 +28,10 @@ impl CadencyCommand for Fib {
     async fn execute<'a>(
         &self,
         _ctx: &Context,
-        command: &'a mut ApplicationCommandInteraction,
+        command: &'a mut CommandInteraction,
         response_builder: &'a mut ResponseBuilder,
     ) -> Result<Response, CadencyError> {
-        let number = utils::get_option_value_at_position(command.data.options.as_ref(), 0)
-            .and_then(|option_value| {
-                if let CommandDataOptionValue::Integer(fib_value) = option_value {
-                    Some(fib_value)
-                } else {
-                    error!(
-                        "{} command option not a integer: {:?}",
-                        self.name(),
-                        option_value
-                    );
-                    None
-                }
-            })
-            .ok_or(CadencyError::Command {
-                message: "Invalid number input".to_string(),
-            })?;
-        let fib_msg = Self::calc(number).to_string();
+        let fib_msg = Self::calc(&self.arg_number(command)).to_string();
         Ok(response_builder.message(Some(fib_msg)).build()?)
     }
 }

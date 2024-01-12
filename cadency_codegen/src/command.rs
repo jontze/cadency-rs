@@ -1,6 +1,6 @@
 use crate::argument::Argument;
 
-pub struct Command {
+pub(crate) struct Command {
     pub name: String,
     pub description: String,
     pub deferred: bool,
