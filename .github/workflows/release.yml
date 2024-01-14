@@ -10,12 +10,14 @@ jobs:
     uses: ./.github/workflows/test.yml
 
   publish_image:
+    permissions:
+      contents: read
+      packages: write
     needs:
       - test_release
     name: Publish main image
     uses: ./.github/workflows/image.yml
     with:
+      user: jontze
       push: true
-    secrets:
-      GHCR_USER: ${{ secrets.GHCR_USER }}
-      GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
+    secrets: inherit
