@@ -10,7 +10,7 @@ jobs:
     uses: ./.github/workflows/test.yml
   
   next_version:
-    name: Check release
+    name: Next Version
     runs-on: ubuntu-latest
     needs: 
       - test_branch
