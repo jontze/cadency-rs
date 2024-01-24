@@ -8,13 +8,55 @@ jobs:
   test_branch:
     name: Test Main
     uses: ./.github/workflows/test.yml
-  publish_image:
+  
+  next_version:
+    name: Check release
+    runs-on: ubuntu-latest
+    needs: 
+      - test_branch
+    steps:
+      - name: Checkout with deploy key
+        uses: actions/checkout@v4
+        with:
+          ssh-key: ${{ secrets.CI_TAG_DEPLOY_KEY }}
+          fetch-depth: 0
+      - name: Fetch tags
+        run: git fetch --tags   
+      - name: Setup Conventional Versioning
+        uses: jontze/.workflows/setup-conventional-versioning@main
+        with:
+          version: v0.1.0
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-binstall
+      - name: Install Cargo-Edit
+        run: |
+          cargo binstall cargo-edit --no-confirm
+      - name: Specify next version
+        id: next
+        run: |
+          echo "version=$(conventional-versioning -o plain)" >> $GITHUB_OUTPUT
+      - name: Set Cargo version
+        run: |
+          cargo set-version ${{ steps.next.outputs.version }}
+      - name: Commit Version Bump (if changed)
+        uses: stefanzweifel/git-auto-commit-action@v5
+        id: commit
+        with:
+          commit_message: "chore(version): Bump version to ${{ steps.next.outputs.version }}"
+      - name: Create Tag
+        if: steps.commit.outputs.changes_detected == 'true'
+        run: |
+          git tag v${{ steps.next.outputs.version }}
+          git push origin v${{ steps.next.outputs.version }}
+  
+  publish_main_image:
     permissions: 
       contents: read
       packages: write
     needs:
       - test_branch
-    name: Publish main image
+    name: Publish Main image
     uses: ./.github/workflows/image.yml
     with:
       user: jontze
