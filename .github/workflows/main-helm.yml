@@ -39,6 +39,6 @@ jobs:
           export CHART_VERSION=$(helm show chart $OCI_MANIFESTS_PATH | yq e '.version' -)      
           helm package $OCI_MANIFESTS_PATH
           helm push $CHART_NAME-$CHART_VERSION.tgz $OCI_MANIFESTS_BASE_URL          
-          flux tag artifact $OCI_MANIFESTS_BASE_URL/cadency_rs:$CHART_VERSION \
+          flux tag artifact $OCI_MANIFESTS_BASE_URL/$CHART_NAME:$CHART_VERSION \
             --tag latest \
             --tag $(git rev-parse --short HEAD)
