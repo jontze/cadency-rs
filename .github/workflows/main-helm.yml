@@ -1,0 +1,44 @@
+name: Publish Helm Chart
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'helm/**'
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  OCI_MANIFESTS_BASE_URL: "oci://ghcr.io/jontze/manifests"
+  OCI_MANIFESTS_PATH: "./helm/cadency"
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    name: Publish
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Helm Login
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | helm registry login ghcr.io --username ${{ github.repository_owner }} --password-stdin
+      - name: Login to ghcr.io
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Setup flux cli
+        uses: fluxcd/flux2/action@main
+      - name: Push Helm Manifests to OCI Image
+        run: |
+          export CHART_NAME=$(helm show chart $OCI_MANIFESTS_PATH | yq e '.name' -)
+          export CHART_VERSION=$(helm show chart $OCI_MANIFESTS_PATH | yq e '.version' -)      
+          helm package $OCI_MANIFESTS_PATH
+          helm push $CHART_NAME-$CHART_VERSION.tgz $OCI_MANIFESTS_BASE_URL          
+          flux tag artifact $OCI_MANIFESTS_BASE_URL/cadency_rs:$CHART_VERSION \
+            --tag latest \
+            --tag $(git rev-parse --short HEAD)

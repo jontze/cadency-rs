@@ -31,14 +31,6 @@ Create chart name and version as used by the chart label.
 {{- end -}}
 
 {{/*
-Selector labels
-*/}}
-{{- define "cadency.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "cadency.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
-{{- end -}}
-
-{{/*
 Common labels
 */}}
 {{- define "cadency.labels" -}}
@@ -49,3 +41,22 @@ app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{ end -}}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
+
+{{/*
+Selector labels
+*/}}
+{{- define "cadency.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "cadency.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end -}}
+
+{{/*
+Create the name of the service account to use
+*/}}
+{{- define "cadency.serviceAccountName" -}}
+{{- if .Values.serviceAccount.create }}
+{{- default (include "cadency.fullname" .) .Values.serviceAccount.name }}
+{{- else }}
+{{- default "default" .Values.serviceAccount.name }}
+{{- end }}
+{{- end }}

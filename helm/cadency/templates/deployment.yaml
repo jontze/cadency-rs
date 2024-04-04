@@ -12,29 +12,73 @@ spec:
   replicas: 1
   template:
     metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{ toYaml . | nindent 8 }}
+      {{- end }}
       labels:
         {{- include "cadency.selectorLabels" . | nindent 8 }}
-    spec:
+        {{- with .Values.podLabels }}
+        {{ toYaml . | nindent 8 }}
+        {{- end }}
+    spec:      
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "cadency.serviceAccountName" . }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{ toYaml . | indent 8 }}
       {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}  
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
       - name: {{ .Chart.Name }}
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 12 }}
         image: "{{ .Values.image.name }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         env:
-          - name: RUST_LOG
+          - name: "RUST_LOG"
             valueFrom:
               configMapKeyRef:
-                name: {{ include "cadency.fullname" . }}-config
+                name: {{ include "cadency.fullname" . }}
                 key: logLevel
                 optional: true
+          - name: "CADENCY_PLAYLIST_SONG_LIMIT"
+            valueFrom:
+              configMapKeyRef:
+                name: {{ include "cadency.fullname" . }}
+                key: playlistSongLimit
+                optional: true
+          - name: "CADENCY_SONG_LENGTH_LIMIT"
+            valueFrom:
+              configMapKeyRef:
+                name: {{ include "cadency.fullname" . }}
+                key: songLengthLimit
+                optional: true
+          {{- $createdSecretName := include "cadency.fullname" . -}}
+          {{- with .Values.cadency.discordToken }}
           - name: DISCORD_TOKEN
             valueFrom:
               secretKeyRef:
-                name: {{ include "cadency.fullname" . }}-secrets
-                key: token
                 optional: false
+                {{- if .createSecret }}
+                name: {{ $createdSecretName }}
+                key: token
+                {{- else }}              
+                name: {{ .existingSecretRef.name }}
+                key: {{ .existingSecretRef.key}}
+                {{- end }}
+          {{- end }}
         resources:
           {{- toYaml .Values.resources | nindent 10 }}
