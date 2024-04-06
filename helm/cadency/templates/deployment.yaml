@@ -48,24 +48,31 @@ spec:
         image: "{{ .Values.image.name }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         env:
+          {{- $configMapName := include "cadency.fullname" . -}}
+          {{- with .Values.cadency.config }}
           - name: "RUST_LOG"
             valueFrom:
               configMapKeyRef:
-                name: {{ include "cadency.fullname" . }}
+                name: {{ $configMapName }}
                 key: logLevel
                 optional: true
+          {{- if .playlistSongLimit }}
           - name: "CADENCY_PLAYLIST_SONG_LIMIT"
             valueFrom:
               configMapKeyRef:
-                name: {{ include "cadency.fullname" . }}
+                name: {{ $configMapName }}
                 key: playlistSongLimit
                 optional: true
+          {{- end }}
+          {{- if .songLengthLimit }}
           - name: "CADENCY_SONG_LENGTH_LIMIT"
             valueFrom:
               configMapKeyRef:
-                name: {{ include "cadency.fullname" . }}
+                name: {{ $configMapName }}
                 key: songLengthLimit
                 optional: true
+          {{- end }}
+          {{- end }}
           {{- $createdSecretName := include "cadency.fullname" . -}}
           {{- with .Values.cadency.discordToken }}
           - name: DISCORD_TOKEN
