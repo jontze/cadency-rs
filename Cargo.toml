@@ -39,5 +39,5 @@ default-features = false
 features = ["rustls-tls", "json"]
 
 [workspace.dependencies.symphonia]
-version = "0.5"
+version = "0.5.4"
 features = ["all-formats"]
