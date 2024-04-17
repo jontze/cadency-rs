@@ -1,8 +1,8 @@
 apiVersion: v2
 name: cadency
-description: Helm chart for the cadency discord bot
-version: 0.1.0
-appVersion: "0.3.3"
+description: Helm chart to deploy the cadency discord bot.
+version: 0.2.1
+appVersion: "0.5.1"
 type: application
 maintainers:
   - name: Jontze

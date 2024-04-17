@@ -3,6 +3,8 @@ on:
   push:
     branches:
       - main
+    paths-ignore: 
+      - 'helm/**'
 
 jobs:
   test_branch:

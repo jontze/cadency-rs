@@ -8,3 +8,12 @@ To learn more about the release, try:
 
   $ helm status {{ .Release.Name }}
   $ helm get all {{ .Release.Name }}
+
+Check the running pod with `kubectl get pod {{ include "cadency.fullname" . }} -n {{ .Release.Namespace }}`.
+
+{{- if .Values.cadency.discordToken.createSecret }}
+A new secret was created to store your discord token: `kubectl get secret {{ include "cadency.fullname" . }} -n {{ .Release.Namespace }}`.
+{{- else }}
+Cadency tries to use the discord token stored in this secret: `kubectl get secret {{ .Values.cadency.discordToken.existingSecretRef.name }} -n {{ .Release.Namespace }}` with key `{{ .Values.cadency.discordToken.existingSecretRef.key }}`.
+{{- end }}
+
