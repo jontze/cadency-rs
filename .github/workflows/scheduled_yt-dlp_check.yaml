@@ -19,7 +19,7 @@ jobs:
           echo "version=$(cat .yt-dlprc)" >> $GITHUB_OUTPUT
       - name: Latest Release
         id: latest
-        uses: pozetroninc/github-action-get-latest-release@v0.7.0
+        uses: pozetroninc/github-action-get-latest-release@v0.8.0
         with:
           repo: yt-dlp
           owner: yt-dlp
