@@ -1,6 +1,10 @@
 use crate::{
-    command::Commands, error::CadencyError, handler::command::Handler, http::HttpClientKey,
-    intents::CadencyIntents, CadencyCommand,
+    command::{Commands, CommandsScope},
+    error::CadencyError,
+    handler::command::Handler,
+    http::HttpClientKey,
+    intents::CadencyIntents,
+    CadencyCommand,
 };
 use serenity::{client::Client, model::gateway::GatewayIntents};
 use songbird::SerenityInit;
@@ -13,6 +17,9 @@ pub struct Cadency {
     commands: Vec<Arc<dyn CadencyCommand>>,
     #[builder(default = "CadencyIntents::default().into()")]
     intents: GatewayIntents,
+    /// Used when registering commands with the Discord API
+    #[builder(default)]
+    commands_scope: CommandsScope,
 }
 
 impl Cadency {
@@ -28,6 +35,7 @@ impl Cadency {
             .register_songbird()
             .type_map_insert::<Commands>(self.commands)
             .type_map_insert::<HttpClientKey>(reqwest::Client::new())
+            .type_map_insert::<CommandsScope>(self.commands_scope)
             .await
             .map_err(|err| CadencyError::Start { source: err })?;
         client

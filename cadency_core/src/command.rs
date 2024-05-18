@@ -4,6 +4,7 @@ use crate::{
     utils,
 };
 use serenity::{
+    all::{Builder, GuildId},
     async_trait,
     builder::{
         CreateCommand, CreateCommandOption, CreateInteractionResponse,
@@ -46,7 +47,11 @@ pub struct CadencyCommandOption {
 #[async_trait]
 pub trait CadencyCommand: Sync + Send + CadencyCommandBaseline {
     /// Construct the slash command that will be submited to the discord api
-    async fn register(&self, ctx: &Context) -> Result<Command, serenity::Error> {
+    async fn register(
+        &self,
+        ctx: &Context,
+        scope: CommandsScope,
+    ) -> Result<Command, serenity::Error> {
         let command_options: Vec<CreateCommandOption> = self
             .options()
             .into_iter()
@@ -58,8 +63,16 @@ pub trait CadencyCommand: Sync + Send + CadencyCommandBaseline {
         let command_builder = CreateCommand::new(self.name())
             .description(self.description())
             .set_options(command_options);
-        Ok(Command::create_global_command(&ctx.http, command_builder).await?)
+        match scope {
+            CommandsScope::Global => {
+                Ok(Command::create_global_command(&ctx.http, command_builder).await?)
+            }
+            CommandsScope::Guild(guild_id) => Ok(command_builder
+                .execute(&ctx.http, (Some(guild_id), None))
+                .await?),
+        }
     }
+
     async fn execute<'a>(
         &self,
         ctx: &Context,
@@ -74,14 +87,28 @@ impl TypeMapKey for Commands {
     type Value = Vec<Arc<dyn CadencyCommand>>;
 }
 
-/// Submit global slash commands to the discord api.
-/// As global commands are cached for 1 hour, the activation ca take some time.
+#[derive(Default, Copy, Clone, Debug)]
+pub enum CommandsScope {
+    /// Global command, see <https://discord.com/developers/docs/interactions/application-commands#get-global-application-commands>
+    #[default]
+    Global,
+    /// Guild command, see <https://discord.com/developers/docs/interactions/application-commands#create-guild-application-command>
+    Guild(GuildId),
+}
+impl TypeMapKey for CommandsScope {
+    type Value = CommandsScope;
+}
+
+/// Submit slash commands to the discord api.
+/// As global commands are cached for 1 hour, the activation can take some time.
 /// For local testing it is recommended to create commands with a guild scope.
 pub(crate) async fn setup_commands(ctx: &Context) -> Result<(), serenity::Error> {
     let commands = utils::get_commands(ctx).await;
+    let commands_scope = utils::get_commands_scope(ctx).await;
+
     // No need to run this in parallel as serenity will enforce one-by-one execution
     for command in &commands {
-        command.register(ctx).await?;
+        command.register(ctx, commands_scope).await?;
     }
     Ok(())
 }
