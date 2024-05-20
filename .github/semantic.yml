@@ -1,5 +1,5 @@
 ---
-titleAndCommits: true
+titleAndCommits: false
 types:
   - feat
   - fix
