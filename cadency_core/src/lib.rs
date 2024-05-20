@@ -5,7 +5,7 @@ extern crate serenity;
 pub mod client;
 pub use client::Cadency;
 mod command;
-pub use command::{CadencyCommand, CadencyCommandBaseline, CadencyCommandOption};
+pub use command::{CadencyCommand, CadencyCommandBaseline, CadencyCommandOption, CommandsScope};
 mod error;
 pub use error::CadencyError;
 pub mod handler;
