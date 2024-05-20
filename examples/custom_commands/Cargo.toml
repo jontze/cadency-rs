@@ -1,6 +1,6 @@
 [package]
 name = "custom_commands"
-version = "0.5.3"
+version = "0.6.0"
 edition = "2021"
 description = "An example how to integrate custom commands into cadency_rs"
 license = "MIT"
@@ -19,12 +19,12 @@ log = { workspace = true }
 
 [dependencies.cadency_core]
 path = "../../cadency_core"
-version = "0.5.3"
+version = "0.6.0"
 
 [dependencies.cadency_codegen]
 path = "../../cadency_codegen"
-version = "0.5.3"
+version = "0.6.0"
 
 [dependencies.cadency_commands]
 path = "../../cadency_commands"
-version = "0.5.3"
+version = "0.6.0"
