@@ -1,6 +1,6 @@
 [package]
 name = "cadency_codegen"
-version = "0.6.3"
+version = "0.6.4"
 edition = "2021"
 description = "Library with codegen macros for the cadency discord bot"
 license = "MIT"

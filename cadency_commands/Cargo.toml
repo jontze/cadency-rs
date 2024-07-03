@@ -1,6 +1,6 @@
 [package]
 name = "cadency_commands"
-version = "0.6.3"
+version = "0.6.4"
 edition = "2021"
 description = "Library with a collection of some commands for the cadency discord bot"
 license = "MIT"
@@ -19,12 +19,12 @@ rand = "0.8.5"
 
 [dependencies.cadency_core]
 path = "../cadency_core"
-version = "0.6.3"
+version = "0.6.4"
 
 [dependencies.cadency_codegen]
 path = "../cadency_codegen"
-version = "0.6.3"
+version = "0.6.4"
 
 [dependencies.cadency_yt_playlist]
 path = "../cadency_yt_playlist"
-version = "0.6.3"
+version = "0.6.4"
