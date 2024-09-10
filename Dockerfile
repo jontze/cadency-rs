@@ -1,4 +1,4 @@
-FROM lukemathwalker/cargo-chef:latest-rust-1.81.0-slim-bullseye as build_base
+FROM lukemathwalker/cargo-chef:latest-rust-1.81.0-slim-bookworm as build_base
 
 FROM build_base as planner
 WORKDIR /cadency
@@ -29,7 +29,7 @@ ENV CARGO_TERM_COLOR=always
 RUN cargo build --release --bin cadency
 
 # Downloads yt-dlp
-FROM bitnami/minideb:bullseye as packages
+FROM bitnami/minideb:bookworm as packages
 WORKDIR /packages
 COPY --from=builder /cadency/.yt-dlprc .
 RUN YTDLP_VERSION=$(cat .yt-dlprc) && \

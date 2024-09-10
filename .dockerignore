@@ -1,6 +1,7 @@
-target/
-.env
 .github/
+target/
+helm/
+.env
 .env.example
 .git
 .gitignore
