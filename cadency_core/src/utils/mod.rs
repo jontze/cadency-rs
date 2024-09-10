@@ -17,8 +17,7 @@ pub(crate) async fn get_commands(ctx: &Context) -> Vec<Arc<dyn CadencyCommand>> 
 
 pub(crate) async fn get_commands_scope(ctx: &Context) -> CommandsScope {
     let data_read = ctx.data.read().await;
-    data_read
+    *data_read
         .get::<CommandsScope>()
         .expect("Commands scope missing")
-        .clone()
 }
