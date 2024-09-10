@@ -7,8 +7,15 @@ updates:
       interval: "daily"
     commit-message:
       prefix: "fix(deps)"
-      prefix-development: "chore(dev-deps)"      
+      prefix-development: "chore(dev-deps)"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "daily"
+  - package-ecosystem: "docker"
+    directory: /
+    schedule:
+      interval: "daily"
+    commit-message:
+      prefix: "fix(deps)"
+      prefix-development: "chore(dev-deps)"
