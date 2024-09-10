@@ -13,6 +13,7 @@ use serenity::{async_trait, client::Context, model::application::CommandInteract
     required = false,
     kind = "Integer"
 )]
+#[allow(clippy::duplicated_attributes)]
 #[argument(
     name = "stop",
     description = "Cancel looping",

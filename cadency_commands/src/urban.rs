@@ -51,14 +51,14 @@ impl Urban {
             }
             let embed_urban_entry = CreateEmbed::default()
                 .color(Color::from_rgb(255, 255, 0))
-                .title(&urban.word.replace(['[', ']'], ""))
+                .title(urban.word.replace(['[', ']'], ""))
                 .url(&urban.permalink)
                 .field(
                     "Definition",
-                    &urban.definition.replace(['[', ']'], ""),
+                    urban.definition.replace(['[', ']'], ""),
                     false,
                 )
-                .field("Example", &urban.example.replace(['[', ']'], ""), false)
+                .field("Example", urban.example.replace(['[', ']'], ""), false)
                 .field(
                     "Rating",
                     format!(

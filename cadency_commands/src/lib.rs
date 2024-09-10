@@ -38,6 +38,7 @@ pub use roll::Roll;
 mod test {
     #[test]
     fn impl_commandbaseline_trait_with_macro() {
+        #[allow(dead_code)]
         #[derive(cadency_codegen::CommandBaseline)]
         struct Test {}
     }
@@ -140,7 +141,7 @@ mod test {
         let test = Test {};
         let arguments = test.options();
         assert_eq!(arguments.len(), 1);
-        let argument = arguments.get(0).unwrap();
+        let argument = arguments.first().unwrap();
         assert_eq!(argument.name, "say");
         assert_eq!(argument.description, "Word to say");
         assert_eq!(argument.kind, CommandOptionType::String);
@@ -160,7 +161,7 @@ mod test {
             "Command should have 1 argument, but had {}",
             amount_of_arguments
         );
-        let argument = arguments.get(0).unwrap();
+        let argument = arguments.first().unwrap();
         assert!(argument.required, "Command argument should be required");
     }
 
@@ -175,7 +176,7 @@ mod test {
         let test = Test {};
         let arguments = test.options();
         assert_eq!(arguments.len(), 2);
-        let first_argument = arguments.get(0).unwrap();
+        let first_argument = arguments.first().unwrap();
         let second_argument = arguments.get(1).unwrap();
         assert_eq!(first_argument.name, "say");
         assert_eq!(first_argument.description, "Word to say");
