@@ -12,6 +12,7 @@ ENV RUSTUP_MAX_RETRIES=100
 ENV CARGO_INCREMENTAL=0
 ENV CARGO_NET_RETRY=100
 ENV CARGO_TERM_COLOR=always
+RUN apt-get update && apt-get install -y cmake && apt-get autoremove -y
 # Build dependencies - this is the dependencies caching layer
 RUN cargo chef cook --release --recipe-path recipe.json 
 
